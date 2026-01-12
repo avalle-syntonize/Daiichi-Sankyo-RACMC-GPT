@@ -6,8 +6,8 @@ resource "azurerm_search_service" "main" {
 
   # Replica and partition count only supported on paid tiers
   # Free tier has fixed 1 replica and 1 partition
-  replica_count   = var.sku == "free" ? 1 : var.replica_count
-  partition_count = var.sku == "free" ? 1 : var.partition_count
+  replica_count   = lower(var.sku) == "free" ? 1 : var.replica_count
+  partition_count = lower(var.sku) == "free" ? 1 : var.partition_count
 
   tags = var.tags
 }

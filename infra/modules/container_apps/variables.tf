@@ -43,6 +43,12 @@ variable "memory" {
   default     = "0.5Gi"
 }
 
+variable "create_example_app" {
+  description = "Whether to create an example container app (for demo/testing purposes)"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)

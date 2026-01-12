@@ -76,6 +76,12 @@ variable "container_memory" {
   default     = "0.5Gi"
 }
 
+variable "create_example_container_app" {
+  description = "Whether to create an example container app (for demo/testing purposes)"
+  type        = bool
+  default     = false
+}
+
 # AI Search Variables
 variable "ai_search_sku" {
   description = "SKU for Azure AI Search (free, basic, standard)"

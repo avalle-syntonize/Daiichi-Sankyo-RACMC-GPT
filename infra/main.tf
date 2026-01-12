@@ -28,8 +28,9 @@ resource "azurerm_resource_group" "main" {
 }
 
 # Storage Account (Free tier: 5GB)
+# Note: Storage account names must be 3-24 characters, lowercase letters and numbers only
 resource "azurerm_storage_account" "main" {
-  name                     = "st${replace(var.project_name, "-", "")}${var.environment}"
+  name                     = lower(substr("st${replace(var.project_name, "-", "")}${var.environment}", 0, 24))
   resource_group_name      = azurerm_resource_group.main.name
   location                 = azurerm_resource_group.main.location
   account_tier             = var.storage_account_tier
@@ -46,8 +47,9 @@ resource "azurerm_storage_container" "data" {
 }
 
 # Key Vault (Free tier: 10k operations/month)
+# Note: Key Vault names must be 3-24 characters and globally unique
 resource "azurerm_key_vault" "main" {
-  name                = "kv-${var.project_name}-${var.environment}"
+  name                = substr("kv-${var.project_name}-${var.environment}", 0, 24)
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
@@ -100,6 +102,7 @@ module "container_apps" {
   max_replicas        = var.container_max_replicas
   cpu                 = var.container_cpu
   memory              = var.container_memory
+  create_example_app  = var.create_example_container_app
   tags                = var.tags
 }
 

@@ -27,6 +27,9 @@ container_max_replicas  = 2
 container_cpu           = 0.25  # 0.25 vCPU
 container_memory        = "0.5Gi"  # 0.5 GiB memory
 
+# Set to true to create an example container app for demo/testing
+create_example_container_app = false
+
 # AI Search Configuration (Free Tier)
 ai_search_sku            = "free"  # Options: free, basic, standard
 ai_search_replica_count  = 1

@@ -19,8 +19,10 @@ resource "azurerm_container_app_environment" "main" {
   tags = var.tags
 }
 
-# Example Container App (can be customized or removed)
+# Example Container App (optional, controlled by create_example_app variable)
 resource "azurerm_container_app" "example" {
+  count = var.create_example_app ? 1 : 0
+
   name                         = "ca-${var.name}-api"
   container_app_environment_id = azurerm_container_app_environment.main.id
   resource_group_name          = var.resource_group_name

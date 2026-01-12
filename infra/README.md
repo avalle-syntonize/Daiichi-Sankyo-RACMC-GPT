@@ -32,8 +32,10 @@ Before running Terraform, you need to create the storage account for Terraform s
 
 ```bash
 # Set variables
+# NOTE: Storage account name must be globally unique across Azure (3-24 chars, lowercase, numbers only)
+# Change "sttfstateracmcgpt" to something unique for your deployment
 RESOURCE_GROUP_NAME="rg-terraform-state"
-STORAGE_ACCOUNT_NAME="sttfstateracmcgpt"
+STORAGE_ACCOUNT_NAME="sttfstateracmcgpt"  # CHANGE THIS to ensure uniqueness
 CONTAINER_NAME="tfstate"
 LOCATION="eastus"
 
@@ -54,6 +56,8 @@ az storage container create \
   --account-name $STORAGE_ACCOUNT_NAME \
   --auth-mode login
 ```
+
+**Important**: After creating the storage account with a unique name, update `infra/backend.tf` with your actual storage account name.
 
 ### 3. Configure Backend Authentication
 
@@ -138,6 +142,9 @@ environment         = "dev"
 location           = "East US"
 project_name       = "racmc-gpt"
 resource_group_name = "rg-racmc-gpt-dev"
+
+# Create example container app for testing (set to true for demo)
+create_example_container_app = false
 
 # Custom tags
 tags = {

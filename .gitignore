@@ -11,6 +11,10 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# Terraform variable files (may contain sensitive data)
+*.tfvars
+!terraform.tfvars.example
+
 # Local environment files
 .env
 .env.local

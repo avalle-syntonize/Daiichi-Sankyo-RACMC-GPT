@@ -31,33 +31,10 @@ Un sistema integral que combina tecnología de IA moderna con requisitos de segu
 
 ## 🏗️ Arquitectura
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                                                                 │
-│  📱 Frontend Layer                                              │
-│  ├─ React + TypeScript + Vite                                  │
-│  └─ Azure Static Web Apps                                      │
-│                                                                 │
-│                           ↓                                     │
-│  🔌 API Gateway & Services                                     │
-│  ├─ FastAPI Backend (Container Apps)                           │
-│  ├─ Azure Logic Apps (Workflow Automation)                     │
-│  └─ Azure API Management (opcional)                            │
-│                                                                 │
-│                           ↓                                     │
-│  🧠 AI & Search Services                                       │
-│  ├─ Azure OpenAI (GPT-4 o similar)                             │
-│  ├─ Azure AI Search (Búsqueda Semántica)                       │
-│  └─ Vector Database (Embeddings)                               │
-│                                                                 │
-│  🔒 Security & Observability                                   │
-│  ├─ Azure Entra ID (Autenticación)                             │
-│  ├─ Azure Key Vault (Secrets Management)                       │
-│  └─ Application Insights + Azure Monitor + Log Analytics       │
-│     (Monitoreo, Logging y Observabilidad)                      │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
+![Architecture Overview](./docs/images/architecture.png)
+
+**Documentación completa:** [Architecture Design](./docs/architecture.md)  
+**Diagrama editable:** [architecture.drawio](./docs/diagrams/architecture.drawio)
 
 ---
 

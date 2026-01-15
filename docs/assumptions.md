@@ -59,7 +59,7 @@
 
 ### Enterprise Application Timeline
 **Previous assumption:** Could create Enterprise Apps directly  
-**Updated:** Requires Service Request to external Azure provider (2-4 weeks processing time)
+**Updated:** Requires Service Request to external Azure provider
 
 ### Development Approach
 **Previous assumption:** Real authentication from Week 2  

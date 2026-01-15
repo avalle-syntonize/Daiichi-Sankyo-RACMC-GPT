@@ -2,10 +2,10 @@
 # Copy this file to terraform.tfvars and customize the values
 
 # Environment Configuration
-environment         = "dev"
-location           = "East US"
-project_name       = "racmc-gpt"
-resource_group_name = "rg-racmc-gpt-dev"
+environment  = "dev"
+location     = "East US"
+project_name = "racmc-gpt"
+# Note: Resource group name is automatically computed as rg-racmc-{environment}
 
 # Tags for all resources
 tags = {

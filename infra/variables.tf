@@ -16,12 +16,6 @@ variable "project_name" {
   default     = "racmc-gpt"
 }
 
-variable "resource_group_name" {
-  description = "Name of the resource group"
-  type        = string
-  default     = "rg-racmc-gpt-dev"
-}
-
 variable "tags" {
   description = "Common tags for all resources"
   type        = map(string)

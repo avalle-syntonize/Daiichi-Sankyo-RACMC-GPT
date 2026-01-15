@@ -1,9 +1,9 @@
 terraform {
   backend "azurerm" {
-    # NOTE: These values should be unique to your deployment
-    # Update storage_account_name to ensure global uniqueness
+    # NOTE: Storage account name follows convention st<application><env><location><nn>
+    # Current: stracmcdeveus01 (racmc + dev + East US + 01)s
     resource_group_name  = "rg-terraform-state"
-    storage_account_name = "sttfstateracmcgpt"
+    storage_account_name = "stracmcdeveus01"
     container_name       = "tfstate"
     key                  = "racmc-gpt.terraform.tfstate"
   }

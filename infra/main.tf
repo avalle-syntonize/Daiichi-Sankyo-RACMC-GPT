@@ -20,9 +20,9 @@ provider "azurerm" {
 # Data source to get current client configuration
 data "azurerm_client_config" "current" {}
 
-# Resource Group
-resource "azurerm_resource_group" "main" {
-  name     = var.resource_group_name
+# Resource Group for RACMC-GPT
+resource "azurerm_resource_group" "racmc" {
+  name     = "rg-racmc-${var.environment}"
   location = var.location
   tags     = var.tags
 }
@@ -31,8 +31,8 @@ resource "azurerm_resource_group" "main" {
 # Note: Storage account names must be 3-24 characters, lowercase letters and numbers only
 resource "azurerm_storage_account" "main" {
   name                     = lower(substr("st${replace(var.project_name, "-", "")}${var.environment}", 0, 24))
-  resource_group_name      = azurerm_resource_group.main.name
-  location                 = azurerm_resource_group.main.location
+  resource_group_name      = azurerm_resource_group.racmc.name
+  location                 = azurerm_resource_group.racmc.location
   account_tier             = var.storage_account_tier
   account_replication_type = var.storage_account_replication
 
@@ -50,8 +50,8 @@ resource "azurerm_storage_container" "data" {
 # Note: Key Vault names must be 3-24 characters and globally unique
 resource "azurerm_key_vault" "main" {
   name                = substr("kv-${var.project_name}-${var.environment}", 0, 24)
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.racmc.location
+  resource_group_name = azurerm_resource_group.racmc.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
   sku_name            = var.key_vault_sku
 
@@ -83,8 +83,8 @@ module "static_web_app" {
   source = "./modules/static_web_app"
 
   name                = "${var.project_name}-${var.environment}"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.racmc.location
+  resource_group_name = azurerm_resource_group.racmc.name
   sku_tier            = var.static_web_app_sku_tier
   sku_size            = var.static_web_app_sku_size
   tags                = var.tags
@@ -95,8 +95,8 @@ module "container_apps" {
   source = "./modules/container_apps"
 
   name                = "${var.project_name}-${var.environment}"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.racmc.location
+  resource_group_name = azurerm_resource_group.racmc.name
   sku_name            = var.container_apps_sku_name
   min_replicas        = var.container_min_replicas
   max_replicas        = var.container_max_replicas
@@ -111,8 +111,8 @@ module "ai_search" {
   source = "./modules/ai_search"
 
   name                = "${var.project_name}-${var.environment}"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.racmc.location
+  resource_group_name = azurerm_resource_group.racmc.name
   sku                 = var.ai_search_sku
   replica_count       = var.ai_search_replica_count
   partition_count     = var.ai_search_partition_count

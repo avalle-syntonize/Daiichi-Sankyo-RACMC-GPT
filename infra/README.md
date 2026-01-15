@@ -11,6 +11,22 @@ The infrastructure includes:
 - **Azure Blob Storage** (5GB free) - Data storage
 - **Azure Key Vault** (10k operations free/month) - Secrets management
 
+## Resource Isolation Strategy
+
+Per client requirements, RACMC-GPT infrastructure is **completely separated** from other projects: 
+
+- **Resource Group:** `rg-racmc-{environment}` (e.g., `rg-racmc-dev`, `rg-racmc-prod`)
+- **Independent lifecycle:** No shared resources with other applications
+- **Separate cost tracking:** All costs attributed to RACMC project
+- **Isolated security boundaries:** Each environment has its own RBAC and access controls
+
+**Naming Convention:**
+- **Resource Groups:** `rg-racmc-{environment}`
+- **Storage Accounts:** `st{application}{env}{location}{nn}` (e.g., `stracmcdeveus01`)
+- **Other resources:** `{resource-type}-{project}-{environment}` (e.g., `swa-racmc-gpt-dev`)
+
+---
+
 ## Prerequisites
 
 1. **Azure CLI** - Install from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
@@ -35,7 +51,7 @@ Before running Terraform, you need to create the storage account for Terraform s
 # NOTE: Storage account name must be globally unique across Azure (3-24 chars, lowercase, numbers only)
 # Change "sttfstateracmcgpt" to something unique for your deployment
 RESOURCE_GROUP_NAME="rg-terraform-state"
-STORAGE_ACCOUNT_NAME="sttfstateracmcgpt"  # CHANGE THIS to ensure uniqueness
+STORAGE_ACCOUNT_NAME="stracmcdeveus01"  # Unique name following st<app><env><location><nn> convention
 CONTAINER_NAME="tfstate"
 LOCATION="eastus"
 
@@ -57,7 +73,7 @@ az storage container create \
   --auth-mode login
 ```
 
-**Important**: After creating the storage account with a unique name, update `infra/backend.tf` with your actual storage account name.
+**Important**: The storage account name follows the convention `st<application><env><location><nn>` (e.g., `stracmcdeveus01`). If you need a different name for your deployment, update both this script and `infra/backend.tf`.
 
 ### 3. Configure Backend Authentication
 

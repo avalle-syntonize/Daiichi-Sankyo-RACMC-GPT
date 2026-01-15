@@ -261,6 +261,32 @@ racmc-keyvault/
 
 ### 8. Terraform: Infraestructura como Código
 
+**Resource Isolation Strategy:**
+
+Per client decision (2026-01-12), RACMC-GPT and DS-BOT will have **fully separated Resource Groups**:
+
+- **No shared resources** between projects
+- **Independent scaling** and lifecycle management
+- **Separate cost tracking** per project
+- **Isolated security boundaries**
+
+**Resource Group Naming:**
+```hcl
+# RACMC-GPT
+rg-racmc-staging    # Development and testing
+rg-racmc-production # Production environment
+
+# DS-BOT (if managed)
+rg-dsbot-staging
+rg-dsbot-production
+```
+**Environments:**
+- **Staging:** Personal Azure subscription (Week 1-7)
+- **Production:** Syntonize tenant (Week 8-10)
+
+This approach ensures complete independence and simplifies billing, access control, and potential future migrations. 
+
+---
 **Estructura de Módulos:**
 
 ```hcl
@@ -298,6 +324,22 @@ environments/
 ---
 
 ### 9. Entra ID: Autenticación & Autorización
+
+---
+
+**Enterprise Application Status:**
+- **Required:** One Enterprise Application for RACMC-GPT
+- **Process:** Service Request to Azure Service Provider (2-4 weeks)
+- **Timeline:** 
+  - Specifications sent: Jan 20, 2026
+  - Target approval:  End Jan / Early Feb 2026
+  - Deadline: Feb 10, 2026 (Week 6 - SharePoint integration)
+- **Development Workaround:** Use mocked authentication in Weeks 2-5 if Enterprise App is delayed
+- **Service Principal:** Separate app for SharePoint access (coordinated via Tobias)
+
+**Required Permissions:**
+- Microsoft Graph (Delegated): User.Read, openid, email, profile
+- Account Type: Single tenant (Daiichi Sankyo Europe only)
 
 **Configuración:**
 

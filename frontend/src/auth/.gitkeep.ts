@@ -1,2 +1,0 @@
-// Placeholder for auth
-export {};

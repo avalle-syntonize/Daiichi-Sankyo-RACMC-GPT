@@ -4,6 +4,64 @@
 .terraform/
 crash.log
 crash.*.log
+# Copilot:  Create a comprehensive .gitignore for a project with:
+# - Python (FastAPI, scripts, virtual environments)
+# - Node.js / React / Vite (frontend)
+# - Terraform (infrastructure as code)
+# - Azure (cloud services)
+# - Environment variables and secrets (. env, keys, certificates)
+# - IDEs (VS Code, PyCharm)
+# - OS files (macOS, Windows, Linux)
+# - Logs and temporary files
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+. installed.cfg
+*.egg
+venv/
+env/
+ENV/
+. venv
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+. pnpm-debug.log*
+dist/
+build/
+. next/
+out/
+.cache/
+.parcel-cache/
+.npm
+. eslintcache
+
+# Terraform
+.terraform/
+*. tfstate
+*.tfstate.*
+*. tfvars
+. terraformrc
+terraform.rc
+crash.log
 override.tf
 override.tf.json
 *_override.tf
@@ -22,3 +80,54 @@ terraform.rc
 # OS files
 .DS_Store
 Thumbs.db
+. terraform. lock.hcl
+
+# Azure
+.azure/
+
+# Environment variables & Secrets
+.env
+.env. local
+.env.development.local
+.env.test.local
+.env.production.local
+*. pem
+*.key
+*.p12
+*.pfx
+secrets/
+. secrets
+
+# IDEs
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+coverage/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini

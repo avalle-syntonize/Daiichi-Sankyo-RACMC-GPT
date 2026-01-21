@@ -1,0 +1,138 @@
+/* Input Area */
+.input-area {
+  border-top: 1px solid #e0e0e0;
+  padding: 20px 24px;
+  background: #fafafa;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.file-preview-area {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.file-badge {
+  background: #e3f5ff;
+  color: #005baa;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-badge button {
+  background: none;
+  border: none;
+  color: #005baa;
+  cursor: pointer;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.file-badge button:hover {
+  color: #003d7a;
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.input-field {
+  flex: 1;
+  padding: 14px 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 24px;
+  font-size: 15px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  transition: border-color 0.3s;
+  resize: none;
+  max-height: 100px;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #00b4ed;
+}
+
+.input-field:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.input-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.upload-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #666;
+}
+
+.upload-btn:hover:not(:disabled) {
+  border-color: #00b4ed;
+  color: #00b4ed;
+  background: #f8f9fa;
+}
+
+.upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upload-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.send-btn {
+  background: linear-gradient(135deg, #005baa, #00acea);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.send-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}

@@ -8,24 +8,52 @@ output "resource_group_location" {
   value       = azurerm_resource_group.racmc.location
 }
 
-output "static_web_app_default_hostname" {
-  description = "Default hostname for Static Web App"
-  value       = module.static_web_app.default_hostname
+# Azure Container Registry outputs
+output "acr_login_server" {
+  description = "Login server for ACR"
+  value       = azurerm_container_registry.acr.login_server
 }
 
-output "static_web_app_id" {
-  description = "ID of the Static Web App"
-  value       = module.static_web_app.static_web_app_id
+output "acr_admin_username" {
+  description = "ACR admin username (if enabled)"
+  value       = azurerm_container_registry.acr.admin_username
 }
 
-output "container_apps_environment_id" {
-  description = "ID of the Container Apps Environment"
-  value       = module.container_apps.environment_id
+output "acr_admin_enabled" {
+  description = "Whether ACR admin user is enabled"
+  value       = azurerm_container_registry.acr.admin_enabled
 }
 
-output "container_apps_environment_default_domain" {
-  description = "Default domain of Container Apps Environment"
-  value       = module.container_apps.environment_default_domain
+# App Service / Web App outputs
+
+output "frontend_name" {
+  description = "Name of the frontend App Service"
+  value       = azurerm_linux_web_app.frontend.name
+}
+
+output "frontend_id" {
+  description = "ID of the frontend App Service"
+  value       = azurerm_linux_web_app.frontend.id
+}
+
+output "api_name" {
+  description = "Name of the API App Service"
+  value       = azurerm_linux_web_app.api.name
+}
+
+output "api_id" {
+  description = "ID of the API App Service"
+  value       = azurerm_linux_web_app.api.id
+}
+
+output "app_service_plan_name" {
+  description = "Name of the App Service Plan"
+  value       = azurerm_service_plan.plan.name
+}
+
+output "app_service_plan_id" {
+  description = "ID of the App Service Plan"
+  value       = azurerm_service_plan.plan.id
 }
 
 output "ai_search_endpoint" {

@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = ">= 4.0"
     }
   }
 }
@@ -15,6 +15,7 @@ provider "azurerm" {
       purge_soft_delete_on_destroy = true
     }
   }
+  subscription_id = var.subscription_id
 }
 
 # Data source to get current client configuration
@@ -78,32 +79,70 @@ resource "azurerm_key_vault" "main" {
   tags = var.tags
 }
 
-# Static Web App Module (Free tier)
-module "static_web_app" {
-  source = "./modules/static_web_app"
-
-  name                = "${var.project_name}-${var.environment}"
-  location            = azurerm_resource_group.racmc.location
+# Azure Container Registry
+resource "azurerm_container_registry" "acr" {
+  name                = lower(substr("acr${replace(var.project_name, "-", "")}${var.environment}", 0, 30))
   resource_group_name = azurerm_resource_group.racmc.name
-  sku_tier            = var.static_web_app_sku_tier
-  sku_size            = var.static_web_app_sku_size
-  tags                = var.tags
+  location            = azurerm_resource_group.racmc.location
+  sku                 = var.acr_sku
+  admin_enabled       = true
+
+  tags = var.tags
 }
 
-# Container Apps Module (Consumption tier: 180k vCPU-seconds free/month)
-module "container_apps" {
-  source = "./modules/container_apps"
-
-  name                = "${var.project_name}-${var.environment}"
+# App Service Plan (Linux)
+resource "azurerm_service_plan" "plan" {
+  name                = "${var.project_name}-${var.environment}-plan"
   location            = azurerm_resource_group.racmc.location
   resource_group_name = azurerm_resource_group.racmc.name
-  sku_name            = var.container_apps_sku_name
-  min_replicas        = var.container_min_replicas
-  max_replicas        = var.container_max_replicas
-  cpu                 = var.container_cpu
-  memory              = var.container_memory
-  create_example_app  = var.create_example_container_app
-  tags                = var.tags
+  # `kind` and `reserved` are set automatically by the provider and must not be configured here
+
+  # azurerm_service_plan requires sku_name and os_type
+  sku_name = var.app_service_plan_size
+  os_type  = "Linux"
+
+  tags = var.tags
+}
+
+# Frontend App Service (container from ACR)
+resource "azurerm_linux_web_app" "frontend" {
+  name                = "${var.project_name}-${var.environment}-web"
+  resource_group_name = azurerm_resource_group.racmc.name
+  location            = azurerm_resource_group.racmc.location
+  service_plan_id     = azurerm_service_plan.plan.id
+
+  site_config {
+    application_stack {
+      docker_image_name = "${azurerm_container_registry.acr.login_server}/${var.frontend_image}:${var.image_tag}"
+    }
+  }
+
+  app_settings = {
+    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
+  }
+
+  tags = var.tags
+}
+
+# Backend App Service (FastAPI container from ACR)
+resource "azurerm_linux_web_app" "api" {
+  name                = "${var.project_name}-${var.environment}-api"
+  resource_group_name = azurerm_resource_group.racmc.name
+  location            = azurerm_resource_group.racmc.location
+  service_plan_id     = azurerm_service_plan.plan.id
+
+
+  site_config {
+    application_stack {
+      docker_image_name = "${azurerm_container_registry.acr.login_server}/${var.backend_image}:${var.image_tag}"
+    }
+  }
+
+  app_settings = {
+    "WEBSITES_PORT" = "80"
+  }
+
+  tags = var.tags
 }
 
 # AI Search Module (Free tier: 50MB, 10k docs)

@@ -27,54 +27,7 @@ variable "tags" {
 }
 
 # Static Web App Variables
-variable "static_web_app_sku_tier" {
-  description = "SKU tier for Static Web App"
-  type        = string
-  default     = "Free"
-}
 
-variable "static_web_app_sku_size" {
-  description = "SKU size for Static Web App"
-  type        = string
-  default     = "Free"
-}
-
-# Container Apps Variables
-variable "container_apps_sku_name" {
-  description = "SKU name for Container Apps Environment"
-  type        = string
-  default     = "Consumption"
-}
-
-variable "container_min_replicas" {
-  description = "Minimum number of replicas for container apps"
-  type        = number
-  default     = 0
-}
-
-variable "container_max_replicas" {
-  description = "Maximum number of replicas for container apps"
-  type        = number
-  default     = 2
-}
-
-variable "container_cpu" {
-  description = "CPU allocation for container (vCPU)"
-  type        = number
-  default     = 0.25
-}
-
-variable "container_memory" {
-  description = "Memory allocation for container (Gi)"
-  type        = string
-  default     = "0.5Gi"
-}
-
-variable "create_example_container_app" {
-  description = "Whether to create an example container app (for demo/testing purposes)"
-  type        = bool
-  default     = false
-}
 
 # AI Search Variables
 variable "ai_search_sku" {
@@ -113,4 +66,47 @@ variable "key_vault_sku" {
   description = "SKU for Key Vault"
   type        = string
   default     = "standard"
+}
+
+
+variable "subscription_id" {
+  description = "Azure Subscription ID"
+  type        = string
+}
+
+# ACR + App Service variables
+variable "acr_sku" {
+  description = "SKU for Azure Container Registry"
+  type        = string
+  default     = "Basic"
+}
+
+variable "frontend_image" {
+  description = "ACR repository name for frontend image"
+  type        = string
+  default     = "frontend"
+}
+
+variable "backend_image" {
+  description = "ACR repository name for backend image"
+  type        = string
+  default     = "backend"
+}
+
+variable "image_tag" {
+  description = "Tag to deploy from ACR"
+  type        = string
+  default     = "latest"
+}
+
+variable "app_service_plan_tier" {
+  description = "App Service plan tier"
+  type        = string
+  default     = "Basic"
+}
+
+variable "app_service_plan_size" {
+  description = "App Service plan size"
+  type        = string
+  default     = "B1"
 }

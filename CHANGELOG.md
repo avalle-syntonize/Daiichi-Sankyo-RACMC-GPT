@@ -7,6 +7,101 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.1] - 2026-01-22
+
+### 🎨 UI Components Integration
+
+This release implements the UI components and features originally planned for issue #8 (HTML mockups in React) but adapted for the Next.js architecture.
+
+### Added
+
+#### Chat Interface Components
+- **ChatContainer**: Main chat message display with support for user and AI messages
+  - Message bubbles with proper role identification
+  - Inline reference display within messages
+  - Auto-scroll to latest message
+  - Empty state for new conversations
+- **ChatInput**: User input component for queries
+  - Textarea with auto-resize
+  - Send button with loading states
+  - Keyboard shortcuts (Enter to send, Shift+Enter for new line)
+  - Input validation and disabled states
+- **ReferencesPanel**: Document citation viewer
+  - Detailed reference information display
+  - Document metadata and traceability info
+  - External link support for full documents
+  - Responsive design (full screen on mobile, sidebar on desktop)
+- **FilterSidebar**: Document and project filtering
+  - Project-based filtering
+  - Document type filtering
+  - Active filters display and management
+  - Responsive filter toggle for mobile
+
+#### UI/UX Improvements
+- **lib/utils.ts**: Added utility functions for component styling (shadcn/ui compatibility)
+- **Responsive Design**: Mobile-first approach with optimized layouts for all screen sizes
+- **Regulatory Compliance**: UI elements include traceability and evidence-based information display
+
+### Changed
+
+#### Chatbot Page
+- Replaced placeholder content with full chat interface
+- Integrated all new UI components (ChatContainer, ChatInput, ReferencesPanel, FilterSidebar)
+- Added mock data structure for testing (to be replaced with API calls)
+- Implemented state management for messages, references, and filters
+
+#### Layout
+- Temporarily disabled Google Fonts loading for build compatibility in restricted environments
+- Font configuration commented out (to be re-enabled in production deployment)
+
+### Migration Notes
+
+#### From Issue #8 (React/Vite) to Issue #70 (Next.js)
+This release addresses the migration of UI components from the original React/Vite plan (issue #8) to the new Next.js architecture:
+
+- **Issue #8 Scope**: Original plan to integrate HTML mockups into React with React Router
+- **Issue #70 Scope**: Adaptation of mockup features to Next.js with App Router
+- **Decision**: HTML mockups referenced in issue #8 were not found in repository, so components were built directly in Next.js
+- **Components Delivered**: All components from issue #8 checklist implemented:
+  - ✅ Header (integrated in AppSidebar)
+  - ✅ Sidebar with filters (FilterSidebar)
+  - ✅ ChatContainer for messages
+  - ✅ ChatInput for queries
+  - ✅ ReferencesPanel for citations
+  - ✅ Responsive design
+  - ✅ Routing (Next.js App Router)
+
+### Technical Details
+
+#### Build Compatibility
+- Fixed missing `@/lib/utils` dependency for shadcn/ui components
+- Resolved font loading issues in restricted build environments
+- Maintained TypeScript strict mode compliance
+
+#### Component Architecture
+- All chat components are client-side rendered (`"use client"`)
+- Proper TypeScript interfaces for Message and Reference types
+- Mock data structure ready for API integration
+- Filter state management prepared for backend integration
+
+### Known Limitations
+
+- Google Fonts temporarily disabled (system fonts used as fallback)
+- Chat functionality uses mock data (API integration pending)
+- Filter options are hardcoded (to be fetched from backend)
+- File upload and audio recording features not yet implemented
+
+### Next Steps
+
+See issue #70 for:
+- [ ] API integration with FastAPI backend
+- [ ] Real document search and RAG implementation
+- [ ] Export functionality (JSON/PDF)
+- [ ] Advanced filtering from backend data
+- [ ] Re-enable Google Fonts for production
+
+---
+
 ## [0.2.0] - 2026-01-22
 
 ### 🔄 MAJOR ARCHITECTURAL CHANGE: Migration to Next.js

@@ -10,10 +10,10 @@
         <mxCell id="user" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="Usuario RACMC&lt;br&gt;(Entra ID)" vertex="1">
           <mxGeometry height="80" width="40" x="80" y="200" as="geometry" />
         </mxCell>
-        <mxCell id="frontend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;" value="&lt;b&gt;Frontend&lt;/b&gt;&lt;br&gt;React + Vite&lt;br&gt;MSAL.js Auth&lt;br&gt;&lt;br&gt;Azure Static Web Apps&lt;br&gt;(Free Tier)" vertex="1">
+        <mxCell id="frontend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;" value="&lt;b&gt;Frontend&lt;/b&gt;&lt;br&gt;Next.js 15 + React 19&lt;br&gt;NextAuth.js&lt;br&gt;&lt;br&gt;Azure App Service&lt;br&gt;(Linux Web App, Docker)" vertex="1">
           <mxGeometry height="120" width="160" x="200" y="180" as="geometry" />
         </mxCell>
-        <mxCell id="backend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;" value="&lt;b&gt;Backend&lt;/b&gt;&lt;br&gt;FastAPI + Python 3.11&lt;br&gt;/health, /auth, /query&lt;br&gt;&lt;br&gt;Azure Container Apps&lt;br&gt;(Consumption, 0.25 vCPU)&lt;br&gt;Auto-scale 0-10" vertex="1">
+        <mxCell id="backend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;" value="&lt;b&gt;Backend&lt;/b&gt;&lt;br&gt;FastAPI + Python 3.11&lt;br&gt;/health, /auth, /query&lt;br&gt;&lt;br&gt;Azure App Service&lt;br&gt;(Linux Web App, Docker)&lt;br&gt;App Service Plan B1" vertex="1">
           <mxGeometry height="140" width="180" x="440" y="170" as="geometry" />
         </mxCell>
         <mxCell id="entraid" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="&lt;b&gt;Entra ID&lt;/b&gt;&lt;br&gt;(Azure AD)&lt;br&gt;&lt;br&gt;Authentication&lt;br&gt;JWT Tokens" vertex="1">
@@ -27,6 +27,9 @@
         </mxCell>
         <mxCell id="keyvault" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="&lt;b&gt;Azure Key Vault&lt;/b&gt;&lt;br&gt;&lt;br&gt;Secrets Management&lt;br&gt;OpenAI Keys&lt;br&gt;SharePoint Credentials&lt;br&gt;Managed Identities" vertex="1">
           <mxGeometry height="120" width="180" x="440" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="acr" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" value="&lt;b&gt;Azure Container Registry&lt;/b&gt;&lt;br&gt;&lt;br&gt;Docker Images&lt;br&gt;frontend:latest&lt;br&gt;backend:latest&lt;br&gt;&lt;br&gt;Basic Tier" vertex="1">
+          <mxGeometry height="110" width="180" x="190" y="360" as="geometry" />
         </mxCell>
         <mxCell id="sharepoint" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" value="&lt;b&gt;SharePoint Online&lt;/b&gt;&lt;br&gt;&lt;br&gt;/RACMC/[Proyecto]/&lt;br&gt;documentos/&lt;br&gt;&lt;br&gt;PDF, DOCX, XLSX, PPTX" vertex="1">
           <mxGeometry height="120" width="180" x="80" y="400" as="geometry" />

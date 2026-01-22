@@ -18,7 +18,10 @@ RACMC-GPT es un asistente de IA basado en **Retrieval-Augmented Generation (RAG)
 
 ### Justificación Tecnológica
 
-- **React 18 + Vite**: Bundling ultrarrápido, HMR, compatible con TypeScript
+> **Nota**: El sistema ha migrado de React SPA a **Next.js 15** con App Router. Ver [MIGRATION.md](./MIGRATION.md) para detalles completos del cambio arquitectónico.
+
+- **Next.js 15**: SSR, mejor seguridad (tokens en servidor), SEO optimizado, App Router
+- **NextAuth.js**: Autenticación empresarial integrada, sesiones seguras del lado del servidor
 - **FastAPI**: Framework async nativo, validación automática, documentación OpenAPI
 - **Azure Cosmos DB** (recomendado para RAG): Búsqueda vectorial baja latencia, aislamiento por usuario/tenant, escalabilidad elástica
 - **Azure AI Search**: Índices vectoriales maduros, filtrado híbrido BM25 + vectorial
@@ -35,8 +38,8 @@ graph TB
     end
 
     subgraph Frontend["Frontend Layer"]
-        B["React 18 + Vite<br/>Static Web Apps<br/>(Free Tier)"]
-        C["MSAL.js<br/>Autenticación"]
+        B["Next.js 15<br/>Static Web Apps<br/>(Free Tier)"]
+        C["NextAuth.js<br/>Autenticación"]
     end
 
     subgraph Auth["Identidad & Secretos"]
@@ -98,24 +101,45 @@ graph TB
 
 ## 🔧 Componentes del Sistema
 
-### 1. Frontend: React 18 + Vite on Static Web Apps
+### 1. Frontend: Next.js 15 on Static Web Apps
 
 **Configuración:**
 - Runtime: Node.js 18+
-- Build: Vite
-- Autenticación: MSAL.js v3
-- Tier: Free
+- Framework: Next.js 15 (App Router)
+- Autenticación: NextAuth.js v4 con Azure AD Provider
+- Tier: Free (Static Web Apps)
 
 **Responsabilidades:**
-- Interfaz de chat conversacional
-- Gestión de sesiones de usuario
+- **Server Components**: Renderizado inicial del lado del servidor
+- **Client Components**: Interfaz de chat conversacional e interactiva
+- Gestión de sesiones seguras (JWT en HttpOnly cookies)
 - Visualización de resultados con referencias a documentos
-- Exportación de conversaciones (CSV/PDF)
+- Exportación de conversaciones (JSON/PDF)
+- **API Routes**: Backend-for-Frontend (BFF) pattern
 
-**Endpoints Consumidos:**
-- `POST /api/query` - Enviar consultas
-- `GET /health` - Health check
-- `POST /auth/validate` - Validar tokens JWT
+**Estructura del Proyecto:**
+```
+src/
+├── app/
+│   ├── layout.tsx           # Layout raíz
+│   ├── page.tsx             # Página de login
+│   ├── (auth)/              # Grupo de rutas de auth
+│   │   ├── error/
+│   │   └── signout/
+│   ├── chatbot/             # Aplicación principal
+│   │   └── page.tsx
+│   └── api/                 # API Routes (BFF)
+│       ├── auth/[...nextauth]/
+│       └── storage/
+├── auth.config.ts           # Configuración NextAuth
+├── components/              # Componentes reutilizables
+└── services/               # Servicios API
+```
+
+**Endpoints Internos (API Routes):**
+- `GET/POST /api/auth/*` - NextAuth.js endpoints
+- `POST /api/storage/token` - Token management
+- API calls al backend FastAPI desde Server Components
 
 ---
 

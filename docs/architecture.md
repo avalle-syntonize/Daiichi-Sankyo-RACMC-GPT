@@ -18,7 +18,10 @@ RACMC-GPT es un asistente de IA basado en **Retrieval-Augmented Generation (RAG)
 
 ### Justificación Tecnológica
 
-- **React 18 + Vite**: Bundling ultrarrápido, HMR, compatible con TypeScript
+> **Nota**: El sistema ha migrado de React SPA a **Next.js 15** con App Router. Ver [MIGRATION.md](./MIGRATION.md) para detalles completos del cambio arquitectónico.
+
+- **Next.js 15**: SSR, mejor seguridad (tokens en servidor), SEO optimizado, App Router
+- **NextAuth.js**: Autenticación empresarial integrada, sesiones seguras del lado del servidor
 - **FastAPI**: Framework async nativo, validación automática, documentación OpenAPI
 - **Azure Cosmos DB** (recomendado para RAG): Búsqueda vectorial baja latencia, aislamiento por usuario/tenant, escalabilidad elástica
 - **Azure AI Search**: Índices vectoriales maduros, filtrado híbrido BM25 + vectorial
@@ -35,8 +38,8 @@ graph TB
     end
 
     subgraph Frontend["Frontend Layer"]
-        B["React 18 + Vite<br/>Static Web Apps<br/>(Free Tier)"]
-        C["MSAL.js<br/>Autenticación"]
+        B["Next.js 15<br/>App Service (Linux Web App)<br/>Docker Container"]
+        C["NextAuth.js<br/>Autenticación"]
     end
 
     subgraph Auth["Identidad & Secretos"]
@@ -45,7 +48,7 @@ graph TB
     end
 
     subgraph Backend["Backend Layer"]
-        F["FastAPI<br/>Container Apps<br/>0-10 replicas"]
+        F["FastAPI<br/>App Service (Linux Web App)<br/>Docker Container"]
         G["/health<br/>/auth/validate<br/>/api/query<br/>/api/export"]
     end
 
@@ -98,39 +101,64 @@ graph TB
 
 ## 🔧 Componentes del Sistema
 
-### 1. Frontend: React 18 + Vite on Static Web Apps
+### 1. Frontend: Next.js 15 on Azure App Service
 
 **Configuración:**
 - Runtime: Node.js 18+
-- Build: Vite
-- Autenticación: MSAL.js v3
-- Tier: Free
+- Framework: Next.js 15 (App Router)
+- Hosting: Azure App Service (Linux Web App)
+- Deployment: Docker container from Azure Container Registry (ACR)
+- Autenticación: NextAuth.js v4 con Azure AD Provider
+- Tier: Basic B1 (shared App Service Plan with backend)
 
 **Responsabilidades:**
-- Interfaz de chat conversacional
-- Gestión de sesiones de usuario
+- **Server Components**: Renderizado inicial del lado del servidor
+- **Client Components**: Interfaz de chat conversacional e interactiva
+- Gestión de sesiones seguras (JWT en HttpOnly cookies)
 - Visualización de resultados con referencias a documentos
-- Exportación de conversaciones (CSV/PDF)
+- Exportación de conversaciones (JSON/PDF)
+- **API Routes**: Backend-for-Frontend (BFF) pattern
 
-**Endpoints Consumidos:**
-- `POST /api/query` - Enviar consultas
-- `GET /health` - Health check
-- `POST /auth/validate` - Validar tokens JWT
+**Estructura del Proyecto:**
+```
+src/
+├── app/
+│   ├── layout.tsx           # Layout raíz
+│   ├── page.tsx             # Página de login
+│   ├── (auth)/              # Grupo de rutas de auth
+│   │   ├── error/
+│   │   └── signout/
+│   ├── chatbot/             # Aplicación principal
+│   │   └── page.tsx
+│   └── api/                 # API Routes (BFF)
+│       ├── auth/[...nextauth]/
+│       └── storage/
+├── auth.config.ts           # Configuración NextAuth
+├── components/              # Componentes reutilizables
+└── services/               # Servicios API
+```
+
+**Deployment:**
+- Build como Docker image
+- Push a Azure Container Registry
+- Deploy a App Service desde ACR
+- Configuración de environment variables en App Service
 
 ---
 
-### 2. Backend: Python FastAPI on Container Apps
+### 2. Backend: Python FastAPI on Azure App Service
 
 **Configuración:**
 ```yaml
-Plataforma: Azure Container Apps
+Plataforma: Azure App Service (Linux Web App)
 Runtime: Python 3.11
 Framework: FastAPI
-Tier: Consumption
+Deployment: Docker container from ACR
+Tier: Basic B1 (shared App Service Plan)
 Recursos:
-  CPU: 0.25 vCPU
-  Memoria: 0.5Gi
-  Réplicas: 0-10 (auto-scale)
+  CPU: Shared
+  Memoria: 1.75 GB
+  Escalado: Manual o Auto-scale (opcional)
 ```
 
 **Endpoints Principales:**

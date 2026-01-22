@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.3.0">
   <diagram name="Architecture Overview" id="architecture-overview">
-    <mxGraphModel dx="1213" dy="730" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1426" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -10,10 +11,10 @@
         <mxCell id="user" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="Usuario RACMC&lt;br&gt;(Entra ID)" vertex="1">
           <mxGeometry height="80" width="40" x="80" y="200" as="geometry" />
         </mxCell>
-        <mxCell id="frontend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;" value="&lt;b&gt;Frontend&lt;/b&gt;&lt;br&gt;React + Vite&lt;br&gt;MSAL.js Auth&lt;br&gt;&lt;br&gt;Azure Static Web Apps&lt;br&gt;(Free Tier)" vertex="1">
+        <mxCell id="frontend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;" value="&lt;b&gt;Frontend&lt;/b&gt;&lt;br&gt;Next.js 15 + React 19&lt;br&gt;NextAuth.js&lt;br&gt;&lt;br&gt;Azure App Service&lt;br&gt;(Linux Web App, Docker)" vertex="1">
           <mxGeometry height="120" width="160" x="200" y="180" as="geometry" />
         </mxCell>
-        <mxCell id="backend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;" value="&lt;b&gt;Backend&lt;/b&gt;&lt;br&gt;FastAPI + Python 3.11&lt;br&gt;/health, /auth, /query&lt;br&gt;&lt;br&gt;Azure Container Apps&lt;br&gt;(Consumption, 0.25 vCPU)&lt;br&gt;Auto-scale 0-10" vertex="1">
+        <mxCell id="backend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;verticalAlign=middle;" value="&lt;b&gt;Backend&lt;/b&gt;&lt;br&gt;FastAPI + Python 3.11&lt;br&gt;/health, /auth, /query&lt;br&gt;&lt;br&gt;Azure App Service&lt;br&gt;(Linux Web App, Docker)&lt;br&gt;App Service Plan B1" vertex="1">
           <mxGeometry height="140" width="180" x="440" y="170" as="geometry" />
         </mxCell>
         <mxCell id="entraid" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="&lt;b&gt;Entra ID&lt;/b&gt;&lt;br&gt;(Azure AD)&lt;br&gt;&lt;br&gt;Authentication&lt;br&gt;JWT Tokens" vertex="1">
@@ -27,6 +28,9 @@
         </mxCell>
         <mxCell id="keyvault" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="&lt;b&gt;Azure Key Vault&lt;/b&gt;&lt;br&gt;&lt;br&gt;Secrets Management&lt;br&gt;OpenAI Keys&lt;br&gt;SharePoint Credentials&lt;br&gt;Managed Identities" vertex="1">
           <mxGeometry height="120" width="180" x="440" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="acr" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" value="&lt;b&gt;Azure Container Registry&lt;/b&gt;&lt;br&gt;&lt;br&gt;Docker Images&lt;br&gt;frontend:latest&lt;br&gt;backend:latest&lt;br&gt;&lt;br&gt;Basic Tier" vertex="1">
+          <mxGeometry height="110" width="180" x="200" y="30" as="geometry" />
         </mxCell>
         <mxCell id="sharepoint" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" value="&lt;b&gt;SharePoint Online&lt;/b&gt;&lt;br&gt;&lt;br&gt;/RACMC/[Proyecto]/&lt;br&gt;documentos/&lt;br&gt;&lt;br&gt;PDF, DOCX, XLSX, PPTX" vertex="1">
           <mxGeometry height="120" width="180" x="80" y="400" as="geometry" />
@@ -172,6 +176,18 @@
         </mxCell>
         <mxCell id="footer" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" value="RACMC-GPT Architecture | Daiichi Sankyo Europe | v1.0 | 2026-01-12" vertex="1">
           <mxGeometry height="20" width="570" x="300" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="Dd0apkUIK7L_h2oHvFCl-4" edge="1" parent="1" source="acr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.206;exitY=1.009;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;dashed=1;fillColor=#fff2cc;strokeColor=#d6b656;exitPerimeter=0;" target="frontend">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="190" as="sourcePoint" />
+            <mxPoint x="450" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Dd0apkUIK7L_h2oHvFCl-7" edge="1" parent="1" source="acr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1.011;exitY=0.836;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeWidth=2;dashed=1;fillColor=#fff2cc;strokeColor=#d6b656;exitPerimeter=0;" target="backend">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="460" y="190" as="sourcePoint" />
+            <mxPoint x="530" y="150" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

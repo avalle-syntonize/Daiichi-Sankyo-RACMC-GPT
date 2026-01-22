@@ -2,7 +2,7 @@
 
 ![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
 ![Azure](https://img.shields.io/badge/Azure-Cloud-0078D4?logo=microsoft-azure)
-![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react)
+![Next.js](https://img.shields.io/badge/Next.js-15+-000000?logo=next.js)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688?logo=fastapi)
 ![License](https://img.shields.io/badge/License-Proprietary-red)
 
@@ -13,6 +13,8 @@
 **RACMC-GPT** es un asistente de IA basado en RAG (Retrieval-Augmented Generation) diseñado específicamente para el equipo de RACMC de Daiichi Sankyo Europe. El sistema proporciona búsqueda semántica y respuestas inteligentes sobre documentación regulatoria farmacéutica, con capacidades de rastrabilidad completa y autenticación segura mediante Entra ID.
 
 Un sistema integral que combina tecnología de IA moderna con requisitos de seguridad y cumplimiento normativo de la industria farmacéutica.
+
+> **Nota sobre Migración a Next.js**: Este proyecto ha migrado de una arquitectura React SPA a Next.js 15 con App Router para mejorar el rendimiento, la seguridad y la experiencia del desarrollador. Ver [MIGRATION.md](./docs/MIGRATION.md) para detalles completos.
 
 ---
 
@@ -48,11 +50,15 @@ Daiichi-Sankyo-RACMC-GPT/
 │   ├── architecture.md
 │   ├── api-specification.md
 │   └── deployment-guide.md
-├── frontend/                       # Aplicación React
+├── frontend/                       # Aplicación Next.js
 │   ├── src/
+│   │   ├── app/                   # App Router (Next.js 15)
+│   │   ├── components/            # Componentes React
+│   │   ├── auth.config.ts         # Configuración NextAuth
+│   │   └── services/              # Servicios API
 │   ├── public/
 │   ├── package.json
-│   └── vite.config.ts
+│   └── next.config.ts
 ├── backend/                        # API FastAPI
 │   ├── app/
 │   │   ├── main.py
@@ -107,10 +113,15 @@ cd Daiichi-Sankyo-RACMC-GPT
 ```bash
 cd frontend
 npm install
+
+# Configurar variables de entorno
+cp .env.example .env.local
+# Editar .env.local con tus credenciales de Azure AD
+
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:5173`
+La aplicación estará disponible en `http://localhost:3000`
 
 #### 3. Configurar el Backend
 
@@ -126,8 +137,22 @@ La API estará disponible en `http://localhost:8000`
 
 #### 4. Configurar Variables de Entorno
 
-Crea un archivo `.env` en la raíz del proyecto:
+**Frontend (.env.local):**
+```env
+# NextAuth Configuration
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_nextauth_secret
 
+# Azure AD (Entra ID) Configuration
+AZURE_AD_CLIENT_ID=your_client_id
+AZURE_AD_CLIENT_SECRET=your_client_secret
+AZURE_AD_TENANT_ID=your_tenant_id
+
+# Backend API
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+**Backend (.env):**
 ```env
 # Azure Configuration
 AZURE_SUBSCRIPTION_ID=your_subscription_id
@@ -158,12 +183,13 @@ terraform apply -var-file="environments/dev.tfvars"
 
 ### Frontend
 ```
-├── React 18
+├── Next.js 15 (App Router)
+├── React 19
 ├── TypeScript 5
-├── Vite (Build Tool)
+├── NextAuth.js (Azure AD/Entra ID Integration)
 ├── Tailwind CSS (Styling)
-├── React Query (Data Fetching)
-└── Azure Static Web Apps (Hosting)
+├── Shadcn/ui (Component Library)
+└── Azure App Service (Linux Web App - Docker)
 ```
 
 ### Backend
@@ -173,7 +199,7 @@ terraform apply -var-file="environments/dev.tfvars"
 ├── Pydantic (Data Validation)
 ├── SQLAlchemy (ORM)
 ├── Azure SDK for Python
-└── Azure Container Apps (Runtime)
+└── Azure App Service (Linux Web App - Docker)
 ```
 
 ### Infrastructure & Monitoring
@@ -185,13 +211,14 @@ terraform apply -var-file="environments/dev.tfvars"
 │   ├── Azure Monitor (Alertas & Dashboards)
 │   └── Log Analytics (Análisis de Logs)
 ├── Azure Services:
-│   ├── Static Web Apps
-│   ├── Container Apps
+│   ├── App Service Plan (Linux)
+│   ├── App Service (Web Apps for Frontend & Backend)
+│   ├── Container Registry (ACR)
 │   ├── OpenAI
 │   ├── AI Search
+│   ├── Blob Storage
 │   ├── Key Vault
-│   ├── Entra ID
-│   └── Logic Apps
+│   └── Entra ID
 └── CI/CD: GitHub Actions
 ```
 
@@ -244,6 +271,12 @@ terraform apply -var-file="environments/dev.tfvars"
 
 - 📊 [Project Board](https://github.com/users/avalle-syntonize/projects/5) - Seguimiento de tareas
 - 📚 [Documentación Completa](./docs/) - Guías técnicas detalladas
+- 🎓 [Onboarding Guide](./docs/ONBOARDING.md) - Guía para nuevos desarrolladores
+- 🔄 [Migración a Next.js](./docs/MIGRATION.md) - Rationale y detalles del cambio
+- 🔐 [Autenticación](./docs/AUTHENTICATION.md) - Flujos de autenticación con Entra ID
+- 🚀 [Guía de Despliegue](./docs/DEPLOYMENT.md) - Instrucciones de despliegue en Azure
+- ✅ [Cumplimiento Normativo](./docs/COMPLIANCE.md) - Requisitos regulatorios y privacidad
+- 📝 [Changelog](./CHANGELOG.md) - Historial de cambios del proyecto
 - 🐛 [Issues & Bugs](https://github.com/avalle-syntonize/RACMC-GPT/issues) - Reporte de problemas
 - 📋 [Assumptions](./docs/assumptions.md) - Suposiciones del proyecto
 - 🏗️ [Architecture](./docs/architecture.md) - Detalles de arquitectura
@@ -266,4 +299,4 @@ Propietario - Daiichi Sankyo Europe. Todos los derechos reservados.
 
 ---
 
-**Última actualización**: Enero 2026 | **Estado**: En Desarrollo 🚧
+**Última actualización**: Enero 2026 | **Estado**: En Desarrollo 🚧 | **Stack**: Next.js 15 + FastAPI

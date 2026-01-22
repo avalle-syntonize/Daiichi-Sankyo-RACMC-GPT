@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 // Temporarily disabled for build compatibility in restricted environments
 // import { Roboto, Roboto_Condensed } from 'next/font/google';
 import "./globals.css";
-import { AppSidebar } from "@/components/app-sidebar";
-import { AppFooter } from "@/components/app-footer";
 import { AuthProvider } from "@/providers/SessionProvider";
 import { Toaster } from "sonner";
 import Head from "next/head";
@@ -36,14 +34,8 @@ export default function RootLayout({
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <body className="antialiased">
-            
                 <AuthProvider>
-                    <main>
-                    {/* <AppSidebar /> */}
-                        <div className="main-scroll">
-                            {children}
-                        </div>
-                    </main>
+                    {children}
                 </AuthProvider>
                 <Toaster expand />
             </body>

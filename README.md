@@ -270,10 +270,12 @@ terraform apply -var-file="environments/dev.tfvars"
 
 - 📊 [Project Board](https://github.com/users/avalle-syntonize/projects/5) - Seguimiento de tareas
 - 📚 [Documentación Completa](./docs/) - Guías técnicas detalladas
+- 🎓 [Onboarding Guide](./docs/ONBOARDING.md) - Guía para nuevos desarrolladores
 - 🔄 [Migración a Next.js](./docs/MIGRATION.md) - Rationale y detalles del cambio
 - 🔐 [Autenticación](./docs/AUTHENTICATION.md) - Flujos de autenticación con Entra ID
 - 🚀 [Guía de Despliegue](./docs/DEPLOYMENT.md) - Instrucciones de despliegue en Azure
 - ✅ [Cumplimiento Normativo](./docs/COMPLIANCE.md) - Requisitos regulatorios y privacidad
+- 📝 [Changelog](./CHANGELOG.md) - Historial de cambios del proyecto
 - 🐛 [Issues & Bugs](https://github.com/avalle-syntonize/RACMC-GPT/issues) - Reporte de problemas
 - 📋 [Assumptions](./docs/assumptions.md) - Suposiciones del proyecto
 - 🏗️ [Architecture](./docs/architecture.md) - Detalles de arquitectura

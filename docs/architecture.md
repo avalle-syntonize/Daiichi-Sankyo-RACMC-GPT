@@ -38,7 +38,7 @@ graph TB
     end
 
     subgraph Frontend["Frontend Layer"]
-        B["Next.js 15<br/>Static Web Apps<br/>(Free Tier)"]
+        B["Next.js 15<br/>App Service (Linux Web App)<br/>Docker Container"]
         C["NextAuth.js<br/>Autenticación"]
     end
 
@@ -48,7 +48,7 @@ graph TB
     end
 
     subgraph Backend["Backend Layer"]
-        F["FastAPI<br/>Container Apps<br/>0-10 replicas"]
+        F["FastAPI<br/>App Service (Linux Web App)<br/>Docker Container"]
         G["/health<br/>/auth/validate<br/>/api/query<br/>/api/export"]
     end
 
@@ -101,13 +101,15 @@ graph TB
 
 ## 🔧 Componentes del Sistema
 
-### 1. Frontend: Next.js 15 on Static Web Apps
+### 1. Frontend: Next.js 15 on Azure App Service
 
 **Configuración:**
 - Runtime: Node.js 18+
 - Framework: Next.js 15 (App Router)
+- Hosting: Azure App Service (Linux Web App)
+- Deployment: Docker container from Azure Container Registry (ACR)
 - Autenticación: NextAuth.js v4 con Azure AD Provider
-- Tier: Free (Static Web Apps)
+- Tier: Basic B1 (shared App Service Plan with backend)
 
 **Responsabilidades:**
 - **Server Components**: Renderizado inicial del lado del servidor
@@ -136,25 +138,27 @@ src/
 └── services/               # Servicios API
 ```
 
-**Endpoints Internos (API Routes):**
-- `GET/POST /api/auth/*` - NextAuth.js endpoints
-- `POST /api/storage/token` - Token management
-- API calls al backend FastAPI desde Server Components
+**Deployment:**
+- Build como Docker image
+- Push a Azure Container Registry
+- Deploy a App Service desde ACR
+- Configuración de environment variables en App Service
 
 ---
 
-### 2. Backend: Python FastAPI on Container Apps
+### 2. Backend: Python FastAPI on Azure App Service
 
 **Configuración:**
 ```yaml
-Plataforma: Azure Container Apps
+Plataforma: Azure App Service (Linux Web App)
 Runtime: Python 3.11
 Framework: FastAPI
-Tier: Consumption
+Deployment: Docker container from ACR
+Tier: Basic B1 (shared App Service Plan)
 Recursos:
-  CPU: 0.25 vCPU
-  Memoria: 0.5Gi
-  Réplicas: 0-10 (auto-scale)
+  CPU: Shared
+  Memoria: 1.75 GB
+  Escalado: Manual o Auto-scale (opcional)
 ```
 
 **Endpoints Principales:**

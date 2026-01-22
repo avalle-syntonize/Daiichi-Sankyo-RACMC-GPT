@@ -189,7 +189,7 @@ terraform apply -var-file="environments/dev.tfvars"
 ├── NextAuth.js (Azure AD/Entra ID Integration)
 ├── Tailwind CSS (Styling)
 ├── Shadcn/ui (Component Library)
-└── Azure Static Web Apps (Hosting)
+└── Azure App Service (Linux Web App - Docker)
 ```
 
 ### Backend
@@ -199,7 +199,7 @@ terraform apply -var-file="environments/dev.tfvars"
 ├── Pydantic (Data Validation)
 ├── SQLAlchemy (ORM)
 ├── Azure SDK for Python
-└── Azure Container Apps (Runtime)
+└── Azure App Service (Linux Web App - Docker)
 ```
 
 ### Infrastructure & Monitoring
@@ -211,13 +211,14 @@ terraform apply -var-file="environments/dev.tfvars"
 │   ├── Azure Monitor (Alertas & Dashboards)
 │   └── Log Analytics (Análisis de Logs)
 ├── Azure Services:
-│   ├── Static Web Apps
-│   ├── Container Apps
+│   ├── App Service Plan (Linux)
+│   ├── App Service (Web Apps for Frontend & Backend)
+│   ├── Container Registry (ACR)
 │   ├── OpenAI
 │   ├── AI Search
+│   ├── Blob Storage
 │   ├── Key Vault
-│   ├── Entra ID
-│   └── Logic Apps
+│   └── Entra ID
 └── CI/CD: GitHub Actions
 ```
 

@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-Esta guía detalla los procedimientos para desplegar RACMC-GPT en Azure utilizando Infrastructure as Code (IaC) con Terraform. El sistema se despliega en Azure Static Web Apps (frontend) y Azure Container Apps (backend).
+Esta guía detalla los procedimientos para desplegar RACMC-GPT en Azure utilizando Infrastructure as Code (IaC) con Terraform. El sistema se despliega en **Azure App Service** (frontend y backend como Linux Web Apps) utilizando **Azure Container Registry** para las imágenes Docker.
 
 ---
 
@@ -16,9 +16,14 @@ Esta guía detalla los procedimientos para desplegar RACMC-GPT en Azure utilizan
 │  │         Resource Group: rg-racmc-{env}                │  │
 │  │                                                        │  │
 │  │  ┌──────────────────┐  ┌─────────────────────────┐  │  │
-│  │  │ Azure Static     │  │  Azure Container Apps   │  │  │
-│  │  │ Web Apps         │──▶  Environment             │  │  │
-│  │  │ (Next.js)        │  │  (FastAPI Backend)      │  │  │
+│  │  │ App Service Plan │  │  Container Registry      │  │  │
+│  │  │ (Linux, B1)      │  │  (ACR - Basic)          │  │  │
+│  │  └────────┬─────────┘  └──────────┬──────────────┘  │  │
+│  │           │                         │                 │  │
+│  │  ┌────────┴─────────┐  ┌───────────┴──────────────┐ │  │
+│  │  │ App Service      │  │  App Service             │ │  │
+│  │  │ (Frontend Web)   │──▶  (Backend API)          │ │  │
+│  │  │ Next.js Container│  │  FastAPI Container       │ │  │
 │  │  └──────────────────┘  └─────────────────────────┘  │  │
 │  │                                                        │  │
 │  │  ┌──────────────────┐  ┌─────────────────────────┐  │  │
@@ -51,19 +56,21 @@ Esta guía detalla los procedimientos para desplegar RACMC-GPT en Azure utilizan
 
 | Entorno | Propósito | Resource Group | Domain |
 |---------|-----------|----------------|--------|
-| **Development** | Desarrollo activo | `rg-racmc-dev` | `racmc-dev.azurestaticapps.net` |
-| **Staging** | Testing pre-producción | `rg-racmc-staging` | `racmc-staging.azurestaticapps.net` |
+| **Development** | Desarrollo activo | `rg-racmc-dev` | `racmc-gpt-dev-web.azurewebsites.net` |
+| **Staging** | Testing pre-producción | `rg-racmc-staging` | `racmc-gpt-staging-web.azurewebsites.net` |
 | **Production** | Producción | `rg-racmc-prod` | `racmc-gpt.daiichi-sankyo.eu` |
 
 ### Naming Conventions
 
 ```
-Resource Groups:     rg-racmc-{environment}
-Static Web Apps:     swa-racmc-{environment}
-Container Apps:      ca-racmc-api-{environment}
-Storage Accounts:    stracmc{env}{location}{nn}
-Key Vault:           kv-racmc-{environment}
-AI Search:           srch-racmc-{environment}
+Resource Groups:      rg-racmc-{environment}
+App Service Plan:     racmc-gpt-{environment}-plan
+App Service (Frontend): racmc-gpt-{environment}-web
+App Service (Backend):  racmc-gpt-{environment}-api
+Container Registry:   acrracmcgpt{environment}
+Storage Accounts:     stracmc{env}{location}{nn}
+Key Vault:            kv-racmc-{environment}
+AI Search:            srch-racmc-{environment}
 ```
 
 ---
@@ -189,7 +196,12 @@ tags = {
   Client      = "Daiichi-Sankyo"
 }
 
-# Container Apps
+# App Service + ACR variables
+acr_sku = "Basic"
+frontend_image = "frontend"
+backend_image  = "backend"
+image_tag      = "latest"
+app_service_plan_size = "B1"
 container_app_min_replicas = 0
 container_app_max_replicas = 2
 container_app_cpu          = "0.25"
@@ -231,206 +243,179 @@ terraform output
 
 ### 5. Obtener Deployment Token
 
+### 5. Obtener Container Registry Credentials
+
 ```bash
-# Para desplegar frontend
-az staticwebapp secrets list \
-  --name swa-racmc-dev \
-  --query "properties.apiKey" \
-  --output tsv
+# Login server
+ACR_LOGIN_SERVER=$(terraform output -raw acr_login_server)
+
+# Admin credentials
+ACR_USERNAME=$(terraform output -raw acr_admin_username)
+ACR_PASSWORD=$(az acr credential show \
+  --name acrracmcgptdev \
+  --query "passwords[0].value" \
+  --output tsv)
+
+echo "ACR Login Server: $ACR_LOGIN_SERVER"
+echo "ACR Username: $ACR_USERNAME"
 ```
 
 ---
 
 ## 🌐 Despliegue del Frontend (Next.js)
 
-### 1. Build Local
+### 1. Build Docker Image
 
 ```bash
 cd frontend
 
-# Instalar dependencias
-npm ci
+# Build imagen Next.js
+docker build -t racmc-frontend:latest .
 
-# Build para producción
-npm run build
-
-# Test build localmente
-npm start
+# Tag para ACR
+docker tag racmc-frontend:latest $ACR_LOGIN_SERVER/frontend:latest
+docker tag racmc-frontend:latest $ACR_LOGIN_SERVER/frontend:v1.0.0
 ```
 
-### 2. Despliegue Manual a Static Web Apps
-
-**Opción A: Azure CLI**
+### 2. Push a Azure Container Registry
 
 ```bash
-# Instalar SWA CLI
-npm install -g @azure/static-web-apps-cli
+# Login a ACR
+az acr login --name acrracmcgptdev
 
-# Deploy
-swa deploy \
-  --app-location ./frontend \
-  --output-location .next \
-  --deployment-token $DEPLOYMENT_TOKEN
+# Push imagen
+docker push $ACR_LOGIN_SERVER/frontend:latest
+docker push $ACR_LOGIN_SERVER/frontend:v1.0.0
+
+# Verificar imágenes en ACR
+az acr repository list --name acrracmcgptdev --output table
+az acr repository show-tags --name acrracmcgptdev --repository frontend --output table
 ```
 
-**Opción B: GitHub Actions (Recomendado)**
-
-Ver sección [CI/CD con GitHub Actions](#cicd)
-
-### 3. Configurar Variables de Entorno en Azure
+### 3. Configurar Variables de Entorno en App Service
 
 ```bash
-# Configurar app settings
-az staticwebapp appsettings set \
-  --name swa-racmc-dev \
-  --setting-names \
-    NEXTAUTH_URL=https://racmc-dev.azurestaticapps.net \
+# Configurar app settings en App Service
+az webapp config appsettings set \
+  --name racmc-gpt-dev-web \
+  --resource-group rg-racmc-dev \
+  --settings \
+    NEXTAUTH_URL=https://racmc-gpt-dev-web.azurewebsites.net \
     NEXTAUTH_SECRET=$NEXTAUTH_SECRET \
     AZURE_AD_CLIENT_ID=$AZURE_AD_CLIENT_ID \
     AZURE_AD_CLIENT_SECRET=$AZURE_AD_CLIENT_SECRET \
     AZURE_AD_TENANT_ID=$AZURE_AD_TENANT_ID \
-    NEXT_PUBLIC_API_URL=https://ca-racmc-api-dev.eastus.azurecontainerapps.io
+    NEXT_PUBLIC_API_URL=https://racmc-gpt-dev-api.azurewebsites.net \
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE=false \
+    WEBSITES_PORT=3000
 
 # Verificar
-az staticwebapp appsettings list --name swa-racmc-dev
+az webapp config appsettings list \
+  --name racmc-gpt-dev-web \
+  --resource-group rg-racmc-dev
 ```
 
-### 4. Configuración de Static Web App
+### 4. Deploy a App Service
 
-**staticwebapp.config.json:**
+El App Service ya está configurado en Terraform para pull la imagen desde ACR. Terraform configura:
 
-```json
-{
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/images/*.{png,jpg,gif,svg}", "/api/*"]
-  },
-  "routes": [
-    {
-      "route": "/api/auth/*",
-      "allowedRoles": ["anonymous"]
-    },
-    {
-      "route": "/chatbot",
-      "allowedRoles": ["authenticated"]
-    },
-    {
-      "route": "/api/*",
-      "allowedRoles": ["authenticated"]
-    }
-  ],
-  "responseOverrides": {
-    "401": {
-      "redirect": "/",
-      "statusCode": 302
-    },
-    "403": {
-      "redirect": "/error?code=403",
-      "statusCode": 302
-    }
-  },
-  "globalHeaders": {
-    "X-Content-Type-Options": "nosniff",
-    "X-Frame-Options": "DENY",
-    "X-XSS-Protection": "1; mode=block",
-    "Referrer-Policy": "strict-origin-when-cross-origin"
-  },
-  "mimeTypes": {
-    ".json": "application/json",
-    ".svg": "image/svg+xml"
+```hcl
+site_config {
+  application_stack {
+    docker_image_name = "acrracmcgptdev.azurecr.io/frontend:latest"
   }
 }
+```
+
+Para actualizar a una nueva versión:
+
+```bash
+# Opción A: Actualizar via Terraform (recomendado)
+cd infra
+terraform apply -var="image_tag=v1.0.0"
+
+# Opción B: Actualizar manualmente
+az webapp config container set \
+  --name racmc-gpt-dev-web \
+  --resource-group rg-racmc-dev \
+  --docker-custom-image-name $ACR_LOGIN_SERVER/frontend:v1.0.0
+
+# Restart App Service
+az webapp restart \
+  --name racmc-gpt-dev-web \
+  --resource-group rg-racmc-dev
 ```
 
 ---
 
 ## 🐳 Despliegue del Backend (FastAPI)
 
-### 1. Dockerfile
+### 1. Dockerfile (Backend)
 
 ```dockerfile
-# frontend/Dockerfile
-FROM node:18-alpine AS base
+# backend/Dockerfile
+FROM python:3.11-slim
 
-# Dependencies
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Builder
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# Copy application code
+COPY ./app ./app
 
-ENV NEXT_TELEMETRY_DISABLED 1
+# Expose port
+EXPOSE 80
 
-RUN npm run build
-
-# Runner
-FROM base AS runner
-WORKDIR /app
-
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-
-CMD ["node", "server.js"]
+# Run FastAPI with uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
 ```
 
 ### 2. Build y Push a Container Registry
 
 ```bash
 # Login a Azure Container Registry
-az acr login --name acrracmcdev
+az acr login --name acrracmcgptdev
 
-# Build imagen
-docker build -t acrracmcdev.azurecr.io/racmc-gpt-frontend:latest ./frontend
+# Build imagen backend
+cd backend
+docker build -t $ACR_LOGIN_SERVER/backend:latest .
+docker tag $ACR_LOGIN_SERVER/backend:latest $ACR_LOGIN_SERVER/backend:v1.0.0
 
 # Push imagen
-docker push acrracmcdev.azurecr.io/racmc-gpt-frontend:latest
+docker push $ACR_LOGIN_SERVER/backend:latest
+docker push $ACR_LOGIN_SERVER/backend:v1.0.0
 
-# Tag con versión
-docker tag acrracmcdev.azurecr.io/racmc-gpt-frontend:latest \
-  acrracmcdev.azurecr.io/racmc-gpt-frontend:1.0.0
-docker push acrracmcdev.azurecr.io/racmc-gpt-frontend:1.0.0
+# Verificar
+az acr repository show-tags --name acrracmcgptdev --repository backend --output table
 ```
 
-### 3. Desplegar a Container Apps
+### 3. Configurar App Service Backend
 
 ```bash
-# Deploy backend API
-az containerapp update \
-  --name ca-racmc-api-dev \
+# Configurar app settings para backend API
+az webapp config appsettings set \
+  --name racmc-gpt-dev-api \
   --resource-group rg-racmc-dev \
-  --image acrracmcdev.azurecr.io/racmc-api:latest \
-  --set-env-vars \
+  --settings \
     AZURE_OPENAI_ENDPOINT=$OPENAI_ENDPOINT \
-    AZURE_OPENAI_KEY=secretref:openai-key \
+    AZURE_OPENAI_KEY=$OPENAI_KEY \
     AZURE_SEARCH_ENDPOINT=$SEARCH_ENDPOINT \
-    AZURE_SEARCH_KEY=secretref:search-key
+    AZURE_SEARCH_KEY=$SEARCH_KEY \
+    AZURE_STORAGE_CONNECTION_STRING=$STORAGE_CONNECTION \
+    WEBSITES_PORT=80
 
-# Verificar deployment
-az containerapp revision list \
-  --name ca-racmc-api-dev \
+# Update image
+az webapp config container set \
+  --name racmc-gpt-dev-api \
   --resource-group rg-racmc-dev \
-  --output table
+  --docker-custom-image-name $ACR_LOGIN_SERVER/backend:latest
+
+# Restart
+az webapp restart \
+  --name racmc-gpt-dev-api \
+  --resource-group rg-racmc-dev
 ```
 
 ---
@@ -448,14 +433,15 @@ AZURE_CLIENT_SECRET
 AZURE_SUBSCRIPTION_ID
 AZURE_TENANT_ID
 
-# Static Web Apps
-AZURE_STATIC_WEB_APPS_API_TOKEN_DEV
-AZURE_STATIC_WEB_APPS_API_TOKEN_PROD
-
 # Container Registry
-ACR_LOGIN_SERVER
+ACR_LOGIN_SERVER          # e.g., acrracmcgptdev.azurecr.io
 ACR_USERNAME
 ACR_PASSWORD
+
+# App Service Names
+WEBAPP_FRONTEND_NAME      # e.g., racmc-gpt-dev-web
+WEBAPP_BACKEND_NAME       # e.g., racmc-gpt-dev-api
+RESOURCE_GROUP_NAME       # e.g., rg-racmc-dev
 
 # Application Secrets
 NEXTAUTH_SECRET
@@ -469,7 +455,7 @@ AZURE_AD_TENANT_ID
 **.github/workflows/deploy-frontend.yml:**
 
 ```yaml
-name: Deploy Frontend to Azure Static Web Apps
+name: Deploy Frontend to Azure App Service
 
 on:
   push:
@@ -482,50 +468,43 @@ on:
 
 env:
   NODE_VERSION: '18.x'
+  ACR_IMAGE_NAME: 'frontend'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Azure Login
+        uses: azure/login@v1
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Install dependencies
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and Push Docker Image
         working-directory: ./frontend
-        run: npm ci
-
-      - name: Build Next.js application
-        working-directory: ./frontend
-        run: npm run build
-        env:
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          AZURE_AD_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
-          AZURE_AD_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
-          AZURE_AD_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
-
-      - name: Deploy to Azure Static Web Apps
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_DEV }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          app_location: "frontend"
-          output_location: ".next"
-          skip_app_build: true
-
-      - name: Notify Deployment Status
-        if: always()
         run: |
-          echo "Deployment completed with status: ${{ job.status }}"
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.ACR_IMAGE_NAME }}:${IMAGE_TAG} .
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.ACR_IMAGE_NAME }}:latest .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.ACR_IMAGE_NAME }}:${IMAGE_TAG}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.ACR_IMAGE_NAME }}:latest
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.WEBAPP_FRONTEND_NAME }}
+          images: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.ACR_IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Azure Logout
+        run: az logout
 ```
 
 ### 3. Workflow: Deploy Infrastructure
@@ -622,18 +601,17 @@ az keyvault secret set \
   --value $NEXTAUTH_SECRET
 ```
 
-**Dar acceso a Container App:**
+**Dar acceso a App Service:**
 
 ```bash
-# Habilitar Managed Identity en Container App
-az containerapp identity assign \
-  --name ca-racmc-api-dev \
-  --resource-group rg-racmc-dev \
-  --system-assigned
+# Habilitar Managed Identity en App Service
+az webapp identity assign \
+  --name racmc-gpt-dev-api \
+  --resource-group rg-racmc-dev
 
 # Obtener identity ID
-IDENTITY_ID=$(az containerapp identity show \
-  --name ca-racmc-api-dev \
+IDENTITY_ID=$(az webapp identity show \
+  --name racmc-gpt-dev-api \
   --resource-group rg-racmc-dev \
   --query principalId -o tsv)
 
@@ -644,20 +622,16 @@ az keyvault set-policy \
   --secret-permissions get list
 ```
 
-### 2. Referenciar Secretos en Container Apps
+### 2. Referenciar Secretos en App Service
 
 ```bash
-az containerapp create \
-  --name ca-racmc-api-dev \
+# App Service puede referenciar Key Vault directamente
+az webapp config appsettings set \
+  --name racmc-gpt-dev-api \
   --resource-group rg-racmc-dev \
-  --environment containerapp-env-racmc-dev \
-  --image acrracmcdev.azurecr.io/racmc-api:latest \
-  --secrets \
-    openai-key=keyvaultref:https://kv-racmc-dev.vault.azure.net/secrets/openai-api-key,identityref:system \
-    search-key=keyvaultref:https://kv-racmc-dev.vault.azure.net/secrets/azure-search-key,identityref:system \
-  --env-vars \
-    AZURE_OPENAI_KEY=secretref:openai-key \
-    AZURE_SEARCH_KEY=secretref:search-key
+  --settings \
+    AZURE_OPENAI_KEY="@Microsoft.KeyVault(SecretUri=https://kv-racmc-dev.vault.azure.net/secrets/openai-api-key/)" \
+    AZURE_SEARCH_KEY="@Microsoft.KeyVault(SecretUri=https://kv-racmc-dev.vault.azure.net/secrets/azure-search-key/)"
 ```
 
 ---
@@ -680,10 +654,11 @@ AI_CONNECTION_STRING=$(az monitor app-insights component show \
   --resource-group rg-racmc-dev \
   --query connectionString -o tsv)
 
-# Configurar en Static Web App
-az staticwebapp appsettings set \
-  --name swa-racmc-dev \
-  --setting-names \
+# Configurar en App Service
+az webapp config appsettings set \
+  --name racmc-gpt-dev-web \
+  --resource-group rg-racmc-dev \
+  --settings \
     APPLICATIONINSIGHTS_CONNECTION_STRING=$AI_CONNECTION_STRING
 ```
 
@@ -709,8 +684,9 @@ Ver [Azure Monitor Dashboard](https://portal.azure.com/) para:
 
 2. **Dominio Personalizado:**
    - Registrar dominio: `racmc-gpt.daiichi-sankyo.eu`
-   - Configurar DNS CNAME
-   - Validar en Azure Static Web Apps
+   - Configurar DNS CNAME apuntando al App Service
+   - Configurar certificado SSL en App Service
+   - Validar en Azure App Service custom domain settings
 
 3. **Data Migration:**
    - Si existe data en dev, planear migración
@@ -740,28 +716,40 @@ Ver [Azure Monitor Dashboard](https://portal.azure.com/) para:
 ### Frontend no carga después de deploy
 
 ```bash
-# Verificar logs
-az staticwebapp logs show \
-  --name swa-racmc-dev \
+# Verificar logs de App Service
+az webapp log tail \
+  --name racmc-gpt-dev-web \
   --resource-group rg-racmc-dev
 
-# Verificar build
-az staticwebapp show \
-  --name swa-racmc-dev \
-  --query "defaultHostname"
+# Verificar estado
+az webapp show \
+  --name racmc-gpt-dev-web \
+  --resource-group rg-racmc-dev \
+  --query "state"
+
+# Verificar URL
+az webapp show \
+  --name racmc-gpt-dev-web \
+  --resource-group rg-racmc-dev \
+  --query "defaultHostName" -o tsv
 ```
 
 ### Backend API no responde
 
 ```bash
-# Ver logs de Container App
-az containerapp logs show \
-  --name ca-racmc-api-dev \
+# Ver logs de App Service
+az webapp log tail \
+  --name racmc-gpt-dev-api \
   --resource-group rg-racmc-dev \
   --follow
 
 # Verificar health endpoint
-curl https://ca-racmc-api-dev.eastus.azurecontainerapps.io/health
+curl https://racmc-gpt-dev-api.azurewebsites.net/health
+
+# Ver configuración de container
+az webapp config container show \
+  --name racmc-gpt-dev-api \
+  --resource-group rg-racmc-dev
 ```
 
 ### Errores de autenticación
@@ -776,9 +764,10 @@ curl https://ca-racmc-api-dev.eastus.azurecontainerapps.io/health
 ## 📚 Referencias
 
 - [Terraform Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
-- [Azure Static Web Apps - Next.js](https://docs.microsoft.com/en-us/azure/static-web-apps/deploy-nextjs)
-- [Azure Container Apps Documentation](https://docs.microsoft.com/en-us/azure/container-apps/)
+- [Azure App Service - Linux containers](https://docs.microsoft.com/en-us/azure/app-service/quickstart-custom-container)
+- [Azure Container Registry Documentation](https://docs.microsoft.com/en-us/azure/container-registry/)
 - [GitHub Actions for Azure](https://github.com/Azure/actions)
+- [Next.js Deployment](https://nextjs.org/docs/deployment)
 
 ---
 

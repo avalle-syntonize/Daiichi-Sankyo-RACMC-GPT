@@ -6,7 +6,7 @@ async function Page() {
     const session = await getSession();
 
     if(session){
-        redirect('/chat');
+        redirect('/chatbot');
     }
  
     return <HomePage />

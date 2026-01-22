@@ -10,13 +10,6 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-  citations?: Citation[];
-}
-
-interface Citation {
-  id: string;
-  document: string;
-  metadata: string;
 }
 
 interface FilterCategory {
@@ -115,41 +108,43 @@ export default function ChatbotPage() {
     setUploadedFiles([]);
     setIsLoading(true);
 
-    // Simulate AI response with citations (matching mockup)
+    // Simulate AI response with inline citations (matching mockup)
     setTimeout(() => {
       const selectedFiltersList = Array.from(selectedFilters);
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
         content: `Based on selected sources (${selectedFiltersList.join(", ")}), here are the findings:
+<br/><br/>
+<strong>1. Process Validation Protocol</strong><br/>
+This must include a detailed description of the manufacturing process, critical process parameters, and acceptance criteria. 
+<a href="#" class="citation" title="Click to view document">
+  <div class="citation-details">
+    <span class="citation-doc">IMPD_Guidelines_v2.3.pdf</span>
+    <span class="citation-meta">Page 47 | Uploaded: 2024-01-15</span>
+  </div>
+</a>
 
-<strong>1. Process Validation Protocol</strong>
-This must include a detailed description of the manufacturing process, critical process parameters, and acceptance criteria.
-
-<strong>2. Manufacturing Batch Records</strong>
+<br/><br/>
+<strong>2. Manufacturing Batch Records</strong><br/>
 Complete batch manufacturing records for at least three consecutive batches must be provided to demonstrate process consistency and control.
-
-<strong>3. Quality Control Testing Results</strong>
+<a href="#" class="citation" title="Click to view document">
+  <div class="citation-details">
+    <span class="citation-doc">Manufacturing_SOP_2024.docx</span>
+    <span class="citation-meta">Page 12 | Uploaded: 2023-11-20</span>
+  </div>
+</a>
+<br/><br/>
+<strong>3. Quality Control Testing Results</strong><br/>
 All in-process and final product testing results must be documented and compared against established specifications.
-
+<a href="#" class="citation" title="Click to view document">
+  <div class="citation-details">
+    <span class="citation-doc">QC_Procedures.xlsx</span>
+    <span class="citation-meta">Sheet: Validation | Uploaded: 2024-02-03</span>
+  </div>
+</a>
+<br/><br/>
 All documentation must follow the format specified in Annex 15 of the EU GMP guidelines.`,
-        citations: [
-          {
-            id: "c1",
-            document: "IMPD_Guidelines_v2.3.pdf",
-            metadata: "Page 47 | Uploaded: 2024-01-15",
-          },
-          {
-            id: "c2",
-            document: "Manufacturing_SOP_2024.docx",
-            metadata: "Page 12 | Uploaded: 2023-11-20",
-          },
-          {
-            id: "c3",
-            document: "QC_Procedures.xlsx",
-            metadata: "Sheet: Validation | Uploaded: 2024-02-03",
-          },
-        ],
       };
       setMessages((prev) => [...prev, assistantMessage]);
       setIsLoading(false);
@@ -164,18 +159,13 @@ All documentation must follow the format specified in Annex 15 of the EU GMP gui
   };
 
   const handleExport = () => {
-    // Create export content
+    // Create export content - strip HTML tags but keep the text
     const exportContent = messages
       .map((msg) => {
         const role = msg.role === "user" ? "User" : "AI Assistant";
-        let content = `${role}: ${msg.content}`;
-        if (msg.citations && msg.citations.length > 0) {
-          content += "\n\nCitations:\n";
-          msg.citations.forEach((c) => {
-            content += `- ${c.document} (${c.metadata})\n`;
-          });
-        }
-        return content;
+        // Strip HTML tags for plain text export
+        const strippedContent = msg.content.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+        return `${role}: ${strippedContent}`;
       })
       .join("\n\n---\n\n");
 
@@ -288,7 +278,7 @@ All documentation must follow the format specified in Annex 15 of the EU GMP gui
           </div>
 
           {/* Chat area */}
-          <div className="bg-white rounded-lg shadow-sm flex flex-col flex-1 ">
+          <div className="bg-white rounded-lg shadow-sm flex flex-col flex-1 min-h-0">
             {/* Messages container */}
             <div className="flex-1 overflow-y-auto p-6 space-y-5">
               {messages.length === 0 ? (
@@ -329,30 +319,11 @@ All documentation must follow the format specified in Annex 15 of the EU GMP gui
                       </div>
                       <div className="bg-gray-50 p-4 rounded-lg shadow-sm flex-1">
                         <div
-                          className="text-sm leading-relaxed"
+                          className="text-sm leading-relaxed [&_.citation]:inline-block [&_.citation]:bg-[rgba(0,180,237,0.1)] [&_.citation]:text-[#00B4ED] [&_.citation]:px-2 [&_.citation]:py-1 [&_.citation]:rounded [&_.citation]:text-xs [&_.citation]:font-medium [&_.citation]:cursor-pointer [&_.citation]:transition-all [&_.citation]:border [&_.citation]:border-[rgba(0,180,237,0.3)] [&_.citation]:no-underline [&_.citation]:mx-0.5 [&_.citation:hover]:bg-[rgba(0,180,237,0.2)] [&_.citation:hover]:border-[#00B4ED] [&_.citation-details]:flex [&_.citation-details]:flex-col [&_.citation-details]:gap-0.5 [&_.citation-details]:text-[11px] [&_.citation-doc]:font-semibold [&_.citation-meta]:text-gray-600"
                           dangerouslySetInnerHTML={{
-                            __html: message.content.replace(/\n/g, "<br/>"),
+                            __html: message.content,
                           }}
                         />
-                        {message.citations && message.citations.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
-                            {message.citations.map((citation) => (
-                              <a
-                                key={citation.id}
-                                href="#"
-                                className="block p-2 rounded bg-white border border-gray-200 hover:border-[#00B4ED] hover:bg-blue-50 transition-colors"
-                                title="Click to view document"
-                              >
-                                <div className="text-xs font-medium text-[#005BAA]">
-                                  {citation.document}
-                                </div>
-                                <div className="text-xs text-gray-500 mt-0.5">
-                                  {citation.metadata}
-                                </div>
-                              </a>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </div>
                   ))}

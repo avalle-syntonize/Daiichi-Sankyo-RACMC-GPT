@@ -10,9 +10,9 @@ import {
 
 export default function Home() {
   return (
-    <SidebarProvider>
-      {/* <AppSidebar /> */}
-      {/* <SidebarInset>
+   {/*   <SidebarProvider>
+  
+     <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
         </header>
@@ -21,10 +21,10 @@ export default function Home() {
             <div className="aspect-video rounded-xl bg-muted/50" />
             <div className="aspect-video rounded-xl bg-muted/50" />
             <div className="aspect-video rounded-xl bg-muted/50" />
-          </div>
+          </div>  
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
         </div>
-      </SidebarInset> */}
-    </SidebarProvider>
+      </SidebarInset> 
+    </SidebarProvider>*/}
   );
 }

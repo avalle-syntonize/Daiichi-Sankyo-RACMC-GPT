@@ -21,8 +21,8 @@ import Head from "next/head";
 // });
 
 export const metadata: Metadata = {
-    title: "InformA",
-    description: "InformA",
+    title: "RACMC GPT",
+    description: "RACMC GPT",
 };
 
 export default function RootLayout({
@@ -39,7 +39,7 @@ export default function RootLayout({
             
                 <AuthProvider>
                     <main>
-                    <AppSidebar />
+                    {/* <AppSidebar /> */}
                         <div className="main-scroll">
                             {children}
                         </div>

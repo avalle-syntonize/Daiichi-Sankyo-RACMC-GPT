@@ -63,20 +63,20 @@ const authOptions: NextAuthOptions = {
     },
     async signIn(session) {
 
-      const userInfo = await userService.getUserInfoFromToken(session.account?.access_token as string);
+      // const userInfo = await userService.getUserInfoFromToken(session.account?.access_token as string);
 
-      const isValid = userInfo ? true : false;
+      const isValid = true //userInfo ? true : false;
 
       const user: SessionUser = session.user as SessionUser;
 
-      if (isValid) {
-        user.email = userInfo?.userPrincipalName as string;
-        user.name = userInfo?.displayName as string;
-        user.id = userInfo?.id as string;
-        user.type = userInfo?.jobTitle as string;
-        user.roles = userInfo?.roles as string[];
-        session.user = user
-      }
+      // if (isValid) {
+      //   user.email = userInfo?.userPrincipalName as string;
+      //   user.name = userInfo?.displayName as string;
+      //   user.id = userInfo?.id as string;
+      //   user.type = userInfo?.jobTitle as string;
+      //   user.roles = userInfo?.roles as string[];
+      //   session.user = user
+      // }
 
       return isValid;
     },
@@ -106,18 +106,18 @@ export const getSession = async (redirectTo = true) => {
 
   if(!session) return null;
 
-  const isSessionAlive = await userService.getUserInfoFromToken(session.accessToken as string);
+  // const isSessionAlive = await userService.getUserInfoFromToken(session.accessToken as string);
 
-  if (!isSessionAlive && redirectTo) redirect("/signout");
+  // if (!isSessionAlive && redirectTo) redirect("/signout");
   
-  if (!isSessionAlive) return null
+  // if (!isSessionAlive) return null
 
   return {
     ...session,
     user: {
       ...session.user,
-      type: isSessionAlive.jobTitle,
-      roles: isSessionAlive.roles
+      // type: isSessionAlive.jobTitle,
+      // roles: isSessionAlive.roles
     }
   }
 }

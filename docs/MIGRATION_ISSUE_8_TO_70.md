@@ -31,33 +31,69 @@ This document tracks the migration of UI mockup components from the original Rea
 - Ensure Azure AD login functionality remains intact
 - Support evidence, document references, and filtering
 
+## Implementation Timeline
+
+### Phase 1: Initial Generic Implementation (v0.2.1) - **SUPERSEDED**
+
+**Components Created** (no longer in use):
+- ❌ **Generic ChatContainer** - Generic message display
+- ❌ **Generic ChatInput** - Basic input component
+- ❌ **Generic ReferencesPanel** - Separate panel for citations
+- ❌ **Generic FilterSidebar** - Dropdown-based filters
+
+**Issue**: These components were created based on assumed requirements without the actual client mockup.
+
+### Phase 2: Client Mockup Implementation (v0.2.2) - **CURRENT**
+
+**Actual HTML Mockup Received**: `index-v2.html` provided by client after feedback
+
 **Components Delivered**:
-- ✅ **AppSidebar** - Header with logo, user info, and logout (already existed)
-- ✅ **FilterSidebar** - Project and document type filtering
-- ✅ **ChatContainer** - Message display with user/AI bubbles and inline references
-- ✅ **ChatInput** - Query input with send button and loading states
-- ✅ **ReferencesPanel** - Document citation viewer with traceability info
-- ✅ **Responsive Design** - Mobile-first with tablet/desktop optimizations
-- ✅ **Next.js App Router** - File-based routing (no manual configuration needed)
+- ✅ **Branded Header** - Daiichi Sankyo gradient header with logo, user info, and logout
+- ✅ **Categorized Filter Sidebar** - Checkbox-based filters organized by Dossiers, Guidelines, and Internal Guidance
+- ✅ **Integrated Chat Interface** - Complete chat area with inline citations
+- ✅ **File Upload** - Document upload functionality with preview badges
+- ✅ **Export Modal** - Plain text export with privacy notice
+- ✅ **Daiichi Sankyo Branding** - Exact color scheme and styling from mockup
 
 ## Key Differences from Original Plan
 
 ### Architecture Changes
 - **Routing**: React Router → Next.js App Router (file-based)
-- **State Management**: Context API → React hooks with local state (server components)
+- **State Management**: Context API → React hooks with local state
 - **Authentication**: MSAL.js → NextAuth.js with Azure AD
 - **Build Tool**: Vite → Next.js compiler
 
-### Implementation Notes
-1. **No HTML Mockups Found**: The mockup files referenced in issue #8 (`/mockups/` directory) were not present in the repository. Components were implemented directly based on:
-   - Functional requirements from issue #8 and #70 (component list, features needed)
-   - Architecture documentation in `docs/architecture.md` (system design, RAG flow)
-   - Existing shadcn/ui component library patterns
-   - Industry best practices for conversational AI interfaces
-   - Regulatory compliance requirements specified in `docs/COMPLIANCE.md`
-   - Existing AppSidebar component as reference for styling
+### Design Implementation
 
-2. **Regulatory Compliance**: All components include:
+#### Phase 1 (Generic - Superseded)
+- Generic chat UI without specific branding
+- Dropdown filters
+- Separate reference panel
+- Based on assumptions
+
+#### Phase 2 (Client Mockup - Current)
+- Daiichi Sankyo branded interface
+- Checkbox-based categorized filters (Dossiers, Guidelines, Internal)
+- Inline citations within messages
+- DS color gradient: #005BAA → #00ACEA → #89BA17 → #CFD300
+- Based on actual client mockup (index-v2.html)
+
+### Implementation Notes
+
+1. **HTML Mockup Source**: After client feedback, the actual mockup (`index-v2.html`) was provided containing:
+   - Complete HTML structure
+   - Embedded CSS with DS branding
+   - JavaScript functionality for chat, filters, and export
+   - Specific filter categories: Dossiers, Guidelines, Internal Guidance
+   - Inline citation format within messages
+   - Export modal for conversation history
+
+2. **Filter Categories Implemented**:
+   - **Dossiers**: DS-1062, U3-1402, DS-8201, IMPD, MAA, BLA, Core
+   - **Guidelines**: EMA, ICH, FDA, JP, CN, RoW
+   - **Internal Guidance**: Internal Documents
+
+3. **Regulatory Compliance**: All components include:
    - Traceability information in references
    - Evidence-based display (no unnecessary conversation storage)
    - Privacy-compliant design

@@ -7,11 +7,121 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.2] - 2026-01-22
+
+### 🎨 MAJOR UI REDESIGN: Client Mockup Implementation
+
+This release completely reimplements the chatbot UI based on the actual HTML mockup provided by the client (index-v2.html), replacing the previous generic implementation.
+
+### Added
+
+#### Daiichi Sankyo Branded Interface
+- **Header with DS Gradient**: Branded header with linear gradient (blue → cyan → green → yellow)
+  - Daiichi Sankyo logo (DS)
+  - Application title "RA CMC-GPT"
+  - User name and logout button
+  - User avatar with initials
+  
+#### Enhanced Filter Sidebar
+- **Categorized Checkbox Filters**: Organized filter system replacing dropdown approach
+  - **Dossiers**: DS-1062, U3-1402, DS-8201, IMPD, MAA, BLA, Core
+  - **Guidelines**: EMA, ICH, FDA, JP, CN, RoW
+  - **Internal Guidance**: Internal Documents
+- **Export History Button**: Prominently placed in sidebar footer
+- **Multi-select Capability**: Users can select multiple sources simultaneously
+
+#### Improved Chat Interface
+- **Inline Citations**: Citations integrated directly within AI responses
+  - Document name and metadata displayed in clickable cards
+  - Hover effects and visual feedback
+- **Message Bubbles**: User and AI messages with avatars
+- **Typing Indicator**: Animated loading state for AI responses
+- **Welcome Message**: Placeholder with instructions when no messages
+
+#### Input Area Enhancements
+- **File Upload**: Button to upload regulatory documents
+  - File preview badges with remove functionality
+  - Accepts .pdf, .doc, .docx, .xlsx, .txt, .pptx
+- **Smart Send Button**: Disabled when no filters selected or no input
+- **Keyboard Shortcuts**: Enter to send, Shift+Enter for new line
+
+#### Export Modal
+- **Plain Text Export**: Download conversations as .txt files
+- **Privacy Notice**: Prominent warning about ephemeral sessions
+- **Branded Design**: Gradient header matching application theme
+
+#### Styling & Branding
+- **Daiichi Sankyo Color Palette**:
+  - Primary Blue: #005BAA
+  - Cyan: #00ACEA  
+  - Green: #89BA17
+  - Yellow: #CFD300
+- **Consistent Typography**: Helvetica Neue font family
+- **Smooth Animations**: Slide-in effects for messages and modal
+- **Professional Shadows**: Subtle shadows for depth
+
+### Changed
+
+#### Complete UI Overhaul
+- **Removed**: Generic ChatContainer, ChatInput, ReferencesPanel, FilterSidebar components
+- **Replaced**: Single integrated Chatbot component matching client mockup
+- **Layout**: Removed AppSidebar wrapper, full-screen chat interface
+- **Filter UX**: Changed from dropdowns to categorized checkboxes
+- **Citation Display**: Changed from separate panel to inline cards
+
+#### Architecture Simplification
+- **Consolidated Components**: All chat functionality in single component
+- **Direct State Management**: Local state instead of prop drilling
+- **Simplified Layout**: Removed unnecessary wrapper components
+
+### Removed
+
+- **Previous Generic Components**: ChatContainer, ChatInput, ReferencesPanel, FilterSidebar (still in codebase but unused)
+- **AppSidebar**: No longer rendered in layout
+- **Separate Reference Panel**: Replaced with inline citations
+
+### Migration Notes
+
+#### From Generic to Client-Specific Design
+
+**Previous Implementation (v0.2.1)**:
+- Generic chat UI without specific branding
+- Dropdown-based filters
+- Separate panel for references
+- Generic color scheme
+- Based on assumed requirements
+
+**Current Implementation (v0.2.2)**:
+- Daiichi Sankyo branded interface
+- Checkbox-based categorized filters
+- Inline citations within messages
+- Client-specific DS color gradient
+- Based on actual client mockup (index-v2.html)
+
+### Technical Details
+
+- **Build Status**: ✅ Successful compilation
+- **TypeScript**: ✅ All types validated
+- **Component Size**: Reduced from 4 separate components to 1 integrated component
+- **Bundle Impact**: Chatbot route reduced from 6.21 kB to 5.04 kB
+
+### Design Fidelity
+
+The implementation now matches the client's HTML mockup (index-v2.html) with:
+- ✅ Exact color scheme (#005BAA, #00ACEA, #89BA17, #CFD300)
+- ✅ Matching layout structure (header, sidebar, chat area)
+- ✅ Same filter organization (Dossiers, Guidelines, Internal)
+- ✅ Inline citation format
+- ✅ Export modal design
+- ✅ Consistent spacing and typography
+
+---
+
 ## [0.2.1] - 2026-01-22
 
-### 🎨 UI Components Integration
+### 🎨 UI Components Integration (Superseded by 0.2.2)
 
-This release implements the UI components and features originally planned for issue #8 (HTML mockups in React) but adapted for the Next.js architecture.
+**Note**: This release was superseded by 0.2.2 which implements the actual client mockup instead of generic components.
 
 ### Added
 

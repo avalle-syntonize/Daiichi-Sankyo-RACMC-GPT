@@ -49,7 +49,13 @@ This document tracks the migration of UI mockup components from the original Rea
 - **Build Tool**: Vite → Next.js compiler
 
 ### Implementation Notes
-1. **No HTML Mockups Found**: The mockup files referenced in issue #8 (`/mockups/` directory) were not present in the repository. Components were implemented directly based on functional requirements.
+1. **No HTML Mockups Found**: The mockup files referenced in issue #8 (`/mockups/` directory) were not present in the repository. Components were implemented directly based on:
+   - Functional requirements from issue #8 and #70 (component list, features needed)
+   - Architecture documentation in `docs/architecture.md` (system design, RAG flow)
+   - Existing shadcn/ui component library patterns
+   - Industry best practices for conversational AI interfaces
+   - Regulatory compliance requirements specified in `docs/COMPLIANCE.md`
+   - Existing AppSidebar component as reference for styling
 
 2. **Regulatory Compliance**: All components include:
    - Traceability information in references

@@ -276,9 +276,9 @@ All documentation must follow the format specified in Annex 15 of the EU GMP gui
         </aside>
 
         {/* Main chat area */}
-        <main className="flex-1 flex flex-direction: column p-10">
+        <main className="flex-1 flex flex-col p-10">
           {/* Info box */}
-          <div className="bg-[#e3f5ff] border-l-4 border-[#00B4ED] p-4 rounded-md mb-5">
+          <div className="bg-[#e3f5ff] border-l-4 border-[#00B4ED] p-4 rounded-md mb-5 max-h-20">
             <p className="text-[#005BAA] text-sm leading-relaxed">
               <strong>ℹ️ Important: </strong> This system is designed for
               Regulatory Affairs - Chemistry, Manufacturing and Controls (RA CMC)
@@ -288,7 +288,7 @@ All documentation must follow the format specified in Annex 15 of the EU GMP gui
           </div>
 
           {/* Chat area */}
-          <div className="bg-white rounded-lg shadow-sm flex flex-col flex-1 max-h-[600px]">
+          <div className="bg-white rounded-lg shadow-sm flex flex-col flex-1 ">
             {/* Messages container */}
             <div className="flex-1 overflow-y-auto p-6 space-y-5">
               {messages.length === 0 ? (

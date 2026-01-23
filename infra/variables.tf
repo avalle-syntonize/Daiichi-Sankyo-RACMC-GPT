@@ -110,3 +110,15 @@ variable "app_service_plan_size" {
   type        = string
   default     = "B1"
 }
+
+variable "function_app_service_plan_size" {
+  description = "Function App Service plan size"
+  type        = string
+  default     = "Y1"
+}
+
+variable "trigger_blob_image" {
+  description = "ACR repository name for blob trigger function image"
+  type        = string
+  default     = "blob-trigger"
+}

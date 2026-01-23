@@ -36,15 +36,34 @@ output "frontend_id" {
   value       = azurerm_linux_web_app.frontend.id
 }
 
-output "api_name" {
-  description = "Name of the API App Service"
-  value       = azurerm_linux_web_app.api.name
+
+output "backend_name" {
+  description = "Name of the backend Function App"
+  value       = azurerm_function_app_flex_consumption.backend.name
+}
+output "backend_id" {
+  description = "ID of the backend Function App"
+  value       = azurerm_function_app_flex_consumption.backend.id
 }
 
-output "api_id" {
-  description = "ID of the API App Service"
-  value       = azurerm_linux_web_app.api.id
+output "backend_ingestor_name" {
+  description = "Name of the backend Function App for blob trigger"
+  value       = azurerm_function_app_flex_consumption.trigger_blob.name
 }
+output "backend_ingestor_id" {
+  description = "ID of the backend Function App for blob trigger"
+  value       = azurerm_function_app_flex_consumption.trigger_blob.id
+}
+
+# output "api_name" {
+#   description = "Name of the API App Service"
+#   value       = azurerm_linux_web_app.api.name
+# }
+
+# output "api_id" {
+#   description = "ID of the API App Service"
+#   value       = azurerm_linux_web_app.api.id
+# }
 
 output "app_service_plan_name" {
   description = "Name of the App Service Plan"
@@ -85,3 +104,5 @@ output "key_vault_name" {
   description = "Name of the Key Vault"
   value       = azurerm_key_vault.main.name
 }
+
+

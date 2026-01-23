@@ -124,26 +124,201 @@ resource "azurerm_linux_web_app" "frontend" {
   tags = var.tags
 }
 
-# Backend App Service (FastAPI container from ACR)
-resource "azurerm_linux_web_app" "api" {
-  name                = "${var.project_name}-${var.environment}-api"
+# service plan for function app
+resource "azurerm_service_plan" "func_plan" {
+  name                = "${var.project_name}-${var.environment}-func-plan"
   resource_group_name = azurerm_resource_group.racmc.name
   location            = azurerm_resource_group.racmc.location
-  service_plan_id     = azurerm_service_plan.plan.id
 
+  os_type  = "Linux"
+  sku_name = var.function_app_service_plan_size
+}
+
+resource "azurerm_application_insights" "app_insights" {
+  name                = "${var.project_name}-${var.environment}-app-insights"
+  location            = azurerm_resource_group.racmc.location
+  resource_group_name = azurerm_resource_group.racmc.name
+  application_type    = "web"
+}
+
+
+# resource "azurerm_function_app_flex_consumption_plan" "func_plan" {
+#   name                = "${var.project_name}-${var.environment}-func-plan"
+#   location            = azurerm_resource_group.racmc.location
+#   resource_group_name = azurerm_resource_group.racmc.name
+# }
+
+
+# # Backend (FastAPI container from ACR)
+resource "azurerm_function_app_flex_consumption" "backend" {
+  name                = "${var.project_name}-${var.environment}-func-backend"
+  resource_group_name = azurerm_resource_group.racmc.name
+  location            = azurerm_resource_group.racmc.location
+  service_plan_id     = azurerm_service_plan.func_plan.id
+
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = azurerm_storage_account.main.primary_blob_endpoint
+  storage_authentication_type = "StorageAccountConnectionString"
+  storage_access_key          = azurerm_storage_account.main.primary_access_key
+  runtime_name                = "python"
+  runtime_version             = "3.11"
+  maximum_instance_count      = 50
+  instance_memory_in_mb       = 2048
 
   site_config {
-    application_stack {
-      docker_image_name = "${azurerm_container_registry.acr.login_server}/${var.backend_image}:${var.image_tag}"
-    }
   }
 
   app_settings = {
-    "WEBSITES_PORT" = "80"
+    # FUNCTIONS_WORKER_RUNTIME    = "python"
+    AzureWebJobsStorage         = azurerm_storage_account.main.primary_connection_string
+    WEBSITES_PORT               = "80"
+    FUNCTIONS_EXTENSION_VERSION = "~4"
+  }
+}
+
+# resource "azurerm_function_app_flex_consumption_plan" "trigger_blob_plan" {
+#   name                = "${var.project_name}-${var.environment}-func-blob-trigger-plan"
+#   location            = azurerm_resource_group.racmc.location
+#   resource_group_name = azurerm_resource_group.racmc.name
+# }
+
+resource "azurerm_function_app_flex_consumption" "trigger_blob" {
+  name                = "${var.project_name}-${var.environment}-func-blob-trigger"
+  resource_group_name = azurerm_resource_group.racmc.name
+  location            = azurerm_resource_group.racmc.location
+  service_plan_id     = azurerm_service_plan.func_plan.id
+
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = azurerm_storage_account.main.primary_blob_endpoint
+  storage_authentication_type = "StorageAccountConnectionString"
+  storage_access_key          = azurerm_storage_account.main.primary_access_key
+  runtime_name                = "python"
+  runtime_version             = "3.11"
+  maximum_instance_count      = 50
+  instance_memory_in_mb       = 2048
+
+  site_config {
   }
 
-  tags = var.tags
+  app_settings = {
+    # FUNCTIONS_WORKER_RUNTIME       = "python"
+    AzureWebJobsStorage            = azurerm_storage_account.main.primary_connection_string
+    FUNCTIONS_EXTENSION_VERSION    = "~4"
+    AzureWebJobsFeatureFlags       = "EnableWorkerIndexing"
+    BlobStorageConnectionString    = azurerm_storage_account.main.primary_connection_string
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.app_insights.instrumentation_key
+  }
+  
 }
+
+# resource "azurerm_linux_function_app" "backend" {
+#   name                        = "${var.project_name}-${var.environment}-func-backend"
+#   resource_group_name         = azurerm_resource_group.racmc.name
+#   location                    = azurerm_resource_group.racmc.location
+#   service_plan_id             = azurerm_service_plan.func_plan.id
+#   functions_extension_version = "~4"
+#   storage_account_name        = azurerm_storage_account.main.name
+#   storage_account_access_key  = azurerm_storage_account.main.primary_access_key
+
+
+#   zip_deploy_file = "./function_app.zip"
+
+#   site_config {
+#     application_stack {
+#       # docker {
+#       #   image_name   = var.backend_image
+#       #   image_tag    = var.image_tag
+#       #   registry_url = azurerm_container_registry.acr.login_server
+#       # }
+#       python_version = "3.13"
+#     }
+
+#     always_on = false
+#   }
+
+
+#   app_settings = {
+#     FUNCTIONS_WORKER_RUNTIME    = "python"
+#     AzureWebJobsStorage         = azurerm_storage_account.main.primary_connection_string
+#     WEBSITES_PORT               = "80"
+#     FUNCTIONS_EXTENSION_VERSION = "~4"
+#   }
+
+#   identity {
+#     type = "SystemAssigned"
+#   }
+
+
+#   tags = var.tags
+# }
+
+# # Trigger Blog Embeddings (Ingestor from ACR)
+# resource "azurerm_linux_function_app" "trigger_blob" {
+#   name                        = "${var.project_name}-${var.environment}-func-blob-trigger"
+#   resource_group_name         = azurerm_resource_group.racmc.name
+#   location                    = azurerm_resource_group.racmc.location
+#   service_plan_id             = azurerm_service_plan.func_plan.id
+#   functions_extension_version = "~4"
+#   storage_account_name        = azurerm_storage_account.main.name
+#   storage_account_access_key  = azurerm_storage_account.main.primary_access_key
+
+#   zip_deploy_file = "./function_app.zip"
+
+#   site_config {
+#     application_stack {
+#       python_version = "3.13"
+#     }
+
+
+
+#     always_on = false
+#   }
+
+#   app_settings = {
+#     FUNCTIONS_WORKER_RUNTIME       = "python"
+#     AzureWebJobsStorage            = azurerm_storage_account.main.primary_connection_string
+#     FUNCTIONS_EXTENSION_VERSION    = "~4"
+#     AzureWebJobsFeatureFlags       = "EnableWorkerIndexing"
+#     BlobStorageConnectionString    = azurerm_storage_account.main.primary_connection_string
+#     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.app_insights.instrumentation_key
+#   }
+
+#   identity {
+#     type = "SystemAssigned"
+#   }
+
+#   tags = var.tags
+# }
+
+
+# resource "azurerm_eventgrid_event_subscription" "blob_to_function" {
+#   name  = "es-blob-to-func-${var.environment}"
+#   scope = azurerm_storage_account.main.id
+
+#   event_delivery_schema = "EventGridSchema"
+#   included_event_types  = ["Microsoft.Storage.BlobCreated"]
+
+#   subject_filter {
+#     subject_begins_with = "/blobServices/default/containers/data/"
+#   }
+
+#   azure_function_endpoint {
+#     function_id = "${azurerm_linux_function_app.backend.id}/functions/BlobCreatedTrigger"
+#   }
+
+#   retry_policy {
+#     max_delivery_attempts = 5
+#     event_time_to_live    = 1440
+#   }
+# }
+
+# resource "azurerm_role_assignment" "acr_pull" {
+#   scope                = azurerm_container_registry.acr.id
+#   role_definition_name = "AcrPull"
+#   principal_id         = azurerm_linux_function_app.backend.identity[0].principal_id
+# }
+
+
 
 # AI Search Module (Free tier: 50MB, 10k docs)
 module "ai_search" {

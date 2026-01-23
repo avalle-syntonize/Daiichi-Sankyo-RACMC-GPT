@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { AccountInfo } from '@azure/msal-browser';
 import { loginRequest } from '@/config/msal.config';
@@ -46,34 +46,7 @@ export function useAuth(): UseAuthReturn {
     setIsLoading(inProgress !== 'none');
   }, [inProgress]);
 
-  useEffect(() => {
-    // Acquire token silently when user is authenticated
-    if (isAuthenticated && account) {
-      getAccessToken();
-    }
-  }, [isAuthenticated, account]);
-
-  const login = async () => {
-    try {
-      await instance.loginRedirect(loginRequest);
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await instance.logoutRedirect({
-        postLogoutRedirectUri: '/',
-      });
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error;
-    }
-  };
-
-  const getAccessToken = async (): Promise<string | null> => {
+  const getAccessToken = useCallback(async (): Promise<string | null> => {
     if (!account) {
       return null;
     }
@@ -108,6 +81,33 @@ export function useAuth(): UseAuthReturn {
       }
       
       return null;
+    }
+  }, [account, instance]);
+
+  useEffect(() => {
+    // Acquire token silently when user is authenticated
+    if (isAuthenticated && account) {
+      getAccessToken();
+    }
+  }, [isAuthenticated, account, getAccessToken]);
+
+  const login = async () => {
+    try {
+      await instance.loginRedirect(loginRequest);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await instance.logoutRedirect({
+        postLogoutRedirectUri: '/',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
     }
   };
 

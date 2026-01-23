@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 // import { Roboto, Roboto_Condensed } from 'next/font/google';
 import "./globals.css";
 import { AuthProvider } from "@/providers/SessionProvider";
+import MsalProviderWrapper from "@/providers/MsalProvider";
 import { Toaster } from "sonner";
 import Head from "next/head";
 
@@ -34,9 +35,11 @@ export default function RootLayout({
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <body className="antialiased">
-                <AuthProvider>
-                    {children}
-                </AuthProvider>
+                <MsalProviderWrapper>
+                    <AuthProvider>
+                        {children}
+                    </AuthProvider>
+                </MsalProviderWrapper>
                 <Toaster expand />
             </body>
         </html>

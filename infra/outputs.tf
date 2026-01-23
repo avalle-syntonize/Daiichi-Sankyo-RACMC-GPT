@@ -9,32 +9,32 @@ output "resource_group_location" {
 }
 
 # Azure Container Registry outputs
-output "acr_login_server" {
-  description = "Login server for ACR"
-  value       = azurerm_container_registry.acr.login_server
-}
+# output "acr_login_server" {
+#   description = "Login server for ACR"
+#   value       = azurerm_container_registry.acr.login_server
+# }
 
-output "acr_admin_username" {
-  description = "ACR admin username (if enabled)"
-  value       = azurerm_container_registry.acr.admin_username
-}
+# output "acr_admin_username" {
+#   description = "ACR admin username (if enabled)"
+#   value       = azurerm_container_registry.acr.admin_username
+# }
 
-output "acr_admin_enabled" {
-  description = "Whether ACR admin user is enabled"
-  value       = azurerm_container_registry.acr.admin_enabled
-}
+# output "acr_admin_enabled" {
+#   description = "Whether ACR admin user is enabled"
+#   value       = azurerm_container_registry.acr.admin_enabled
+# }
 
 # App Service / Web App outputs
 
-output "frontend_name" {
-  description = "Name of the frontend App Service"
-  value       = azurerm_linux_web_app.frontend.name
-}
+# output "frontend_name" {
+#   description = "Name of the frontend App Service"
+#   value       = azurerm_linux_web_app.frontend.name
+# }
 
-output "frontend_id" {
-  description = "ID of the frontend App Service"
-  value       = azurerm_linux_web_app.frontend.id
-}
+# output "frontend_id" {
+#   description = "ID of the frontend App Service"
+#   value       = azurerm_linux_web_app.frontend.id
+# }
 
 
 output "backend_name" {
@@ -65,15 +65,15 @@ output "backend_ingestor_id" {
 #   value       = azurerm_linux_web_app.api.id
 # }
 
-output "app_service_plan_name" {
-  description = "Name of the App Service Plan"
-  value       = azurerm_service_plan.plan.name
-}
+# output "app_service_plan_name" {
+#   description = "Name of the App Service Plan"
+#   value       = azurerm_service_plan.plan.name
+# }
 
-output "app_service_plan_id" {
-  description = "ID of the App Service Plan"
-  value       = azurerm_service_plan.plan.id
-}
+# output "app_service_plan_id" {
+#   description = "ID of the App Service Plan"
+#   value       = azurerm_service_plan.plan.id
+# }
 
 output "ai_search_endpoint" {
   description = "Endpoint URL for AI Search service"

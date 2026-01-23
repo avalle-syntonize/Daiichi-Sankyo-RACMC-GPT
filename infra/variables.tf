@@ -122,3 +122,15 @@ variable "trigger_blob_image" {
   type        = string
   default     = "blob-trigger"
 }
+
+variable "static_web_app_sku_tier" {
+  description = "Static Web App SKU tier"
+  type        = string
+  default     = "Free"
+}
+
+variable "static_web_app_sku_size" {
+  description = "Static Web App SKU size"
+  type        = string
+  default     = "F1"
+}

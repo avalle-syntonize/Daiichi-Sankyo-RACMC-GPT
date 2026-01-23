@@ -124,7 +124,7 @@ resource "azurerm_linux_web_app" "frontend" {
   tags = var.tags
 }
 
-# service plan for function app
+# service plan for function app backend
 resource "azurerm_service_plan" "func_plan" {
   name                = "${var.project_name}-${var.environment}-func-plan"
   resource_group_name = azurerm_resource_group.racmc.name
@@ -134,19 +134,33 @@ resource "azurerm_service_plan" "func_plan" {
   sku_name = var.function_app_service_plan_size
 }
 
-resource "azurerm_application_insights" "app_insights" {
-  name                = "${var.project_name}-${var.environment}-app-insights"
-  location            = azurerm_resource_group.racmc.location
+resource "azurerm_service_plan" "trigger_blob_plan" {
+  name                = "${var.project_name}-${var.environment}-func-blob-trigger-plan"
   resource_group_name = azurerm_resource_group.racmc.name
-  application_type    = "web"
-}
+  location            = azurerm_resource_group.racmc.location
 
+  os_type  = "Linux"
+  sku_name = var.function_app_service_plan_size
+}
 
 # resource "azurerm_function_app_flex_consumption_plan" "func_plan" {
 #   name                = "${var.project_name}-${var.environment}-func-plan"
 #   location            = azurerm_resource_group.racmc.location
 #   resource_group_name = azurerm_resource_group.racmc.name
 # }
+
+# resource "azurerm_function_app_flex_consumption_plan" "trigger_blob_plan" {
+#   name                = "${var.project_name}-${var.environment}-func-blob-trigger-plan"
+#   location            = azurerm_resource_group.racmc.location
+#   resource_group_name = azurerm_resource_group.racmc.name
+# }
+
+resource "azurerm_application_insights" "app_insights" {
+  name                = "${var.project_name}-${var.environment}-app-insights"
+  location            = azurerm_resource_group.racmc.location
+  resource_group_name = azurerm_resource_group.racmc.name
+  application_type    = "web"
+}
 
 
 # # Backend (FastAPI container from ACR)
@@ -176,17 +190,13 @@ resource "azurerm_function_app_flex_consumption" "backend" {
   }
 }
 
-# resource "azurerm_function_app_flex_consumption_plan" "trigger_blob_plan" {
-#   name                = "${var.project_name}-${var.environment}-func-blob-trigger-plan"
-#   location            = azurerm_resource_group.racmc.location
-#   resource_group_name = azurerm_resource_group.racmc.name
-# }
+
 
 resource "azurerm_function_app_flex_consumption" "trigger_blob" {
   name                = "${var.project_name}-${var.environment}-func-blob-trigger"
   resource_group_name = azurerm_resource_group.racmc.name
   location            = azurerm_resource_group.racmc.location
-  service_plan_id     = azurerm_service_plan.func_plan.id
+  service_plan_id     = azurerm_service_plan.trigger_blob_plan.id
 
   storage_container_type      = "blobContainer"
   storage_container_endpoint  = azurerm_storage_account.main.primary_blob_endpoint
@@ -318,6 +328,17 @@ resource "azurerm_function_app_flex_consumption" "trigger_blob" {
 #   principal_id         = azurerm_linux_function_app.backend.identity[0].principal_id
 # }
 
+# Static Web App Module (Free tier)
+module "static_web_app" {
+  source = "./modules/static_web_app"
+
+  name                = "${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.racmc.location
+  resource_group_name = azurerm_resource_group.racmc.name
+  sku_tier            = var.static_web_app_sku_tier
+  sku_size            = var.static_web_app_sku_size
+  tags                = var.tags
+}
 
 
 # AI Search Module (Free tier: 50MB, 10k docs)

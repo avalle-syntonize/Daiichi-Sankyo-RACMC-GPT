@@ -585,15 +585,33 @@ jwt: {
 
 ---
 
+## 🔐 Seguridad Adicional
+
+Para información detallada sobre las medidas de seguridad implementadas para la comunicación API, consulta:
+
+**[Security Implementation Guide](./SECURITY.md)**
+
+Este documento cubre:
+- Middleware de seguridad global
+- Validación de tokens JWT
+- Protección anti-replay con nonces
+- Token binding y fingerprinting
+- Validación de headers personalizados
+- Guía de pruebas de seguridad
+
+---
+
 ## 📚 Referencias
 
 - [NextAuth.js Documentation](https://next-auth.js.org/)
 - [Azure AD Provider](https://next-auth.js.org/providers/azure-ad)
 - [Next.js Authentication](https://nextjs.org/docs/authentication)
+- [Next.js Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware)
 - [Microsoft Identity Platform](https://docs.microsoft.com/en-us/azure/active-directory/develop/)
+- [OWASP API Security](https://owasp.org/www-project-api-security/)
 
 ---
 
 **Última actualización**: Enero 2026  
-**Versión**: 1.0.0  
+**Versión**: 1.1.0  
 **Responsable**: Syntonize Development Team

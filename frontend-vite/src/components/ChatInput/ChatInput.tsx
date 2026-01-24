@@ -5,9 +5,14 @@ import './ChatInput.css';
 interface ChatInputProps {
   onSendMessage: (message: string, files?: File[]) => void;
   disabled?: boolean;
+  hasFiltersSelected?: boolean;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, disabled = false }) => {
+const ChatInput: React.FC<ChatInputProps> = ({
+  onSendMessage,
+  disabled = false,
+  hasFiltersSelected = false,
+}) => {
   const [message, setMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -23,7 +28,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, disabled = false }
   };
 
   const handleSend = () => {
-    if (message.trim() || selectedFiles.length > 0) {
+    if ((message.trim() || selectedFiles.length > 0) && hasFiltersSelected) {
       onSendMessage(message, selectedFiles);
       setMessage('');
       setSelectedFiles([]);
@@ -34,11 +39,20 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, disabled = false }
   };
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && hasFiltersSelected) {
       e.preventDefault();
       handleSend();
     }
   };
+
+  // Button is disabled if: disabled prop, no filters selected, or no content
+  const isSendDisabled =
+    disabled || !hasFiltersSelected || (!message.trim() && selectedFiles.length === 0);
+
+  // Dynamic placeholder based on filter selection
+  const placeholder = hasFiltersSelected
+    ? 'Ask a question about your regulatory documentation...'
+    : 'Select at least one project filter to start asking questions...';
 
   return (
     <div className="input-area">
@@ -56,7 +70,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, disabled = false }
         <input
           type="text"
           className="input-field"
-          placeholder="Ask a question about your regulatory documentation..."
+          placeholder={placeholder}
           value={message}
           onChange={e => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
@@ -78,7 +92,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, disabled = false }
           <button
             className="send-btn"
             onClick={handleSend}
-            disabled={disabled || (!message.trim() && selectedFiles.length === 0)}
+            disabled={isSendDisabled}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <line x1="22" y1="2" x2="11" y2="13"></line>

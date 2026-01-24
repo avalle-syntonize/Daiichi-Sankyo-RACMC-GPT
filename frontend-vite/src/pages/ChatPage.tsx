@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useChatContext } from '../context/ChatContext';
+import { useAuth } from '../auth';
 import Header from '../components/Header/Header';
 import Sidebar from '../components/Sidebar/Sidebar';
 import ChatContainer from '../components/ChatContainer/ChatContainer';
@@ -9,6 +10,7 @@ import './ChatPage.css';
 
 const ChatPage: React.FC = () => {
   const { messages, selectedFilters, addMessage, setSelectedFilters } = useChatContext();
+  const { user, logout } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSendMessage = (text: string) => {
@@ -55,13 +57,16 @@ const ChatPage: React.FC = () => {
   };
 
   const handleLogout = () => {
-    // Placeholder for logout logic
-    console.log('Logout clicked');
+    logout();
   };
 
   return (
     <div className="chat-page">
-      <Header userName="Tobias Schmidt" userInitials="TS" onLogout={handleLogout} />
+      <Header
+        userName={user?.name || 'User'}
+        userInitials={user?.initials || '??'}
+        onLogout={handleLogout}
+      />
 
       <div className="main-wrapper">
         <Sidebar
@@ -81,8 +86,11 @@ const ChatPage: React.FC = () => {
               </p>
             </div>
 
-            <ChatContainer messages={messages} />
-            <ChatInput onSendMessage={handleSendMessage} />
+            <ChatContainer messages={messages} userInitials={user?.initials} />
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              hasFiltersSelected={selectedFilters.length > 0}
+            />
           </div>
         </div>
       </div>

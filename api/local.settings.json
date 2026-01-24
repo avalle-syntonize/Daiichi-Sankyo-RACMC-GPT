@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AZURE_AD_TENANT_ID": "your-tenant-id",
+    "AZURE_AD_CLIENT_ID": "your-backend-client-id",
+    "AZURE_AD_AUDIENCE": "api://your-backend-client-id",
+    "ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:3000",
+    "CUSTOM_HEADER_NAME": "X-SWA-Custom-Header",
+    "CUSTOM_HEADER_VALUE": "your-secret-value",
+    "TOKEN_LIFETIME_MINUTES": "15"
+  }
+}

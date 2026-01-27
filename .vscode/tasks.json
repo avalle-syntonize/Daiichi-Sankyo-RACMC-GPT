@@ -1,0 +1,55 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "func",
+			"label": "func: host start",
+			"command": "host start",
+			"problemMatcher": "$func-python-watch",
+			"isBackground": true,
+			"dependsOn": "pip install (functions)"
+		},
+		{
+			"label": "pip install (functions)",
+			"type": "shell",
+			"osx": {
+				"command": "${config:azureFunctions.pythonVenv}/bin/python -m pip install -r requirements.txt"
+			},
+			"windows": {
+				"command": "${config:azureFunctions.pythonVenv}\\Scripts\\python -m pip install -r requirements.txt"
+			},
+			"linux": {
+				"command": "${config:azureFunctions.pythonVenv}/bin/python -m pip install -r requirements.txt"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "func: start backend api",
+			"type": "func",
+			"command": "host start",
+			"options": {
+				"cwd": "${workspaceFolder}/backend/api",
+				"env": {
+					"VIRTUAL_ENV": "${workspaceFolder}/backend/api/.venv",
+					"PATH": "${workspaceFolder}/backend/api/.venv/Scripts;${env:PATH}"
+				}
+			},
+			"isBackground": true,
+			"problemMatcher": "$func-python-watch"
+		},
+		{
+			"label": "func: start backend api2",
+			"type": "shell",
+			"command": "func start",
+			"options": {
+				"cwd": "${workspaceFolder}/backend/api",
+				"env": {
+					"VIRTUAL_ENV": "${workspaceFolder}/backend/api/.venv",
+					"PATH": "${workspaceFolder}/backend/api/.venv/Scripts;${env:PATH}"
+				}
+			},
+			"isBackground": true,
+			"problemMatcher": "$func-python-watch"
+		}
+	]
+}

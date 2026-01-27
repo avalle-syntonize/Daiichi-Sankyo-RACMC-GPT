@@ -1,0 +1,60 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to Python Functions",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 9091
+            },
+            "preLaunchTask": "func: host start"
+        },
+        {
+            "name": "Launch backend API",
+            "type": "python",
+            "request": "launch",
+            "python": "${workspaceFolder}\\backend\\api\\.venv\\Scripts\\python.exe",
+            "program": "${workspaceFolder}/backend/api/main.py",
+            "cwd": "${workspaceFolder}/backend/api",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Attach backend function",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 9091
+            },
+            "preLaunchTask": "func: start backend api"
+        },
+        {
+            "name": "Launch backend function",
+            "type": "process",
+            "request": "launch",
+            "command": "func",
+            "args": [
+                "start"
+            ],
+            "cwd": "${workspaceFolder}/backend/api",
+            "env": {
+                "VIRTUAL_ENV": "${workspaceFolder}\\backend\\api\\.venv",
+                "PATH": "${workspaceFolder}\\backend\\api\\.venv\\Scripts;${env:PATH}"
+            },
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Launch ingestor function",
+            "type": "python",
+            "request": "launch",
+            "python": "${workspaceFolder}\\backend\\ingestor\\.venv\\Scripts\\python.exe",
+            "program": "${workspaceFolder}/backend/ingestor/function_app.py",
+            "cwd": "${workspaceFolder}/backend/ingestor",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}

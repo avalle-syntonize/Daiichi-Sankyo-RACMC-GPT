@@ -99,7 +99,7 @@ secrets/
 . secrets
 
 # IDEs
-.vscode/
+# .vscode/
 .idea/
 .vs/
 *.swp

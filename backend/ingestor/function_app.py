@@ -4,7 +4,9 @@ import azure.functions as func
 from datetime import datetime
 
 from azure.storage.blob import BlobServiceClient
-from orchestrator import ProcessorOrchestrator
+from core.applications.ingestor_application import IngestorApplication
+from core.adapters.ingestor_adapter import IngestorAdapter
+# from orchestrator import ProcessorOrchestrator
 from core.utils.embeddings import semantic_chunk_documents_generic, load_chunks_azure_search
 from core.utils.embeddings import move_file_to_completed, move_file_to_failed, rename_file
 
@@ -61,8 +63,8 @@ def main(myblob: func.InputStream):
 
     try:
         # Initialize orchestrator
-        orchestrator = ProcessorOrchestrator()
-
+        # orchestrator = ProcessorOrchestrator()
+        orchestrator = IngestorApplication(IngestorAdapter())
         # Process document using orchestrator
         documents = orchestrator.process(
             new_blob_name, source_blob_client, blob_completed, language

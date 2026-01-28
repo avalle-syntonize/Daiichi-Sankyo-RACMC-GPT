@@ -9,6 +9,9 @@ from core.adapters.ingestor_adapter import IngestorAdapter
 # from orchestrator import ProcessorOrchestrator
 from core.utils.embeddings import semantic_chunk_documents_generic, load_chunks_azure_search
 from core.utils.files import move_file_to_completed, move_file_to_failed, rename_file
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = func.FunctionApp()
 
@@ -34,7 +37,7 @@ def main(myblob: func.InputStream):
 
     connection_string = os.environ["BlobStorageConnectionString"]
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-
+    AZURE_OPENAI_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY", None)
     blob_name = myblob.name.split("/")[-1]
     language = myblob.name.split("/")[-2]
 

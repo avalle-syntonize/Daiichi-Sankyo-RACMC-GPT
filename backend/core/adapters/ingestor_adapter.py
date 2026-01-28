@@ -8,4 +8,4 @@ class IngestorAdapter(IngestorRepository):
         self.orchestrator = ProcessorOrchestrator()
      
      def process(self, new_blob_name, source_blob_client, blob_completed, language):
-         return super().process(new_blob_name, source_blob_client, blob_completed, language)
+         return self.orchestrator.process(new_blob_name, source_blob_client, blob_completed, language)

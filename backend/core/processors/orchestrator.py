@@ -14,7 +14,7 @@ from langchain_core.documents import Document
 
 from core.processors.base_processor import BaseDocumentProcessor
 from core.processors.pdf_processor import PDFProcessor
-
+import tempfile
 
 class ProcessorOrchestrator:
     """
@@ -128,7 +128,8 @@ class ProcessorOrchestrator:
         # Create secure temporary file path
         # Use only the filename without path components to prevent path traversal
         safe_filename = os.path.basename(blob_name)
-        temp_file_path = os.path.join("/tmp", safe_filename)
+        temp_dir = tempfile.gettempdir()
+        temp_file_path = os.path.join(temp_dir, safe_filename)
 
         try:
             self._download_file(source_blob_client, blob_name, temp_file_path)
@@ -143,7 +144,8 @@ class ProcessorOrchestrator:
             )
 
             return documents
-
+        except Exception as e:
+            logging.error("Error processing document %s: %s", blob_name, e)
         finally:
             # Clean up temporary file
             self._cleanup_temp_file(temp_file_path)
@@ -162,6 +164,7 @@ class ProcessorOrchestrator:
         Raises:
             Exception: If download fails
         """
+        os.makedirs(os.path.dirname(temp_file_path), exist_ok=True)
         logging.info("Downloading blob to: %s", temp_file_path)
 
         with open(file=temp_file_path, mode="wb") as temp_file:

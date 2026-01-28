@@ -44,7 +44,6 @@
 			"command": "host start",
 			"options": {
 				"cwd": "${workspaceFolder}/backend/ingestor",
-				"envFile": "${workspaceFolder}/backend/api/.env.local",
 				"env": {
 					"VIRTUAL_ENV": "${workspaceFolder}/backend/ingestor/.venv",
 					"PATH": "${workspaceFolder}/backend/ingestor/.venv/Scripts;${env:PATH}",

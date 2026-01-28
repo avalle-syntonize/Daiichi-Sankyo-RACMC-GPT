@@ -1,5 +1,5 @@
 import logging
-import utils.config as cfg
+import core.utils.config as cfg
 from typing import List
 
 from langchain_experimental.text_splitter import SemanticChunker

@@ -1,5 +1,5 @@
-from processors.orchestrator import ProcessorOrchestrator
-from domain.ports.Ingestor_repository import IngestorRepository
+from core.processors.orchestrator import ProcessorOrchestrator
+from core.domain.ports.Ingestor_repository import IngestorRepository
 
 
 class IngestorAdapter(IngestorRepository):

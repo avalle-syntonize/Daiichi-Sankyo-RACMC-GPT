@@ -36,19 +36,14 @@
             "preLaunchTask": "func: start backend api"
         },
         {
-            "name": "Launch backend function",
-            "type": "process",
-            "request": "launch",
-            "command": "func",
-            "args": [
-                "start"
-            ],
-            "cwd": "${workspaceFolder}/backend/api",
-            "env": {
-                "VIRTUAL_ENV": "${workspaceFolder}\\backend\\api\\.venv",
-                "PATH": "${workspaceFolder}\\backend\\api\\.venv\\Scripts;${env:PATH}"
+            "name": "Attach function ingestor",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 9091
             },
-            "console": "integratedTerminal"
+            "preLaunchTask": "func: start ingestor"
         },
         {
             "name": "Launch ingestor function",
@@ -57,6 +52,10 @@
             "python": "${workspaceFolder}\\backend\\ingestor\\.venv\\Scripts\\python.exe",
             "program": "${workspaceFolder}/backend/ingestor/function_app.py",
             "cwd": "${workspaceFolder}/backend/ingestor",
+            "envFile": "${workspaceFolder}/backend/api/.env.local",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/backend"
+            },
             "console": "integratedTerminal",
             "justMyCode": false
         }

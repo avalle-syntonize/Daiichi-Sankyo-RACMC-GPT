@@ -1,6 +1,6 @@
 import logging
 import time
-import utils.config as cfg
+import core.utils.config as cfg
 
 
 def move_file_to_completed(

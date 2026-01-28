@@ -12,7 +12,8 @@ from typing import Dict, List
 from azure.storage.blob import BlobServiceClient
 from langchain_core.documents import Document
 
-from processors import BaseDocumentProcessor, PDFProcessor
+from core.processors.base_processor import BaseDocumentProcessor
+from core.processors.pdf_processor import PDFProcessor
 
 
 class ProcessorOrchestrator:

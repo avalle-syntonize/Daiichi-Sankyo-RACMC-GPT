@@ -8,7 +8,7 @@ from core.applications.ingestor_application import IngestorApplication
 from core.adapters.ingestor_adapter import IngestorAdapter
 # from orchestrator import ProcessorOrchestrator
 from core.utils.embeddings import semantic_chunk_documents_generic, load_chunks_azure_search
-from core.utils.embeddings import move_file_to_completed, move_file_to_failed, rename_file
+from core.utils.files import move_file_to_completed, move_file_to_failed, rename_file
 
 app = func.FunctionApp()
 

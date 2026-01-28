@@ -8,7 +8,7 @@ PyPDFLoader from LangChain.
 import logging
 from typing import List
 
-import utils.config as cfg
+import core.utils.config as cfg
 from langchain_core.documents import Document
 from langchain_community.document_loaders import PyPDFLoader
 

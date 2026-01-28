@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional, Any, Dict
 from enum import Enum
-
+from pydantic import BaseModel, Field, model_validator
 
 class Feedback(str, Enum):
     Neutral = "neutral"
@@ -159,3 +159,17 @@ class FrontendSettings:
     feedback_enabled: Optional[str] = None
     ui: Optional[UI] = None
     sanitize_answer: Optional[bool] = None
+
+
+
+
+
+class LanguageEnum(Enum):
+    SPANISH = 'SP'
+    ENGLISH = 'EN'
+    GERMAN = 'DE'
+    FRENCH = 'FR'
+    DUTCH = 'NL'
+    
+class Language(BaseModel):
+    language: LanguageEnum = Field(description="language that has been detected", default='EN')

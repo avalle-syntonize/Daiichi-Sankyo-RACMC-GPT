@@ -1,0 +1,49 @@
+from azure.search.documents.indexes.models import SearchableField, SearchField, SearchFieldDataType, SimpleField
+
+fields = [
+    SimpleField(
+        name="id",
+        type=SearchFieldDataType.String,
+        key=True,
+        filterable=True,
+    ),
+    SearchableField(
+        name="content",
+        type=SearchFieldDataType.String,
+        searchable=True,
+    ),
+    SearchField(
+        name="contentVector",
+        type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
+        searchable=True,
+        vector_search_dimensions=3072,
+        vector_search_profile_name="myHnswProfile",
+    ),
+    SearchableField(
+        name="metadata",
+        type=SearchFieldDataType.String,
+        searchable=True,
+    ),
+    SearchableField(
+        name="url",
+        type=SearchFieldDataType.String,
+        searchable=True,
+    ),
+    SimpleField(
+        name="title",
+        type=SearchFieldDataType.String,
+        searchable=True,
+    ),
+    SearchableField(
+        name="filepath",
+        type=SearchFieldDataType.String,
+        searchable=True,
+        filterable=True,
+    ),
+    SearchableField(
+        name="language",
+        type=SearchFieldDataType.String,
+        searchable=True,
+        filterable=True,
+    ),
+]

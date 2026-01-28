@@ -17,9 +17,13 @@
             "request": "launch",
             "python": "${workspaceFolder}\\backend\\api\\.venv\\Scripts\\python.exe",
             "program": "${workspaceFolder}/backend/api/main.py",
-            "cwd": "${workspaceFolder}/backend/api",
+            "cwd": "${workspaceFolder}/backend",
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "envFile": "${workspaceFolder}/backend/api/.env.local",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/backend"
+            }
         },
         {
             "name": "Attach backend function",

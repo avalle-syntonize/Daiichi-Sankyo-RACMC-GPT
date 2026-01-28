@@ -2,10 +2,15 @@ import copy
 import logging
 from threading import Thread
 from typing import Any, Dict, List
-from core.domain.models.main import ChatMessage
-from domain.ports.chatbot_repository import ChatbotRepository
+# from core.domain.models.main import ChatMessage
+from core.chains.embeddings import build_embeddings_model
+from core.utils.azure_search import build_azure_search_store_async
+from core.domain.models.main import Language
+from core.chains.prompt import build_chatbot_prompt, build_contextualize_prompt
+from core.utils.utils import format_as_ndjson, format_streaming_response_langchain
+from core.domain.ports.chatbot_repository import ChatbotRepository
 from langchain_chroma import Chroma
-from langchain_openai import AzureOpenAIEmbeddings
+from langchain_openai import AzureChatOpenAI, AzureOpenAIEmbeddings
 import os
 import uuid
 import base64
@@ -15,15 +20,27 @@ import tempfile
 from time import sleep
 from azure.identity.aio import DefaultAzureCredential, get_bearer_token_provider
 from openai import AsyncAzureOpenAI
-from quart import (
-    Blueprint,
-    Quart,
-    jsonify,
-    make_response,
-    request,
-    send_from_directory,
-    render_template,
-)
+from langchain_core.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
+from langchain_core.runnables import RunnableSerializable
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_classic.chains.combine_documents import create_stuff_documents_chain
+from langchain_classic.chains.history_aware_retriever import create_history_aware_retriever
+from langchain_classic.chains.retrieval import create_retrieval_chain
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.runnables import ConfigurableFieldSpec
+from langchain_classic.retrievers import EnsembleRetriever
+from langchain_core.vectorstores import VectorStoreRetriever
+# from quart import (
+#     Blueprint,
+#     Quart,
+#     jsonify,
+#     make_response,
+#     request,
+#     send_from_directory,
+#     render_template,
+# )
+
+from fastapi.responses import JSONResponse, StreamingResponse
 
 AZURE_OPENAI_SYSTEM_MESSAGE = os.environ.get(
     "AZURE_OPENAI_SYSTEM_MESSAGE",
@@ -100,10 +117,10 @@ class ChatbotAdapter(ChatbotRepository):
     def __init__(self):
         SHOULD_USE_DATA = self.should_use_data()
      
-    def create_embeddings(model: str = os.environ.get("AZURE_OPENAI_EMBEDDING_NAME")) -> AzureOpenAIEmbeddings:  
-        return AzureOpenAIEmbeddings(model=model)
+    def create_embeddings(model: str = AZURE_OPENAI_EMBEDDING_NAME) -> AzureOpenAIEmbeddings:  
+        return AzureOpenAIEmbeddings(model=AZURE_OPENAI_EMBEDDING_NAME)
 
-    def create_vector_store(embeddings: AzureOpenAIEmbeddings, collection_name: str = "example_collection") -> Chroma:  
+    def create_vector_store(self, embeddings: AzureOpenAIEmbeddings, collection_name: str) -> Chroma:  
         return Chroma(  
             collection_name=collection_name,  
             embedding_function=embeddings
@@ -157,7 +174,9 @@ class ChatbotAdapter(ChatbotRepository):
         await vector_store.aadd_documents(documents=documents, ids=uuids) 
 
     async def get_completions(self, context: Dict[str, Any]) -> str:
-        vector_store = self.create_vector_store(self.create_embeddings(), str(uuid.uuid4()))
+        collection_name = str(uuid.uuid4())
+        embeddings = self.create_embeddings()
+        vector_store = self.create_vector_store(embeddings=embeddings, collection_name=collection_name)
         filtered_messages = []  
         messages = context.get("messages", [])
         messageContainsAttachment = False
@@ -208,6 +227,184 @@ class ChatbotAdapter(ChatbotRepository):
         # Reset the vector store after 2 minutes
         Thread(target=self.reset_vector_store, args=(vector_store,)).start()
         return response
+    
+    def build_model(self, model: str =  None) -> AzureChatOpenAI:
+        """Builds and returns an AzureChatOpenAI model for generating embeddings.
+        
+            Returns:
+                Embeddings: An instance of AzureChatOpenAI model for generating embeddings.
+        """
+        if model:
+            azure_deployment = os.environ.get("AZURE_OPENAI_MODEL")
+        else :
+            azure_deployment = os.environ.get("AZURE_OPENAI_MODEL_MINI")
+        print(f"Using Azure OpenAI model: {azure_deployment}")
+        return AzureChatOpenAI(
+                azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
+                azure_deployment=azure_deployment,
+                api_version=os.environ.get("AZURE_OPENAI_PREVIEW_API_VERSION"),
+                openai_api_key=os.environ.get("AZURE_OPENAI_KEY"),
+            )
+
+
+    def build_language_prompt(self) -> ChatPromptTemplate:
+        """Returns a ChatPromptTemplate object for building a chatbot prompt.
+        
+        The system prompt includes information about the AI assistant and instructions for responding. It also includes a placeholder for context to be filled in.
+        The function returns a ChatPromptTemplate object with the system prompt, a placeholder for chat history, and a placeholder for human input.
+        """
+
+        prompt_msg = """
+        You are an expert translator and your job is to detect the language. Indicating the language in the format: 
+        "SP for Spanish"
+        "EN for English"
+        "FR for French"
+        "DE for German"
+        "NL for Dutch".
+
+        sentence
+        -------
+        {sentence}
+
+        """
+        prompt = ChatPromptTemplate(
+            [
+                HumanMessagePromptTemplate.from_template(prompt_msg),
+            ],
+            input_variables=["sentence"],
+        )
+
+        return prompt
+
+    def build_language_chain(self):
+        llm = self.build_model("mini")
+        language_prompt = self.build_language_prompt()
+        language = language_prompt | llm.with_structured_output(Language)
+        return language
+        
+    def build_retriever(self,vector_store, ignore_external_documents, language) -> VectorStoreRetriever:
+        """
+        Builds a retriever object that retrieves vectors from an Azure Search store using an embeddings model.
+
+        Returns:
+            VectorStoreRetriever: A retriever object configured to retrieve vectors from an Azure Search store.
+        """
+        azure = build_azure_search_store_async(build_embeddings_model()).as_retriever(search_kwargs={"filters": f"language eq '{language}' or language eq 'EN'"})
+        chroma = vector_store.as_retriever()
+        retrievers = [azure, chroma] if not ignore_external_documents else [chroma]
+        weights=[0.5, 0.5] if not ignore_external_documents else [1.0]
+        return EnsembleRetriever(retrievers=retrievers, weights=weights)
+    
+    def build_chain(self, vector_store, ignore_external_documents,language) -> RunnableSerializable:
+        """Builds a chain of components for a conversational AI system.
+        
+        This function constructs a chain of components for a conversational AI system, including a language model, chatbot prompt, retrievers, parsers, and more.
+        
+        Returns:
+            RunnableSerializable: The chain of components for the conversational AI system.
+        """
+        llm = self.build_model()
+        prompt = build_chatbot_prompt()
+        retriever = self.build_retriever(vector_store, ignore_external_documents, language)
+        question_answer_chain = create_stuff_documents_chain(llm, prompt)
+        history_aware_retriever = create_history_aware_retriever(
+            llm, retriever, build_contextualize_prompt()
+        )
+
+        rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+
+        return rag_chain    
+
+    def get_session_history(self, messages: List[Dict[str, str]]) -> List[str]:
+        """Returns a list of user and assistant messages from the given list of messages.
+        
+            Args:
+                messages (List[Dict[str, str]]): A list of dictionaries containing message information.
+        
+            Returns:
+                List[str]: A list of user and assistant messages.
+        """
+        history = ChatMessageHistory()
+        for message in messages:
+            if message['role'] == 'user':
+                history.add_user_message(message['content'])
+                
+            elif message['role'] == 'assistant':
+                history.add_ai_message(message['content'])
+        return history
+
+    def build_message_history(self, vector_store, ignore_external_documents, language) -> RunnableWithMessageHistory:
+        """Builds a message history for a RunnableWithMessageHistory object.
+        
+        Returns:
+            RunnableWithMessageHistory: A RunnableWithMessageHistory object with specified parameters.
+        """
+        return RunnableWithMessageHistory(self.build_chain(vector_store, ignore_external_documents, language),
+                 self.get_session_history,
+                input_messages_key="input",
+                history_messages_key="chat_history",
+                output_messages_key="answer",
+                history_factory_config=[ConfigurableFieldSpec
+                                        (id="messages",annotation=List[Dict[str, str]], name="messages",description="List of messages from history",
+                                        default="",is_shared=True)])
+
+    async def conversation_history(self, model_args, history_metadata, vector_store, ignore_external_documents, stream: bool = False):
+        """
+        Retrieves the conversation history and returns either a streaming response or full JSON.
+
+        Args:
+            model_args (dict): Model arguments including messages.
+            history_metadata (dict): Metadata for the conversation history.
+            vector_store: Vector store instance for retrieval.
+            ignore_external_documents (bool): Whether to ignore external documents.
+            stream (bool): If True, return StreamingResponse; if False, return JSONResponse.
+
+        Returns:
+            StreamingResponse or JSONResponse: Conversation history in the requested format.
+        """
+        try:
+            last_message = {"input": f"{model_args['messages'][-1]['content']}"}
+
+            # Detect language
+            language = self.build_language_chain().invoke(
+                {"sentence": f"{model_args['messages'][-1]['content']}"}
+            ).language.value
+
+            # Build conversational chain
+            conversational_chain = self.build_message_history(vector_store, ignore_external_documents, language)
+
+            # Stream generator
+            response = conversational_chain.astream(
+                last_message, config={"configurable": {"messages": model_args["messages"]}}
+            )
+
+            # STREAMING RESPONSE
+            if stream:
+                async def generate():
+                    async for completionChunk in response:
+                        yield format_streaming_response_langchain(completionChunk, history_metadata, last_message)
+                return StreamingResponse(format_as_ndjson(generate()), media_type="application/json-lines")
+
+            # FULL JSON RESPONSE
+            else:
+                all_chunks = []
+                async for completionChunk in response:
+                    chunk_json = format_streaming_response_langchain(completionChunk, history_metadata, last_message)
+                    all_chunks.append(chunk_json)
+
+                final_response = {
+                    "id": str(uuid.uuid4()),
+                    "model": model_args.get("model", "unknown"),
+                    "history_metadata": history_metadata,
+                    "choices": all_chunks
+                }
+
+                return JSONResponse(content=final_response)
+
+        except Exception as ex:
+            logging.exception(ex)
+            status_code = getattr(ex, "status_code", 500)
+            return JSONResponse(content={"error": str(ex)}, status_code=status_code)
     
     def should_use_data(self) -> bool:
         global DATASOURCE_TYPE
@@ -347,16 +544,16 @@ class ChatbotAdapter(ChatbotRepository):
                 async for completionChunk in response:
                     yield self.format_stream_response(completionChunk, history_metadata, apim_request_id)
             result = generate()
-            response_json = await make_response(format_as_ndjson(result))
+            response_json = StreamingResponse(format_as_ndjson(result), media_type="application/json-lines")
             response_json.timeout = None
             response_json.mimetype = "application/json-lines"
             return response_json
         except Exception as ex:
             logging.exception(ex)
             if hasattr(ex, "status_code"):
-                return jsonify({"error": str(ex)}), ex.status_code
+                return JSONResponse ({"error": str(ex)}), ex.status_code
             else:
-                return jsonify({"error": str(ex)}), 500
+                return JSONResponse ({"error": str(ex)}), 500
 
     def parse_multi_columns(self,columns: str) -> list:
         """Parses a string of multiple columns separated by '|' or ',' and returns a list of columns.

@@ -1,0 +1,13 @@
+azure-functions>=1.24.0
+azure-identity>=1.25.1
+azure-search-documents>=11.6.0
+dotenv>=0.9.9
+fastapi[standard]>=0.128.0
+langchain>=1.2.7
+langchain-chroma>=1.1.0
+langchain-classic>=1.0.1
+langchain-community>=0.4.1
+langchain-openai>=1.1.7
+quart>=0.20.0
+uuid>=1.30
+uvicorn[standard]>=0.40.0

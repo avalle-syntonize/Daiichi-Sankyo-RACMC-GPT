@@ -1,7 +1,7 @@
 {
     "bindings": [
         {
-        "name": "myblob",
+        "name": "ingestor",
         "type": "blobTrigger",
         "direction": "in",
         "path": "documents/input/{folder}/{name}",

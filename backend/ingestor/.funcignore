@@ -1,0 +1,7 @@
+# Ignorar archivos temporales
+*.pyc
+__pycache__/
+.vscode/
+.DS_Store
+.env
+.local.settings.json

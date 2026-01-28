@@ -29,8 +29,8 @@ def semantic_chunk_documents_generic(documents: List[Document]) -> List[Document
 
     text_splitter = SemanticChunker(
         AzureOpenAIEmbeddings(
-            azure_deployment=cfg.AZURE_DEPLOYMENT_EMBEDDING,
-            openai_api_version=cfg.OPENAI_API_VERSION,
+            azure_deployment=cfg.AZURE_OPENAI_EMBEDDING_NAME,
+            openai_api_version=cfg.AZURE_OPENAI_API_VERSION,
         )
     )
 
@@ -62,8 +62,8 @@ def load_chunks_azure_search(docs: List[Document], blob_name: str = None) -> Non
     vector_store_password = cfg.VECTOR_STORE_PASSWORD
 
     embeddings = AzureOpenAIEmbeddings(
-        azure_deployment=cfg.AZURE_DEPLOYMENT_EMBEDDING,
-        openai_api_version=cfg.OPENAI_API_VERSION,
+        azure_deployment=cfg.AZURE_OPENAI_EMBEDDING_NAME,
+        openai_api_version=cfg.AZURE_OPENAI_API_VERSION,
     )
     index_name: str = cfg.INDEX_NAME
 

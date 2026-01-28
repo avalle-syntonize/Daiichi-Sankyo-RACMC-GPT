@@ -37,7 +37,6 @@ def main(myblob: func.InputStream):
 
     connection_string = os.environ["BlobStorageConnectionString"]
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-    AZURE_OPENAI_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY", None)
     blob_name = myblob.name.split("/")[-1]
     language = myblob.name.split("/")[-2]
 

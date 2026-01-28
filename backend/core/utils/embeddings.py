@@ -65,6 +65,7 @@ def load_chunks_azure_search(docs: List[Document], blob_name: str = None) -> Non
         azure_deployment=cfg.AZURE_OPENAI_EMBEDDING_NAME,
         openai_api_version=cfg.AZURE_OPENAI_API_VERSION,
     )
+    
     index_name: str = cfg.INDEX_NAME
 
     logging.info("Load Document chunking document in: %s", index_name)

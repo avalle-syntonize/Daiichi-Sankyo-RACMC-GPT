@@ -37,7 +37,7 @@ class PDFProcessor(BaseDocumentProcessor):
         return file_extension.lower() == ".pdf"
 
     def extract(
-        self, file_path: str, blob_name: str, blob_url: str, language: str
+        self, file_path: str, blob_name: str, blob_url: str, project_id: str
     ) -> List[Document]:
         """
         Extract text and metadata from a PDF document.
@@ -59,11 +59,11 @@ class PDFProcessor(BaseDocumentProcessor):
             raise ValueError(f"Invalid file: {file_path}")
 
         # Validate language early before attempting to load the file
-        if language not in cfg.LANGUAGES_CODE:
-            raise ValueError(
-                f"Unsupported language: {language}. "
-                f"Supported languages: {', '.join(cfg.LANGUAGES_CODE.keys())}"
-            )
+        # if language not in cfg.LANGUAGES_CODE:
+        #     raise ValueError(
+        #         f"Unsupported language: {language}. "
+        #         f"Supported languages: {', '.join(cfg.LANGUAGES_CODE.keys())}"
+        #     )
 
         logging.info("Processing PDF: %s", blob_name)
 
@@ -73,10 +73,11 @@ class PDFProcessor(BaseDocumentProcessor):
 
         # Combine all pages into a single text
         text = ""
-        language_code = cfg.LANGUAGES_CODE[language]
+        language = '' #cfg.LANGUAGES_CODE.get(language, 'unknown')
+        language_code = '' #cfg.LANGUAGES_CODE[language]
 
         # Get base metadata
-        metadata = self.get_metadata_base(blob_name, blob_url, language, language_code)
+        metadata = self.get_metadata_base(blob_name, blob_url, language, language_code, project_id)
 
         # Add PDF-specific metadata from first page
         if docs and docs[0].metadata:

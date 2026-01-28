@@ -38,7 +38,7 @@ class BaseDocumentProcessor(ABC):
 
     @abstractmethod
     def extract(
-        self, file_path: str, blob_name: str, blob_url: str, language: str
+        self, file_path: str, blob_name: str, blob_url: str, project_id: str
     ) -> List[Document]:
         """
         Extract text and metadata from a document.
@@ -47,7 +47,7 @@ class BaseDocumentProcessor(ABC):
             file_path (str): Path to the local file
             blob_name (str): Name of the blob in storage
             blob_url (str): URL of the blob
-            language (str): Language of the document (e.g., 'english', 'spanish')
+            project_id (str): Project identifier
 
         Returns:
             List[Document]: List of Document objects with extracted content and metadata
@@ -75,7 +75,7 @@ class BaseDocumentProcessor(ABC):
         return True
 
     def get_metadata_base(
-        self, blob_name: str, blob_url: str, language: str, language_code: str
+        self, blob_name: str, blob_url: str, language: str, language_code: str, project_id: str
     ) -> dict:
         """
         Generate standard metadata fields for a document.
@@ -85,7 +85,7 @@ class BaseDocumentProcessor(ABC):
             blob_url (str): URL of the blob
             language (str): Full language name (e.g., 'english')
             language_code (str): Language code (e.g., 'EN')
-
+            project_id (str): Project identifier
         Returns:
             dict: Dictionary with standard metadata fields
         """
@@ -94,6 +94,7 @@ class BaseDocumentProcessor(ABC):
             "url": blob_url,
             "title": blob_name,
             "language": language_code,
+            "project_id": project_id,
             "processor": self.__class__.__name__,
             "processor_version": self.version,
         }

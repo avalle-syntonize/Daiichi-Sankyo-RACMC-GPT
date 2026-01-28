@@ -11,7 +11,7 @@ def move_file_to_completed(
     source_container_name,
     source_blob_client,
     creation_time,
-    language,
+    project_id,
     target_container_name: str = "completed",
     container_name: str = "documents",
 ):
@@ -34,7 +34,7 @@ def move_file_to_completed(
     """
     target_blob_client = blob_service_client.get_blob_client(
         container=container_name,
-        blob=f"{target_container_name}/{language}/{creation_time}/{blob_name}",
+        blob=f"{target_container_name}/{project_id}/{creation_time}/{blob_name}",
     )
 
     try:
@@ -62,7 +62,7 @@ def move_file_to_completed(
             source_container_name,
             source_blob_client,
             creation_time,
-            language,
+            project_id,
             blob_name,
             blob_url,
         )
@@ -75,7 +75,7 @@ def move_file_to_failed(
     source_container_name,
     source_blob_client,
     creation_time,
-    language,
+    project_id,
     new_blob_name: str = "",
     new_blob_url: str = "",
     container_name: str = "documents",
@@ -101,7 +101,7 @@ def move_file_to_failed(
 
     failed_blob_client = blob_service_client.get_blob_client(
         container=container_name,
-        blob=f"{failed_container_name}/{language}/{creation_time}/{blob_name}",
+        blob=f"{failed_container_name}/{project_id}/{creation_time}/{blob_name}",
     )
     try:
         failed_blob_client.start_copy_from_url(copy_source)
@@ -171,7 +171,7 @@ def rename_file(
     blob_name,
     myblob,
     formatted_date,
-    language,
+    project_id
 ) -> str:
     """Rename a file in a specified blob storage container by copying it to an 'inprogress' folder and modifying its name.
 
@@ -190,7 +190,9 @@ def rename_file(
     Raises:
         Exception: If the copy operation fails, an error is logged and the file is moved to a failed state.
     """
-    language_code = cfg.LANGUAGES_CODE[language]
+    # language_code = cfg.LANGUAGES_CODE[language]
+
+    language_code = ''
 
     logging.info("Start rename file %s", blob_name)
     filename_replace = blob_name.replace(" ", "_")
@@ -234,7 +236,7 @@ def rename_file(
             source_container_name,
             blob_client,
             formatted_date,
-            language,
+            project_id
         )
         raise e
 

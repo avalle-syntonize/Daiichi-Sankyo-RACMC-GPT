@@ -38,10 +38,10 @@ def main(myblob: func.InputStream):
     connection_string = os.environ["BlobStorageConnectionString"]
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     blob_name = myblob.name.split("/")[-1]
-    language = myblob.name.split("/")[-2]
+    project_id = myblob.name.split("/")[-2]
 
     container_name = "documents"
-    source_container_name = f"input/{language}"
+    source_container_name = f"input/{project_id}"
     current_date = datetime.now()
     formatted_date = current_date.strftime("%Y%m%d")
     new_blob_name = rename_file(
@@ -51,7 +51,7 @@ def main(myblob: func.InputStream):
         blob_name,
         myblob,
         formatted_date,
-        language,
+        project_id
     )
 
     source_blob_client = blob_service_client.get_blob_client(
@@ -60,7 +60,7 @@ def main(myblob: func.InputStream):
 
     url_inprogress = source_blob_client.url
     blob_completed = url_inprogress.replace(
-        "inprogress", f"completed/{language}/{formatted_date}"
+        "inprogress", f"completed/{project_id}/{formatted_date}"
     )
 
     try:
@@ -69,7 +69,7 @@ def main(myblob: func.InputStream):
         orchestrator = IngestorApplication(IngestorAdapter())
         # Process document using orchestrator
         documents = orchestrator.process(
-            new_blob_name, source_blob_client, blob_completed, language
+            new_blob_name, source_blob_client, blob_completed, project_id
         )
 
         # Chunk documents using generic chunker
@@ -87,7 +87,7 @@ def main(myblob: func.InputStream):
             source_container_name,
             source_blob_client,
             formatted_date,
-            language,
+            project_id,
         )
     except Exception as e:
         logging.error("Failed doc from blob %s to azure search: %s", new_blob_name, e)
@@ -97,7 +97,7 @@ def main(myblob: func.InputStream):
             source_container_name,
             source_blob_client,
             formatted_date,
-            language,
+            project_id,
             new_blob_name,
         )
         raise e

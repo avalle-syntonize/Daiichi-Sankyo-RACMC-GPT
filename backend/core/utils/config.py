@@ -79,4 +79,10 @@ FIELDS = [
         searchable=True,
         filterable=True,
     ),
+    SearchableField(
+        name="project_id",
+        type=SearchFieldDataType.String,
+        searchable=True,
+        filterable=True,
+    ),
 ]

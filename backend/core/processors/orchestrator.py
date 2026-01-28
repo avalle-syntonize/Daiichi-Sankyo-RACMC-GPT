@@ -82,7 +82,7 @@ class ProcessorOrchestrator:
         blob_name: str,
         source_blob_client: BlobServiceClient,
         blob_url: str,
-        language: str,
+        project_id: str,
     ) -> List[Document]:
         """
         Process a document through the complete workflow.
@@ -115,10 +115,10 @@ class ProcessorOrchestrator:
             raise ValueError(f"Could not determine file extension for: {blob_name}")
 
         logging.info(
-            "Processing document: %s (format: %s, language: %s)",
+            "Processing document: %s (format: %s, project_id: %s)",
             blob_name,
             file_extension,
-            language,
+            project_id,
         )
 
         # Get appropriate processor
@@ -135,7 +135,7 @@ class ProcessorOrchestrator:
             self._download_file(source_blob_client, blob_name, temp_file_path)
 
             # Extract document content and metadata
-            documents = processor.extract(temp_file_path, blob_name, blob_url, language)
+            documents = processor.extract(temp_file_path, blob_name, blob_url, project_id)
 
             logging.info(
                 "Successfully processed %s: extracted %d document(s)",

@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 # from core.domain.models.main import ChatMessage
 from core.chains.embeddings import build_embeddings_model
 from core.utils.azure_search import build_azure_search_store_async
-from core.domain.models.main import Language
+from core.domain.models import Language
 from core.chains.prompt import build_chatbot_prompt, build_contextualize_prompt
 from core.utils.utils import format_as_ndjson, format_streaming_response_langchain
 from core.domain.ports.chatbot_repository import ChatbotRepository
@@ -116,6 +116,7 @@ class ChatbotAdapter(ChatbotRepository):
     
     def __init__(self):
         SHOULD_USE_DATA = self.should_use_data()
+        self.stream = False
      
     def create_embeddings(model: str = AZURE_OPENAI_EMBEDDING_NAME) -> AzureOpenAIEmbeddings:  
         return AzureOpenAIEmbeddings(model=AZURE_OPENAI_EMBEDDING_NAME)
@@ -173,7 +174,7 @@ class ChatbotAdapter(ChatbotRepository):
         uuids = [str(uuid.uuid4()) for _ in range(len(documents))]
         await vector_store.aadd_documents(documents=documents, ids=uuids) 
 
-    async def get_completions(self, context: Dict[str, Any]) -> str:
+    async def get_completions(self, context: Dict[str, Any], stream_response: bool = False) -> str:
         collection_name = str(uuid.uuid4())
         embeddings = self.create_embeddings()
         vector_store = self.create_vector_store(embeddings=embeddings, collection_name=collection_name)
@@ -219,7 +220,7 @@ class ChatbotAdapter(ChatbotRepository):
             if has_last_image_content:  
                 response = await self.stream_image_request(model_args, history_metadata)
             else:  
-                response = await self.conversation_history(model_args, history_metadata, vector_store, ignore_external_documents=has_last_file_content)  
+                response = await self.conversation_history(model_args, history_metadata, vector_store, ignore_external_documents=has_last_file_content,stream=stream_response)  
         except Exception as e:  
             logging.exception("Exception in send_chat_request")  
             raise e
@@ -245,7 +246,6 @@ class ChatbotAdapter(ChatbotRepository):
                 api_version=os.environ.get("AZURE_OPENAI_PREVIEW_API_VERSION"),
                 openai_api_key=os.environ.get("AZURE_OPENAI_KEY"),
             )
-
 
     def build_language_prompt(self) -> ChatPromptTemplate:
         """Returns a ChatPromptTemplate object for building a chatbot prompt.
@@ -348,7 +348,7 @@ class ChatbotAdapter(ChatbotRepository):
                                         (id="messages",annotation=List[Dict[str, str]], name="messages",description="List of messages from history",
                                         default="",is_shared=True)])
 
-    async def conversation_history(self, model_args, history_metadata, vector_store, ignore_external_documents, stream: bool = False):
+    async def conversation_history(self, model_args, history_metadata, vector_store, ignore_external_documents, stream: bool = True):
         """
         Retrieves the conversation history and returns either a streaming response or full JSON.
 
@@ -372,7 +372,7 @@ class ChatbotAdapter(ChatbotRepository):
 
             # Build conversational chain
             conversational_chain = self.build_message_history(vector_store, ignore_external_documents, language)
-
+            
             # Stream generator
             response = conversational_chain.astream(
                 last_message, config={"configurable": {"messages": model_args["messages"]}}
@@ -392,11 +392,22 @@ class ChatbotAdapter(ChatbotRepository):
                     chunk_json = format_streaming_response_langchain(completionChunk, history_metadata, last_message)
                     all_chunks.append(chunk_json)
 
+                # Concatenar el contenido de todas las choices en un solo string
+                full_content = ""
+                for chunk in all_chunks:
+                    choices = chunk.get("choices", [])
+                    if choices:
+                        messages = choices[0].get("messages", [])
+                        for msg in messages:
+                            if msg.get("role") == "assistant" and msg.get("content"):
+                                full_content += msg["content"]
+
                 final_response = {
                     "id": str(uuid.uuid4()),
                     "model": model_args.get("model", "unknown"),
                     "history_metadata": history_metadata,
-                    "choices": all_chunks
+                    "history": [],
+                    "content": full_content
                 }
 
                 return JSONResponse(content=final_response)

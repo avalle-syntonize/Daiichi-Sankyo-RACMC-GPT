@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from core.domain.models.main import ChatMessage
+# from backend.core.domain.models.models import ChatMessage
 from langchain_openai import AzureOpenAIEmbeddings
 from typing import Any, Dict, List
 from langchain_chroma import Chroma  
@@ -7,7 +7,7 @@ from langchain_chroma import Chroma
 class ChatbotRepository(ABC):
 
     @abstractmethod
-    async def get_completions(self, context: Dict[str, Any]) -> str:
+    async def get_completions(self, context: Dict[str, Any], stream_response: bool) -> str:
         pass
 
     @abstractmethod

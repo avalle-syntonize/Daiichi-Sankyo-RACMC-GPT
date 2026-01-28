@@ -1,7 +1,7 @@
 from fastapi import FastAPI, APIRouter, Request
 import uvicorn
 from dotenv import load_dotenv
-from typing import Any, Dict
+from typing import Any, Dict, List
 from pydantic import BaseModel, Field
 
 load_dotenv()
@@ -29,7 +29,11 @@ class CompletionsRequest(BaseModel):
     )
 
 class CompletionsResponse(BaseModel):
-    response: Any
+    id: str
+    model: str
+    history_metadata: Dict[str, Any]
+    history: List[Any] = []
+    content: str
 
 @router.get("/ping")
 def hello_world():
@@ -37,6 +41,18 @@ def hello_world():
 
 @router.post(
     "/completions",
+    response_model=CompletionsResponse,
+    summary="Genera una completion",
+    description="Recibe `context` (dict) y devuelve la respuesta del chatbot."
+)
+async def completions(payload: CompletionsRequest):
+    context = payload.context
+    response = await app_chatbot.get_completions(context)
+    return response
+
+
+@router.post(
+    "/stream/completions",
     # response_model=CompletionsResponse,
     summary="Genera una completion",
     description="Recibe `context` (dict) y devuelve la respuesta del chatbot.",
@@ -53,10 +69,11 @@ def hello_world():
     }
 },
 )
-async def completions(payload: CompletionsRequest):
+async def completions_stream(payload: CompletionsRequest):
     context = payload.context
-    response = await app_chatbot.get_completions(context)
+    response = await app_chatbot.get_completions(context, stream_response=True)
     return response
+
 
 
 app.include_router(router, prefix="/api")

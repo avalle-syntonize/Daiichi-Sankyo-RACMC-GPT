@@ -24,29 +24,14 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "func: start backend api",
+			"label": "func: start function backend",
 			"type": "func",
 			"command": "host start",
 			"options": {
-				"cwd": "${workspaceFolder}/backend/api",
+				"cwd": "${workspaceFolder}/backend",
 				"env": {
-					"VIRTUAL_ENV": "${workspaceFolder}/backend/api/.venv",
-					"PATH": "${workspaceFolder}/backend/api/.venv/Scripts;${env:PATH}",
-					"PYTHONPATH": "${workspaceFolder}/backend"
-				}
-			},
-			"isBackground": true,
-			"problemMatcher": "$func-python-watch"
-		},
-		{
-			"label": "func: start ingestor",
-			"type": "func",
-			"command": "host start",
-			"options": {
-				"cwd": "${workspaceFolder}/backend/ingestor",
-				"env": {
-					"VIRTUAL_ENV": "${workspaceFolder}/backend/ingestor/.venv",
-					"PATH": "${workspaceFolder}/backend/ingestor/.venv/Scripts;${env:PATH}",
+					"VIRTUAL_ENV": "${workspaceFolder}/backend/.venv",
+					"PATH": "${workspaceFolder}/backend/.venv/Scripts;${env:PATH}",
 					"PYTHONPATH": "${workspaceFolder}/backend"
 				}
 			},

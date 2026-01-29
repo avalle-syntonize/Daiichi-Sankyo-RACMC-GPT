@@ -192,34 +192,34 @@ resource "azurerm_function_app_flex_consumption" "backend" {
 
 
 
-resource "azurerm_function_app_flex_consumption" "trigger_blob" {
-  name                = "${var.project_name}-${var.environment}-func-blob-trigger"
-  resource_group_name = azurerm_resource_group.racmc.name
-  location            = azurerm_resource_group.racmc.location
-  service_plan_id     = azurerm_service_plan.trigger_blob_plan.id
+# resource "azurerm_function_app_flex_consumption" "trigger_blob" {
+#   name                = "${var.project_name}-${var.environment}-func-blob-trigger"
+#   resource_group_name = azurerm_resource_group.racmc.name
+#   location            = azurerm_resource_group.racmc.location
+#   service_plan_id     = azurerm_service_plan.trigger_blob_plan.id
 
-  storage_container_type      = "blobContainer"
-  storage_container_endpoint  = "${azurerm_storage_account.main.primary_blob_endpoint}${azurerm_storage_container.data.name}"
-  storage_authentication_type = "StorageAccountConnectionString"
-  storage_access_key          = azurerm_storage_account.main.primary_access_key
-  runtime_name                = "python"
-  runtime_version             = "3.11"
-  maximum_instance_count      = 50
-  instance_memory_in_mb       = 2048
+#   storage_container_type      = "blobContainer"
+#   storage_container_endpoint  = "${azurerm_storage_account.main.primary_blob_endpoint}${azurerm_storage_container.data.name}"
+#   storage_authentication_type = "StorageAccountConnectionString"
+#   storage_access_key          = azurerm_storage_account.main.primary_access_key
+#   runtime_name                = "python"
+#   runtime_version             = "3.11"
+#   maximum_instance_count      = 50
+#   instance_memory_in_mb       = 2048
 
-  site_config {
-  }
+#   site_config {
+#   }
 
-  app_settings = {
-    # FUNCTIONS_WORKER_RUNTIME       = "python"
-    AzureWebJobsStorage            = azurerm_storage_account.main.primary_connection_string
-    FUNCTIONS_EXTENSION_VERSION    = "~4"
-    AzureWebJobsFeatureFlags       = "EnableWorkerIndexing"
-    BlobStorageConnectionString    = azurerm_storage_account.main.primary_connection_string
-    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.app_insights.instrumentation_key
-  }
+#   app_settings = {
+#     # FUNCTIONS_WORKER_RUNTIME       = "python"
+#     AzureWebJobsStorage            = azurerm_storage_account.main.primary_connection_string
+#     FUNCTIONS_EXTENSION_VERSION    = "~4"
+#     AzureWebJobsFeatureFlags       = "EnableWorkerIndexing"
+#     BlobStorageConnectionString    = azurerm_storage_account.main.primary_connection_string
+#     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.app_insights.instrumentation_key
+#   }
   
-}
+# }
 
 # resource "azurerm_linux_function_app" "backend" {
 #   name                        = "${var.project_name}-${var.environment}-func-backend"

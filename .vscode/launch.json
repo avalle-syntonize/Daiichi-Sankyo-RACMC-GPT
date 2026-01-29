@@ -15,49 +15,25 @@
             "name": "Launch backend API",
             "type": "python",
             "request": "launch",
-            "python": "${workspaceFolder}\\backend\\api\\.venv\\Scripts\\python.exe",
+            "python": "${workspaceFolder}\\backend\\.venv\\Scripts\\python.exe",
             "program": "${workspaceFolder}/backend/api/main.py",
             "cwd": "${workspaceFolder}/backend",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "envFile": "${workspaceFolder}/backend/api/.env.local",
+            "envFile": "${workspaceFolder}/backend/.env",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/backend"
             }
         },
         {
-            "name": "Attach backend function",
+            "name": "Attach function backend",
             "type": "debugpy",
             "request": "attach",
             "connect": {
                 "host": "localhost",
                 "port": 9091
             },
-            "preLaunchTask": "func: start backend api"
+            "preLaunchTask": "func: start function backend"
         },
-        {
-            "name": "Attach function ingestor",
-            "type": "debugpy",
-            "request": "attach",
-            "connect": {
-                "host": "localhost",
-                "port": 9091
-            },
-            "preLaunchTask": "func: start ingestor"
-        },
-        {
-            "name": "Launch ingestor function",
-            "type": "python",
-            "request": "launch",
-            "python": "${workspaceFolder}\\backend\\ingestor\\.venv\\Scripts\\python.exe",
-            "program": "${workspaceFolder}/backend/ingestor/function_app.py",
-            "cwd": "${workspaceFolder}/backend/ingestor",
-            "envFile": "${workspaceFolder}/backend/api/.env.local",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/backend"
-            },
-            "console": "integratedTerminal",
-            "justMyCode": false
-        }
     ]
 }

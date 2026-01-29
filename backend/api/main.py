@@ -13,9 +13,9 @@ app = FastAPI(
     title="RAG API",
     version="0.1.0",
     description="API para RAG + chat completions",
-    docs_url="/docs",          # Swagger UI
-    redoc_url="/redoc",        # Redoc
-    openapi_url="/openapi.json"
+    docs_url="/api/docs",          # Swagger UI
+    redoc_url="/api/redoc",        # Redoc
+    openapi_url="/api/openapi.json"
 )
 
 router = APIRouter()

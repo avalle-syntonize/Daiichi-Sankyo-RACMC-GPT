@@ -1,5 +1,5 @@
 [project]
-name = "ingestor"
+name = "api"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -8,15 +8,14 @@ dependencies = [
     "azure-functions>=1.24.0",
     "azure-identity>=1.25.1",
     "azure-search-documents>=11.6.0",
-    "azure-storage-blob>=12.28.0",
-    "cohere>=5.20.2",
     "dotenv>=0.9.9",
+    "fastapi[standard]>=0.128.0",
+    "langchain>=1.2.7",
+    "langchain-chroma>=1.1.0",
+    "langchain-classic>=1.0.1",
     "langchain-community>=0.4.1",
-    "langchain-core>=1.2.7",
-    "langchain-experimental>=0.4.1",
     "langchain-openai>=1.1.7",
-    "langchain-text-splitters>=1.1.0",
-    "pypdf>=6.6.2",
-    "python-dotenv>=1.2.1",
-    "temp>=2020.7.2",
+    "quart>=0.20.0",
+    "uuid>=1.30",
+    "uvicorn[standard]>=0.40.0",
 ]

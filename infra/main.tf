@@ -171,7 +171,7 @@ resource "azurerm_function_app_flex_consumption" "backend" {
   service_plan_id     = azurerm_service_plan.func_plan.id
 
   storage_container_type      = "blobContainer"
-  storage_container_endpoint  = azurerm_storage_account.main.primary_blob_endpoint
+  storage_container_endpoint  = "${azurerm_storage_account.main.primary_blob_endpoint}${azurerm_storage_container.data.name}"
   storage_authentication_type = "StorageAccountConnectionString"
   storage_access_key          = azurerm_storage_account.main.primary_access_key
   runtime_name                = "python"
@@ -199,7 +199,7 @@ resource "azurerm_function_app_flex_consumption" "trigger_blob" {
   service_plan_id     = azurerm_service_plan.trigger_blob_plan.id
 
   storage_container_type      = "blobContainer"
-  storage_container_endpoint  = azurerm_storage_account.main.primary_blob_endpoint
+  storage_container_endpoint  = "${azurerm_storage_account.main.primary_blob_endpoint}${azurerm_storage_container.data.name}"
   storage_authentication_type = "StorageAccountConnectionString"
   storage_access_key          = azurerm_storage_account.main.primary_access_key
   runtime_name                = "python"

@@ -6,6 +6,9 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 4.0"
     }
+    azapi = {
+      source = "Azure/azapi"
+    }
   }
 }
 
@@ -16,6 +19,11 @@ provider "azurerm" {
     }
   }
   subscription_id = var.subscription_id
+}
+
+provider "azapi" {
+  skip_provider_registration = false
+  subscription_id            = var.subscription_id
 }
 
 # Data source to get current client configuration
@@ -47,6 +55,14 @@ resource "azurerm_storage_container" "data" {
   container_access_type = "private"
 }
 
+# Storage Container for blob documents
+resource "azurerm_storage_container" "documents" {
+  name                  = "documents"
+  storage_account_name  = azurerm_storage_account.main.name
+  container_access_type = "private"
+}
+
+
 # Key Vault (Free tier: 10k operations/month)
 # Note: Key Vault names must be 3-24 characters and globally unique
 resource "azurerm_key_vault" "main" {
@@ -68,7 +84,7 @@ resource "azurerm_key_vault" "main" {
     ]
 
     secret_permissions = [
-      "Get", "List", "Set", "Delete", "Recover", "Backup", "Restore"
+      "Get", "List", "Set", "Delete", "Recover", "Backup", "Restore", "Purge"
     ]
 
     certificate_permissions = [
@@ -77,6 +93,46 @@ resource "azurerm_key_vault" "main" {
   }
 
   tags = var.tags
+}
+
+
+# Static Web App Module (Free tier)
+# module "static_web_app" {
+#   source = "./modules/static_web_app"
+
+#   name                = "${var.project_name}-${var.environment}"
+#   location            = azurerm_resource_group.racmc.location
+#   resource_group_name = azurerm_resource_group.racmc.name
+#   sku_tier            = var.static_web_app_sku_tier
+#   sku_size            = var.static_web_app_sku_size
+#   tags                = var.tags
+# }
+
+
+# AI Search Module (Free tier: 50MB, 10k docs)
+module "ai_search" {
+  source = "./modules/ai_search"
+
+  name                = "${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.racmc.location
+  resource_group_name = azurerm_resource_group.racmc.name
+  sku                 = var.ai_search_sku
+  replica_count       = var.ai_search_replica_count
+  partition_count     = var.ai_search_partition_count
+  tags                = var.tags
+}
+
+
+resource "azurerm_key_vault_secret" "azure_search_key" {
+  name         = "azure-search-key"
+  value        = module.ai_search.primary_key
+  key_vault_id = azurerm_key_vault.main.id
+}
+
+resource "azurerm_key_vault_secret" "azure_openai_key" {
+  name         = "azure-openai-key"
+  value        = var.azure_openai_key
+  key_vault_id = azurerm_key_vault.main.id
 }
 
 # Azure Container Registry
@@ -134,27 +190,6 @@ resource "azurerm_service_plan" "func_plan" {
   sku_name = var.function_app_service_plan_size
 }
 
-resource "azurerm_service_plan" "trigger_blob_plan" {
-  name                = "${var.project_name}-${var.environment}-func-blob-trigger-plan"
-  resource_group_name = azurerm_resource_group.racmc.name
-  location            = azurerm_resource_group.racmc.location
-
-  os_type  = "Linux"
-  sku_name = var.function_app_service_plan_size
-}
-
-# resource "azurerm_function_app_flex_consumption_plan" "func_plan" {
-#   name                = "${var.project_name}-${var.environment}-func-plan"
-#   location            = azurerm_resource_group.racmc.location
-#   resource_group_name = azurerm_resource_group.racmc.name
-# }
-
-# resource "azurerm_function_app_flex_consumption_plan" "trigger_blob_plan" {
-#   name                = "${var.project_name}-${var.environment}-func-blob-trigger-plan"
-#   location            = azurerm_resource_group.racmc.location
-#   resource_group_name = azurerm_resource_group.racmc.name
-# }
-
 resource "azurerm_application_insights" "app_insights" {
   name                = "${var.project_name}-${var.environment}-app-insights"
   location            = azurerm_resource_group.racmc.location
@@ -163,34 +198,222 @@ resource "azurerm_application_insights" "app_insights" {
 }
 
 
-# # Backend (FastAPI container from ACR)
-resource "azurerm_function_app_flex_consumption" "backend" {
-  name                = "${var.project_name}-${var.environment}-func-backend"
-  resource_group_name = azurerm_resource_group.racmc.name
-  location            = azurerm_resource_group.racmc.location
-  service_plan_id     = azurerm_service_plan.func_plan.id
+# # Backend
+resource "azurerm_linux_function_app" "backend" {
+  name                        = "${var.project_name}-${var.environment}-func-backend"
+  resource_group_name         = azurerm_resource_group.racmc.name
+  location                    = azurerm_resource_group.racmc.location
+  service_plan_id             = azurerm_service_plan.func_plan.id
+  functions_extension_version = "~4"
+  storage_account_name        = azurerm_storage_account.main.name
+  storage_account_access_key  = azurerm_storage_account.main.primary_access_key
 
-  storage_container_type      = "blobContainer"
-  storage_container_endpoint  = "${azurerm_storage_account.main.primary_blob_endpoint}${azurerm_storage_container.data.name}"
-  storage_authentication_type = "StorageAccountConnectionString"
-  storage_access_key          = azurerm_storage_account.main.primary_access_key
-  runtime_name                = "python"
-  runtime_version             = "3.11"
-  maximum_instance_count      = 50
-  instance_memory_in_mb       = 2048
+
+  # zip_deploy_file = "./function_app.zip"
 
   site_config {
+    application_stack {
+      python_version = "3.13"
+    }
+
+    always_on = true
   }
+
 
   app_settings = {
-    # FUNCTIONS_WORKER_RUNTIME    = "python"
-    AzureWebJobsStorage         = azurerm_storage_account.main.primary_connection_string
-    WEBSITES_PORT               = "80"
-    FUNCTIONS_EXTENSION_VERSION = "~4"
+    # SCM_DO_BUILD_DURING_DEPLOYMENT       = true
+    # WEBSITE_RUN_FROM_PACKAGE             = "1"
+    AzureWebJobsStorage                  = azurerm_storage_account.main.primary_connection_string
+    # WEBSITES_PORT                        = "80"
+    # WEBSITES_ENABLE_APP_SERVICE_STORAGE  = "true"
+    BlobStorageConnectionString          = azurerm_storage_account.main.primary_connection_string
+    AzureWebJobsFeatureFlags             = "EnableWorkerIndexing"
+    FUNCTIONS_WORKER_RUNTIME             = "python"
+    # ENABLE_ORYX_BUILD                     = true
+    # AZURE_OPENAI_ENDPOINT                = "https://genai-research-eastus2.openai.azure.com/"
+    # AZURE_OPENAI_KEY                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
+    # AZURE_OPENAI_PREVIEW_API_VERSION     = "2024-12-01-preview"
+    # AZURE_OPENAI_API_KEY                 = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
+    # AZURE_OPENAI_API_VERSION             = "2024-12-01-preview"
+    # OPENAI_API_VERSION                   = "2024-12-01-preview"
+    # AZURE_DEPLOYMENT_EMBEDDING           = "text-embedding-3-large"
+    # AZURE_OPENAI_EMBEDDING_NAME          = "text-embedding-3-large"
+    # AZURE_OPENAI_EMBEDDING_ENDPOINT      = "https://genai-research-eastus2.openai.azure.com/"
+    # AZURE_OPENAI_EMBEDDING_KEY           = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
+    # SEARCH_TOP_K                         = "5"
+    # SEARCH_STRICTNESS                    = "3"
+    # SEARCH_ENABLE_IN_DOMAIN              = "true"
+    # AZURE_SEARCH_SERVICE                 = "srch-racmc-gpt-dev"
+    # AZURE_SEARCH_INDEX                   = "semantic-index"
+    # AZURE_SEARCH_ENDPOINT                = module.ai_search.search_endpoint
+    # AZURE_SEARCH_KEY                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_search_key.id})"
+    # AZURE_SEARCH_SEMANTIC_SEARCH_CONFIG  = "default"
+    # AZURE_SEARCH_INDEX_IS_PRECHUNKED     = "False"
+    # AZURE_SEARCH_TOP_K                   = "5"
+    # AZURE_SEARCH_ENABLE_IN_DOMAIN        = "false"
+    # AZURESEARCH_FIELDS_CONTENT_VECTOR    = "contentVector"
+    # AZURE_SEARCH_CONTENT_COLUMNS         = ""
+    # AZURE_SEARCH_FILENAME_COLUMN         = ""
+    # AZURE_SEARCH_TITLE_COLUMN            = ""
+    # AZURE_SEARCH_URL_COLUMN              = ""
+    # AZURE_SEARCH_VECTOR_COLUMNS          = ""
+    # AZURE_SEARCH_QUERY_TYPE              = "simple"
+    # AZURE_SEARCH_PERMITTED_GROUPS_COLUMN = ""
+    # AZURE_SEARCH_STRICTNESS              = "2",
+    # AZURE_OPENAI_TOP_P                   = "0.95",
+    # AZURE_OPENAI_MAX_TOKENS              = "1024",
+    # AZURE_OPENAI_TEMPERATURE             = "0.7",
+    # AZURE_OPENAI_STOP_SEQUENCE           = "stop all tokens"
+    APPINSIGHTS_INSTRUMENTATIONKEY    = azurerm_application_insights.app_insights.instrumentation_key
   }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  tags = var.tags
 }
 
+data "azurerm_function_app_host_keys" "keys" {
+  name                = azurerm_linux_function_app.backend.name
+  resource_group_name = azurerm_resource_group.racmc.name
+}
 
+# resource "azurerm_function_app_flex_consumption" "backend" {
+#   name                = "${var.project_name}-${var.environment}-func-backend"
+#   resource_group_name = azurerm_resource_group.racmc.name
+#   location            = azurerm_resource_group.racmc.location
+#   service_plan_id     = azurerm_service_plan.func_plan.id
+
+#   storage_container_type      = "blobContainer"
+#   storage_container_endpoint  = "${azurerm_storage_account.main.primary_blob_endpoint}${azurerm_storage_container.data.name}"
+#   storage_authentication_type = "StorageAccountConnectionString"
+#   storage_access_key          = azurerm_storage_account.main.primary_access_key
+#   runtime_name                = "python"
+#   runtime_version             = "3.11"
+#   maximum_instance_count      = 50
+#   instance_memory_in_mb       = 2048
+
+#   identity {
+#     type = "SystemAssigned"
+#   }
+
+#   site_config {
+#   }
+
+#   app_settings = {
+#     AzureWebJobsStorage         = azurerm_storage_account.main.primary_connection_string
+#     WEBSITES_PORT               = "80"
+#     FUNCTIONS_EXTENSION_VERSION = "~4"
+#     BlobStorageConnectionString = azurerm_storage_account.main.primary_connection_string
+#     AzureWebJobsFeatureFlags  = "EnableWorkerIndexing"
+#     # FUNCTIONS_WORKER_RUNTIME = "python"
+#     AZURE_OPENAI_ENDPOINT = "https://genai-research-eastus2.openai.azure.com/"
+#     AZURE_OPENAI_KEY = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
+#     AZURE_OPENAI_PREVIEW_API_VERSION = "2024-12-01-preview"
+#     AZURE_OPENAI_API_KEY = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
+#     AZURE_OPENAI_API_VERSION = "2024-12-01-preview"
+#     OPENAI_API_VERSION = "2024-12-01-preview"
+#     AZURE_DEPLOYMENT_EMBEDDING = "text-embedding-3-large"
+#     AZURE_OPENAI_EMBEDDING_NAME = "text-embedding-3-large"
+#     AZURE_OPENAI_EMBEDDING_ENDPOINT = "https://genai-research-eastus2.openai.azure.com/"
+#     AZURE_OPENAI_EMBEDDING_KEY = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
+#     SEARCH_TOP_K = "5"
+#     SEARCH_STRICTNESS = "3"
+#     SEARCH_ENABLE_IN_DOMAIN = "true"
+#     AZURE_SEARCH_SERVICE = "srch-racmc-gpt-dev"
+#     AZURE_SEARCH_INDEX = "semantic-index"
+#     AZURE_SEARCH_ENDPOINT = module.ai_search.search_endpoint
+#     AZURE_SEARCH_KEY = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_search_key.id})"
+#     AZURE_SEARCH_SEMANTIC_SEARCH_CONFIG = "default"
+#     AZURE_SEARCH_INDEX_IS_PRECHUNKED = "False"
+#     AZURE_SEARCH_TOP_K = "5"
+#     AZURE_SEARCH_ENABLE_IN_DOMAIN = "false"
+#     AZURESEARCH_FIELDS_CONTENT_VECTOR = "contentVector"
+#     AZURE_SEARCH_CONTENT_COLUMNS = ""
+#     AZURE_SEARCH_FILENAME_COLUMN = ""
+#     AZURE_SEARCH_TITLE_COLUMN = ""
+#     AZURE_SEARCH_URL_COLUMN = ""
+#     AZURE_SEARCH_VECTOR_COLUMNS = ""
+#     AZURE_SEARCH_QUERY_TYPE = "simple"
+#     AZURE_SEARCH_PERMITTED_GROUPS_COLUMN = ""
+#     AZURE_SEARCH_STRICTNESS = "2",
+#     AZURE_OPENAI_TOP_P = "0.95",
+#     AZURE_OPENAI_MAX_TOKENS = "1024",
+#     AZURE_OPENAI_TEMPERATURE = "0.7",
+#     AZURE_OPENAI_STOP_SEQUENCE = "stop all tokens"
+#   }
+# }
+
+
+
+# ========================================
+# Event Grid Subscription: Blob Created -> Function App
+# ========================================
+
+# data "azurerm_function_app_host_keys" "keys" {
+#   name                = azurerm_function_app_flex_consumption.backend.name
+#   resource_group_name = azurerm_resource_group.racmc.name
+# }
+
+# resource "azurerm_eventgrid_event_subscription" "ingestor_blob_to_function" {
+#   name  = "ingestor-blob-to-func-${var.environment}"
+#   scope = azurerm_storage_account.main.id
+#   event_delivery_schema = "EventGridSchema"
+
+#   webhook_endpoint {
+#     url = "https://${azurerm_function_app_flex_consumption.backend.default_hostname}/runtime/webhooks/eventgrid?functionName=blob_trigger&code=${data.azurerm_function_app_host_keys.keys.default_function_key}"
+#   }
+
+#   included_event_types = [
+#     "Microsoft.Storage.BlobCreated",
+#   ]
+
+#   depends_on = [
+#     azurerm_function_app_flex_consumption.backend
+#   ]
+# }
+
+# resource "azurerm_eventgrid_event_subscription" "blob_to_function" {
+#   name  = "ingestor-blob-to-func-${var.environment}"
+#   scope = azurerm_storage_account.main.id
+
+#   event_delivery_schema = "EventGridSchema"
+#   included_event_types  = ["Microsoft.Storage.BlobCreated"]
+
+#   subject_filter {
+#     subject_begins_with = "/blobServices/default/containers/documents/input/"
+#   }
+
+#   azure_function_endpoint {
+#     function_id = "${azurerm_function_app_flex_consumption.backend.id}/functions/blob_trigger"
+#   }
+
+#   # azure_function_endpoint {
+#   #   function_id = azurerm_function_app_flex_consumption.backend.id
+#   # }
+
+#   retry_policy {
+#     max_delivery_attempts = 5
+#     event_time_to_live    = 1440
+#   }
+# }
+
+
+
+# ========================================
+# Key Vault Access Policy para Function
+# ========================================
+# resource "azurerm_key_vault_access_policy" "func_kv_policy" {
+#   key_vault_id = azurerm_key_vault.main.id
+#   tenant_id    = data.azurerm_client_config.current.tenant_id
+#   object_id    = azurerm_function_app_flex_consumption.backend.identity[0].principal_id
+
+#   secret_permissions = [
+#     "Get",
+#     "List"
+#   ]
+# }
 
 # resource "azurerm_function_app_flex_consumption" "trigger_blob" {
 #   name                = "${var.project_name}-${var.environment}-func-blob-trigger"
@@ -218,7 +441,7 @@ resource "azurerm_function_app_flex_consumption" "backend" {
 #     BlobStorageConnectionString    = azurerm_storage_account.main.primary_connection_string
 #     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.app_insights.instrumentation_key
 #   }
-  
+
 # }
 
 # resource "azurerm_linux_function_app" "backend" {
@@ -301,55 +524,3 @@ resource "azurerm_function_app_flex_consumption" "backend" {
 # }
 
 
-# resource "azurerm_eventgrid_event_subscription" "blob_to_function" {
-#   name  = "es-blob-to-func-${var.environment}"
-#   scope = azurerm_storage_account.main.id
-
-#   event_delivery_schema = "EventGridSchema"
-#   included_event_types  = ["Microsoft.Storage.BlobCreated"]
-
-#   subject_filter {
-#     subject_begins_with = "/blobServices/default/containers/data/"
-#   }
-
-#   azure_function_endpoint {
-#     function_id = "${azurerm_linux_function_app.backend.id}/functions/BlobCreatedTrigger"
-#   }
-
-#   retry_policy {
-#     max_delivery_attempts = 5
-#     event_time_to_live    = 1440
-#   }
-# }
-
-# resource "azurerm_role_assignment" "acr_pull" {
-#   scope                = azurerm_container_registry.acr.id
-#   role_definition_name = "AcrPull"
-#   principal_id         = azurerm_linux_function_app.backend.identity[0].principal_id
-# }
-
-# Static Web App Module (Free tier)
-module "static_web_app" {
-  source = "./modules/static_web_app"
-
-  name                = "${var.project_name}-${var.environment}"
-  location            = azurerm_resource_group.racmc.location
-  resource_group_name = azurerm_resource_group.racmc.name
-  sku_tier            = var.static_web_app_sku_tier
-  sku_size            = var.static_web_app_sku_size
-  tags                = var.tags
-}
-
-
-# AI Search Module (Free tier: 50MB, 10k docs)
-module "ai_search" {
-  source = "./modules/ai_search"
-
-  name                = "${var.project_name}-${var.environment}"
-  location            = azurerm_resource_group.racmc.location
-  resource_group_name = azurerm_resource_group.racmc.name
-  sku                 = var.ai_search_sku
-  replica_count       = var.ai_search_replica_count
-  partition_count     = var.ai_search_partition_count
-  tags                = var.tags
-}

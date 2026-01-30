@@ -39,21 +39,21 @@ output "frontend_id" {
 
 output "backend_name" {
   description = "Name of the backend Function App"
-  value       = azurerm_function_app_flex_consumption.backend.name
+  value       = azurerm_linux_function_app.backend.name
 }
 output "backend_id" {
   description = "ID of the backend Function App"
-  value       = azurerm_function_app_flex_consumption.backend.id
+  value       = azurerm_linux_function_app.backend.id
 }
 
-output "backend_ingestor_name" {
-  description = "Name of the backend Function App for blob trigger"
-  value       = azurerm_function_app_flex_consumption.trigger_blob.name
-}
-output "backend_ingestor_id" {
-  description = "ID of the backend Function App for blob trigger"
-  value       = azurerm_function_app_flex_consumption.trigger_blob.id
-}
+# output "backend_ingestor_name" {
+#   description = "Name of the backend Function App for blob trigger"
+#   value       = azurerm_function_app_flex_consumption.trigger_blob.name
+# }
+# output "backend_ingestor_id" {
+#   description = "ID of the backend Function App for blob trigger"
+#   value       = azurerm_function_app_flex_consumption.trigger_blob.id
+# }
 
 # output "api_name" {
 #   description = "Name of the API App Service"

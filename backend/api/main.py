@@ -10,9 +10,9 @@ from core.applications.chatbot_application import ChatbotApplication
 from core.adapters.chatbot_adapter import ChatbotAdapter
 
 app = FastAPI(
-    title="RAG API",
-    version="0.1.0",
-    description="API para RAG + chat completions",
+    title="RACMC- GPT API",
+    version="1.0.0",
+    description="API for RACMC GPT",
     docs_url="/api/docs",          # Swagger UI
     redoc_url="/api/redoc",        # Redoc
     openapi_url="/api/openapi.json"
@@ -21,11 +21,11 @@ app = FastAPI(
 router = APIRouter()
 
 app_chatbot = ChatbotApplication(ChatbotAdapter())
-
+    
 class CompletionsRequest(BaseModel):
     context: Dict[str, Any] = Field(
         ...,
-        example={"messages": [{"role": "user", "content": "Hola, ¿qué dice la guía sobre X?"}]}
+        example={"messages": [{"role": "user", "content": "Hello, what do you know about Daiichi?"}]}
     )
 
 class CompletionsResponse(BaseModel):
@@ -36,14 +36,14 @@ class CompletionsResponse(BaseModel):
     content: str
 
 @router.get("/ping")
-def hello_world():
+def ping():
     return {"message": "RACMC GPT API is alive!"}
 
 @router.post(
     "/completions",
     response_model=CompletionsResponse,
-    summary="Genera una completion",
-    description="Recibe `context` (dict) y devuelve la respuesta del chatbot."
+    summary="Generates a completion",
+    description="Receives `context` (dict) and returns the chatbot's response."
 )
 async def completions(payload: CompletionsRequest):
     context = payload.context
@@ -54,20 +54,19 @@ async def completions(payload: CompletionsRequest):
 @router.post(
     "/stream/completions",
     # response_model=CompletionsResponse,
-    summary="Genera una completion",
-    description="Recibe `context` (dict) y devuelve la respuesta del chatbot.",
+    summary="Generates a completion",
+    description="Receives `context` (dict) and returns the chatbot's response.",
     responses={
     200: {
         "content": {"application/json-lines": {}},
-        "description": "Respuesta en streaming NDJSON",
+        "description": "Streaming response in NDJSON format",
         "examples": {
-            "ejemplo": {
-                "summary": "Respuesta simulada",
-                "value": '{"id":"abc","choices":[{"messages":[{"role":"assistant","content":"Hola!"}]}]}'
-            }
+            "example": {
+                "summary": "Simulated response",
+                "value": '{"id":"abc","choices":[{"messages":[{"role":"assistant","content":"Hello!"}]}]}'
         },
     }
-},
+}}
 )
 async def completions_stream(payload: CompletionsRequest):
     context = payload.context

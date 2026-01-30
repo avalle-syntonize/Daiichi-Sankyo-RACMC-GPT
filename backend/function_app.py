@@ -10,7 +10,7 @@ app = func.FunctionApp()
 # ----------------------------
 # HTTP route for FastAPI
 # ----------------------------
-@app.function_name(name="FastAPI")
+@app.function_name(name="api")
 @app.route(route="{*path}", auth_level=func.AuthLevel.ANONYMOUS)
 def main(req: func.HttpRequest, context: func.Context):
     return AsgiMiddleware(app_api).handle(req, context)

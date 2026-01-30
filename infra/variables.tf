@@ -134,3 +134,15 @@ variable "static_web_app_sku_size" {
   type        = string
   default     = "F1"
 }
+
+variable "azure_search_key" {
+  description = "Azure Search service admin key"
+  type        = string
+  default     = "your-azure-search-key"
+}
+
+variable "azure_openai_key" {
+  description = "Azure OpenAI service admin key"
+  type        = string
+  default     = "your-azure-openai-key"
+}

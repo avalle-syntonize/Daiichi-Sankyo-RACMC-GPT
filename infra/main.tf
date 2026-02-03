@@ -31,7 +31,7 @@ data "azurerm_client_config" "current" {}
 
 # Resource Group for RACMC-GPT
 resource "azurerm_resource_group" "racmc" {
-  name     = "rg-racmc-${var.environment}"
+  name     = "rg-${var.project_name}-${var.environment}"
   location = var.location
   tags     = var.tags
 }
@@ -136,49 +136,49 @@ resource "azurerm_key_vault_secret" "azure_openai_key" {
 }
 
 # Azure Container Registry
-resource "azurerm_container_registry" "acr" {
-  name                = lower(substr("acr${replace(var.project_name, "-", "")}${var.environment}", 0, 30))
-  resource_group_name = azurerm_resource_group.racmc.name
-  location            = azurerm_resource_group.racmc.location
-  sku                 = var.acr_sku
-  admin_enabled       = true
+# resource "azurerm_container_registry" "acr" {
+#   name                = lower(substr("acr${replace(var.project_name, "-", "")}${var.environment}", 0, 30))
+#   resource_group_name = azurerm_resource_group.racmc.name
+#   location            = azurerm_resource_group.racmc.location
+#   sku                 = var.acr_sku
+#   admin_enabled       = true
 
-  tags = var.tags
-}
+#   tags = var.tags
+# }
 
 # App Service Plan (Linux)
-resource "azurerm_service_plan" "plan" {
-  name                = "${var.project_name}-${var.environment}-plan"
-  location            = azurerm_resource_group.racmc.location
-  resource_group_name = azurerm_resource_group.racmc.name
-  # `kind` and `reserved` are set automatically by the provider and must not be configured here
+# resource "azurerm_service_plan" "plan" {
+#   name                = "${var.project_name}-${var.environment}-plan"
+#   location            = azurerm_resource_group.racmc.location
+#   resource_group_name = azurerm_resource_group.racmc.name
+#   # `kind` and `reserved` are set automatically by the provider and must not be configured here
 
-  # azurerm_service_plan requires sku_name and os_type
-  sku_name = var.app_service_plan_size
-  os_type  = "Linux"
+#   # azurerm_service_plan requires sku_name and os_type
+#   sku_name = var.app_service_plan_size
+#   os_type  = "Linux"
 
-  tags = var.tags
-}
+#   tags = var.tags
+# }
 
 # Frontend App Service (container from ACR)
-resource "azurerm_linux_web_app" "frontend" {
-  name                = "${var.project_name}-${var.environment}-web"
-  resource_group_name = azurerm_resource_group.racmc.name
-  location            = azurerm_resource_group.racmc.location
-  service_plan_id     = azurerm_service_plan.plan.id
+# resource "azurerm_linux_web_app" "frontend" {
+#   name                = "${var.project_name}-${var.environment}-web"
+#   resource_group_name = azurerm_resource_group.racmc.name
+#   location            = azurerm_resource_group.racmc.location
+#   service_plan_id     = azurerm_service_plan.plan.id
 
-  site_config {
-    application_stack {
-      docker_image_name = "${azurerm_container_registry.acr.login_server}/${var.frontend_image}:${var.image_tag}"
-    }
-  }
+#   site_config {
+#     application_stack {
+#       docker_image_name = "${azurerm_container_registry.acr.login_server}/${var.frontend_image}:${var.image_tag}"
+#     }
+#   }
 
-  app_settings = {
-    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-  }
+#   app_settings = {
+#     "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
+#   }
 
-  tags = var.tags
-}
+#   tags = var.tags
+# }
 
 # service plan for function app backend
 resource "azurerm_service_plan" "func_plan" {

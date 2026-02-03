@@ -221,50 +221,51 @@ resource "azurerm_linux_function_app" "backend" {
 
 
   app_settings = {
-    # SCM_DO_BUILD_DURING_DEPLOYMENT       = true
-    # WEBSITE_RUN_FROM_PACKAGE             = "1"
-    AzureWebJobsStorage                  = azurerm_storage_account.main.primary_connection_string
+    SCM_DO_BUILD_DURING_DEPLOYMENT = true
+    WEBSITE_RUN_FROM_PACKAGE             = "0"
+    AzureWebJobsStorage = azurerm_storage_account.main.primary_connection_string
     # WEBSITES_PORT                        = "80"
     # WEBSITES_ENABLE_APP_SERVICE_STORAGE  = "true"
-    BlobStorageConnectionString          = azurerm_storage_account.main.primary_connection_string
+    FUNCTIONS_EXTENSION_VERSION = "~4"
+    BlobStorageConnectionString = azurerm_storage_account.main.primary_connection_string
     AzureWebJobsFeatureFlags             = "EnableWorkerIndexing"
     FUNCTIONS_WORKER_RUNTIME             = "python"
-    # ENABLE_ORYX_BUILD                     = true
-    # AZURE_OPENAI_ENDPOINT                = "https://genai-research-eastus2.openai.azure.com/"
-    # AZURE_OPENAI_KEY                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
-    # AZURE_OPENAI_PREVIEW_API_VERSION     = "2024-12-01-preview"
-    # AZURE_OPENAI_API_KEY                 = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
-    # AZURE_OPENAI_API_VERSION             = "2024-12-01-preview"
-    # OPENAI_API_VERSION                   = "2024-12-01-preview"
-    # AZURE_DEPLOYMENT_EMBEDDING           = "text-embedding-3-large"
-    # AZURE_OPENAI_EMBEDDING_NAME          = "text-embedding-3-large"
-    # AZURE_OPENAI_EMBEDDING_ENDPOINT      = "https://genai-research-eastus2.openai.azure.com/"
-    # AZURE_OPENAI_EMBEDDING_KEY           = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
-    # SEARCH_TOP_K                         = "5"
-    # SEARCH_STRICTNESS                    = "3"
-    # SEARCH_ENABLE_IN_DOMAIN              = "true"
-    # AZURE_SEARCH_SERVICE                 = "srch-racmc-gpt-dev"
-    # AZURE_SEARCH_INDEX                   = "semantic-index"
-    # AZURE_SEARCH_ENDPOINT                = module.ai_search.search_endpoint
-    # AZURE_SEARCH_KEY                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_search_key.id})"
-    # AZURE_SEARCH_SEMANTIC_SEARCH_CONFIG  = "default"
-    # AZURE_SEARCH_INDEX_IS_PRECHUNKED     = "False"
-    # AZURE_SEARCH_TOP_K                   = "5"
-    # AZURE_SEARCH_ENABLE_IN_DOMAIN        = "false"
-    # AZURESEARCH_FIELDS_CONTENT_VECTOR    = "contentVector"
-    # AZURE_SEARCH_CONTENT_COLUMNS         = ""
-    # AZURE_SEARCH_FILENAME_COLUMN         = ""
-    # AZURE_SEARCH_TITLE_COLUMN            = ""
-    # AZURE_SEARCH_URL_COLUMN              = ""
-    # AZURE_SEARCH_VECTOR_COLUMNS          = ""
-    # AZURE_SEARCH_QUERY_TYPE              = "simple"
-    # AZURE_SEARCH_PERMITTED_GROUPS_COLUMN = ""
-    # AZURE_SEARCH_STRICTNESS              = "2",
-    # AZURE_OPENAI_TOP_P                   = "0.95",
-    # AZURE_OPENAI_MAX_TOKENS              = "1024",
-    # AZURE_OPENAI_TEMPERATURE             = "0.7",
-    # AZURE_OPENAI_STOP_SEQUENCE           = "stop all tokens"
-    APPINSIGHTS_INSTRUMENTATIONKEY    = azurerm_application_insights.app_insights.instrumentation_key
+    ENABLE_ORYX_BUILD                    = true
+    AZURE_OPENAI_ENDPOINT                = "https://genai-research-eastus2.openai.azure.com/"
+    AZURE_OPENAI_KEY                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
+    AZURE_OPENAI_PREVIEW_API_VERSION     = "2024-12-01-preview"
+    AZURE_OPENAI_API_KEY                 = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
+    AZURE_OPENAI_API_VERSION             = "2024-12-01-preview"
+    OPENAI_API_VERSION                   = "2024-12-01-preview"
+    AZURE_DEPLOYMENT_EMBEDDING           = "text-embedding-3-large"
+    AZURE_OPENAI_EMBEDDING_NAME          = "text-embedding-3-large"
+    AZURE_OPENAI_EMBEDDING_ENDPOINT      = "https://genai-research-eastus2.openai.azure.com/"
+    AZURE_OPENAI_EMBEDDING_KEY           = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_openai_key.id})"
+    SEARCH_TOP_K                         = "5"
+    SEARCH_STRICTNESS                    = "3"
+    SEARCH_ENABLE_IN_DOMAIN              = "true"
+    AZURE_SEARCH_SERVICE                 = "srch-racmc-gpt-dev"
+    AZURE_SEARCH_INDEX                   = "semantic-index"
+    AZURE_SEARCH_ENDPOINT                = module.ai_search.search_endpoint
+    AZURE_SEARCH_KEY                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.azure_search_key.id})"
+    AZURE_SEARCH_SEMANTIC_SEARCH_CONFIG  = "default"
+    AZURE_SEARCH_INDEX_IS_PRECHUNKED     = "False"
+    AZURE_SEARCH_TOP_K                   = "5"
+    AZURE_SEARCH_ENABLE_IN_DOMAIN        = "false"
+    AZURESEARCH_FIELDS_CONTENT_VECTOR    = "contentVector"
+    AZURE_SEARCH_CONTENT_COLUMNS         = ""
+    AZURE_SEARCH_FILENAME_COLUMN         = ""
+    AZURE_SEARCH_TITLE_COLUMN            = ""
+    AZURE_SEARCH_URL_COLUMN              = ""
+    AZURE_SEARCH_VECTOR_COLUMNS          = ""
+    AZURE_SEARCH_QUERY_TYPE              = "simple"
+    AZURE_SEARCH_PERMITTED_GROUPS_COLUMN = ""
+    AZURE_SEARCH_STRICTNESS              = "2",
+    AZURE_OPENAI_TOP_P                   = "0.95",
+    AZURE_OPENAI_MAX_TOKENS              = "1024",
+    AZURE_OPENAI_TEMPERATURE             = "0.7",
+    AZURE_OPENAI_STOP_SEQUENCE           = "stop all tokens"
+    APPINSIGHTS_INSTRUMENTATIONKEY       = azurerm_application_insights.app_insights.instrumentation_key
   }
 
   identity {
@@ -272,6 +273,34 @@ resource "azurerm_linux_function_app" "backend" {
   }
 
   tags = var.tags
+}
+
+
+resource "azurerm_key_vault_access_policy" "func" {
+  key_vault_id = azurerm_key_vault.main.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_linux_function_app.backend.identity[0].principal_id
+
+  secret_permissions = [
+    "Get",
+    "List"
+  ]
+
+  depends_on = [
+    azurerm_linux_function_app.backend
+  ]
+}
+
+
+resource "azurerm_role_assignment" "func_kv_secrets" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_linux_function_app.backend.identity[0].principal_id
+
+  depends_on = [
+    azurerm_linux_function_app.backend
+  ]
+
 }
 
 data "azurerm_function_app_host_keys" "keys" {

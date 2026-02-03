@@ -97,16 +97,16 @@ resource "azurerm_key_vault" "main" {
 
 
 # Static Web App Module (Free tier)
-# module "static_web_app" {
-#   source = "./modules/static_web_app"
+module "static_web_app" {
+  source = "./modules/static_web_app"
 
-#   name                = "${var.project_name}-${var.environment}"
-#   location            = azurerm_resource_group.racmc.location
-#   resource_group_name = azurerm_resource_group.racmc.name
-#   sku_tier            = var.static_web_app_sku_tier
-#   sku_size            = var.static_web_app_sku_size
-#   tags                = var.tags
-# }
+  name                = "${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.racmc.location
+  resource_group_name = azurerm_resource_group.racmc.name
+  sku_tier            = var.static_web_app_sku_tier
+  sku_size            = var.static_web_app_sku_size
+  tags                = var.tags
+}
 
 
 # AI Search Module (Free tier: 50MB, 10k docs)

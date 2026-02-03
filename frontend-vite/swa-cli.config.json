@@ -1,0 +1,15 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "frontend-vite": {
+      "appLocation": ".",
+      "outputLocation": "dist",
+      "appBuildCommand": "npm run build",
+      "run": "npm run dev",
+      "appDevserverUrl": "http://localhost:4280",
+      "devServerProxy": true,
+      "appName": "swa-racmc-gpt-dev",
+      "resourceGroup": "rg-racmc-dev"
+    }
+  }
+}

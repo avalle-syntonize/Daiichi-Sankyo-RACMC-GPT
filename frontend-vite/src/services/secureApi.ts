@@ -10,7 +10,7 @@
  * 6. Automatic token refresh on 401
  */
 
-import { IPublicClientApplication } from '@azure/msal-browser';
+import type { IPublicClientApplication } from '@azure/msal-browser';
 
 // Types
 type GetAccessTokenFn = () => Promise<string | null>;
@@ -70,14 +70,22 @@ function computeClientFingerprint(): string {
  * Custom error class for API errors
  */
 export class SecureApiError extends Error {
+  // public message: string;
+  public status: number;
+  public code: string;
+  public details?: any;
+
   constructor(
-    public message: string,
-    public status: number,
-    public code: string = 'UNKNOWN_ERROR',
-    public details?: any
+    message: string,
+    status: number,
+    code: string = 'UNKNOWN_ERROR',
+    details?: any
   ) {
     super(message);
     this.name = 'SecureApiError';
+    this.status = status;
+    this.code = code;
+    this.details = details;
   }
 }
 
@@ -145,15 +153,18 @@ export class SecureApiService {
     // Store mapping for audit logging
     this.requestIdMap.set(requestId, nonce);
 
-    const headers: SecurityHeaders = {
+    const headers: any = {
       'Authorization': `Bearer ${token}`,
-      'X-SWA-Custom-Header': 'swa-protected-request',
       'X-Request-Nonce': nonce,
       'X-Request-ID': requestId,
       'X-Client-Fingerprint': fingerprint,
     };
 
-    return headers;
+    if (this.requireCustomHeader) {
+      headers['X-SWA-Custom-Header'] = 'swa-protected-request';
+    }
+
+    return headers as SecurityHeaders;
   }
 
   /**
@@ -172,7 +183,7 @@ export class SecureApiService {
     }
 
     // Acquire token
-    let token: string;
+    let token: any;
     try {
       token = await this.getAccessToken();
       if (!token) {

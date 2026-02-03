@@ -292,21 +292,21 @@ resource "azurerm_key_vault_access_policy" "func" {
 }
 
 
-resource "azurerm_role_assignment" "func_kv_secrets" {
-  scope                = azurerm_key_vault.main.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_linux_function_app.backend.identity[0].principal_id
+# resource "azurerm_role_assignment" "func_kv_secrets" {
+#   scope                = azurerm_key_vault.main.id
+#   role_definition_name = "Key Vault Secrets User"
+#   principal_id         = azurerm_linux_function_app.backend.identity[0].principal_id
 
-  depends_on = [
-    azurerm_linux_function_app.backend
-  ]
+#   depends_on = [
+#     azurerm_linux_function_app.backend
+#   ]
 
-}
+# }
 
-data "azurerm_function_app_host_keys" "keys" {
-  name                = azurerm_linux_function_app.backend.name
-  resource_group_name = azurerm_resource_group.racmc.name
-}
+# data "azurerm_function_app_host_keys" "keys" {
+#   name                = azurerm_linux_function_app.backend.name
+#   resource_group_name = azurerm_resource_group.racmc.name
+# }
 
 # resource "azurerm_function_app_flex_consumption" "backend" {
 #   name                = "${var.project_name}-${var.environment}-func-backend"

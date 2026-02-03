@@ -10,9 +10,10 @@ export interface Message {
 
 interface ChatContainerProps {
   messages: Message[];
+  userInitials?: string;
 }
 
-const ChatContainer: React.FC<ChatContainerProps> = ({ messages }) => {
+const ChatContainer: React.FC<ChatContainerProps> = ({ messages, userInitials = 'U' }) => {
   return (
     <div className="chat-area">
       <div className="messages-container">
@@ -34,7 +35,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ messages }) => {
         ) : (
           messages.map(message => (
             <div key={message.id} className={`message ${message.role}`}>
-              <div className="message-avatar">{message.role === 'user' ? 'U' : 'AI'}</div>
+              <div className="message-avatar">{message.role === 'user' ? userInitials : 'AI'}</div>
               <div className="message-content">
                 <div className="message-text">{message.content}</div>
                 {message.timestamp && (

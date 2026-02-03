@@ -222,7 +222,7 @@ resource "azurerm_linux_function_app" "backend" {
 
   app_settings = {
     SCM_DO_BUILD_DURING_DEPLOYMENT = true
-    WEBSITE_RUN_FROM_PACKAGE             = "0"
+    WEBSITE_RUN_FROM_PACKAGE             = "1"
     AzureWebJobsStorage = azurerm_storage_account.main.primary_connection_string
     # WEBSITES_PORT                        = "80"
     # WEBSITES_ENABLE_APP_SERVICE_STORAGE  = "true"

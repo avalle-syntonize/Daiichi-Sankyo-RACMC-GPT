@@ -13,6 +13,22 @@
         "PATCH",
         "OPTIONS"
       ]
+    },
+    {
+      "route": "/logout",
+      "redirect": "/.auth/logout"
+    },
+    {
+      "route": "/",
+      "allowedRoles": [
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/chat",
+      "allowedRoles": [
+        "authenticated"
+      ]
     }
   ],
   "navigationFallback": {
@@ -27,5 +43,48 @@
       "/*.svg",
       "/*.ico"
     ]
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "X-XSS-Protection": "1; mode=block",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "geolocation=(), microphone=(), camera=(), payment=()",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.microsoftonline.com https://*.msauth.net; frame-ancestors 'none';"
+  },
+  "auth": {
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "enabled": true,
+        "registration": {
+          "openIdIssuer": "https://login.microsoftonline.com/{tenant}/v2.0",
+          "clientIdSettingName": "",
+          "clientSecretSettingName": ""
+        },
+        "login": {
+          "loginParameters": [
+            "scope=openid profile email"
+          ]
+        }
+      }
+    }
+  },
+  "responseOverrides": {
+    "400": {
+      "rewrite": "/error/400.html",
+      "statusCode": 400
+    },
+    "401": {
+      "redirect": "/.auth/login/aad",
+      "statusCode": 302
+    },
+    "403": {
+      "rewrite": "/error/403.html",
+      "statusCode": 403
+    },
+    "404": {
+      "rewrite": "/404.html",
+      "statusCode": 404
+    }
   }
 }

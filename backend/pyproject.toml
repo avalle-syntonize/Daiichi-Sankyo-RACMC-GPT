@@ -26,5 +26,6 @@ dependencies = [
     "quart>=0.20.0",
     "uuid>=1.30",
     "uvicorn[standard]>=0.40.0",
+    "azurefunctions-extensions-http-fastapi>=1.0.1",
 ]
 

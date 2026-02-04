@@ -7,12 +7,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 4280,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:7071', // puerto donde levantas tu backend local
-        changeOrigin: true,
-        secure: false,
-      }
-    }
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:7071', // puerto donde levantas tu backend local
+    //     changeOrigin: true,
+    //     secure: false,
+    //   }
+    // }
   },
 });

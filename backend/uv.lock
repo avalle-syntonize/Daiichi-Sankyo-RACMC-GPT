@@ -260,6 +260,30 @@ wheels = [
 ]
 
 [[package]]
+name = "azurefunctions-extensions-base"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/60/cd/01b78a1aa298b29c4b2369d92dcd184ae9cabed1eed0346f2ead9f5f7ef8/azurefunctions_extensions_base-1.1.0.tar.gz", hash = "sha256:2c3841900c57ce28f89be96f264c0a04f3e44e6eebe64fc3b2ac93a8eb4110f2", size = 15849, upload-time = "2025-09-12T18:24:24.373Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/43/89/ff3f6d9ad9ee4852bc120ccf76bb65899c26d7cd96dc89515db6f7c47ecf/azurefunctions_extensions_base-1.1.0-py3-none-any.whl", hash = "sha256:d4885d0cc957b76929e193b01137092fd81b7678394bcf043de0a63081caf6f5", size = 10637, upload-time = "2025-09-12T18:24:23.197Z" },
+]
+
+[[package]]
+name = "azurefunctions-extensions-http-fastapi"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "azurefunctions-extensions-base" },
+    { name = "fastapi" },
+    { name = "pydantic" },
+    { name = "uvicorn" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ca/86/dd7e56db9973227f589a2e58d364bfebcfb6807ca1c27bd7125777cb5673/azurefunctions_extensions_http_fastapi-1.0.1.tar.gz", hash = "sha256:dfbc1dbaf9bf31b7ec6b7e1f2aaf66f4b9b7c5368e658337938a4f700761add2", size = 9128, upload-time = "2025-07-21T20:47:00.811Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9b/da/10c27a23e1bf8667ed094ca58c7b4b9f4ddf833ab02cd505a68bdbc51b01/azurefunctions_extensions_http_fastapi-1.0.1-py3-none-any.whl", hash = "sha256:d3bbd7027204cd52a7f7271e51bcb24fbda7c75678bb6cf6ebe80b48d4726cfb", size = 7937, upload-time = "2025-07-21T20:46:59.612Z" },
+]
+
+[[package]]
 name = "backend"
 version = "0.1.0"
 source = { virtual = "." }
@@ -268,6 +292,7 @@ dependencies = [
     { name = "azure-identity" },
     { name = "azure-search-documents" },
     { name = "azure-storage-blob" },
+    { name = "azurefunctions-extensions-http-fastapi" },
     { name = "cohere" },
     { name = "dotenv" },
     { name = "fastapi", extra = ["standard"] },
@@ -293,6 +318,7 @@ requires-dist = [
     { name = "azure-identity", specifier = ">=1.25.1" },
     { name = "azure-search-documents", specifier = ">=11.6.0" },
     { name = "azure-storage-blob", specifier = ">=12.28.0" },
+    { name = "azurefunctions-extensions-http-fastapi", specifier = ">=1.0.1" },
     { name = "cohere", specifier = ">=5.20.2" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.128.0" },

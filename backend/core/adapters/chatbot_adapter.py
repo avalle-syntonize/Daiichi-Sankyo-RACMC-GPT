@@ -40,14 +40,16 @@ from langchain_core.vectorstores import VectorStoreRetriever
 #     render_template,
 # )
 
-from fastapi.responses import JSONResponse, StreamingResponse
+# from fastapi.responses import JSONResponse, StreamingResponse
+from azurefunctions.extensions.http.fastapi import JSONResponse, StreamingResponse
+
 
 AZURE_OPENAI_SYSTEM_MESSAGE = os.environ.get(
     "AZURE_OPENAI_SYSTEM_MESSAGE",
     "You are an AI assistant that helps people find information.",
 )
 
-USER_AGENT = "dsGPT/AsyncAzureOpenAI/1.0.0"
+USER_AGENT = "RACMC-GPT/AsyncAzureOpenAI/1.0.0"
 
 AZURE_SEARCH_KEY = os.environ.get("AZURE_SEARCH_KEY", None)
 AZURE_OPENAI_MODEL = os.environ.get("AZURE_OPENAI_MODEL")

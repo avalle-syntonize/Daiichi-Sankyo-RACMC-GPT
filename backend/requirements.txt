@@ -1,4 +1,5 @@
 azure-functions
+azurefunctions-extensions-http-fastapi
 azure-identity>=1.25.1
 azure-search-documents>=11.6.0
 azure-storage-blob>=12.28.0

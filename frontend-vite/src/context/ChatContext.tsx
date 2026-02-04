@@ -6,6 +6,7 @@ interface ChatContextType {
   messages: Message[];
   selectedFilters: string[];
   addMessage: (message: Message) => void;
+  updateMessage: (id: string, newContent: string) => void;
   setSelectedFilters: (filters: string[]) => void;
   clearMessages: () => void;
 }
@@ -33,6 +34,14 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     setMessages(prev => [...prev, message]);
   };
 
+  const updateMessage = (id: string, newContent: string) => {
+    setMessages(prev =>
+      prev.map(msg =>
+        msg.id === id ? { ...msg, content: newContent } : msg
+      )
+    );
+  };
+
   const clearMessages = () => {
     setMessages([]);
   };
@@ -41,6 +50,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     messages,
     selectedFilters,
     addMessage,
+    updateMessage,
     setSelectedFilters,
     clearMessages,
   };

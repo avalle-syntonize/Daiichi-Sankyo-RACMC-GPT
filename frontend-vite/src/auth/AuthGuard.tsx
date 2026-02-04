@@ -66,22 +66,22 @@ const LoginPrompt: React.FC<{ onLogin: () => void }> = ({ onLogin }) => (
  * - Renders children only when authenticated
  */
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const { isAuthenticated, isLoading, error, login } = useAuth();
+  // const { isAuthenticated, isLoading, error, login } = useAuth();
 
-  // Show loading state while authentication is in progress
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+  // // Show loading state while authentication is in progress
+  // if (isLoading) {
+  //   return <LoadingSpinner />;
+  // }
 
-  // Show error state if authentication failed
-  if (error) {
-    return <AuthError error={error} onRetry={login} />;
-  }
+  // // Show error state if authentication failed
+  // if (error) {
+  //   return <AuthError error={error} onRetry={login} />;
+  // }
 
-  // Show login prompt if not authenticated (fallback)
-  if (!isAuthenticated) {
-    return <LoginPrompt onLogin={login} />;
-  }
+  // // Show login prompt if not authenticated (fallback)
+  // if (!isAuthenticated) {
+  //   return <LoginPrompt onLogin={login} />;
+  // }
 
   // User is authenticated, render protected content
   return <>{children}</>;

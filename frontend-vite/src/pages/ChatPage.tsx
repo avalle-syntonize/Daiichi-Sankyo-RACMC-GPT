@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useChatContext } from '../context/ChatContext';
 import { useAuth } from '../auth';
 import Header from '../components/Header/Header';
@@ -10,7 +10,8 @@ import './ChatPage.css';
 
 const ChatPage: React.FC = () => {
   const { messages, selectedFilters, addMessage, setSelectedFilters } = useChatContext();
-  const { user, logout } = useAuth();
+  // const { user, logout } = useAuth();
+  const [user, setUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSendMessage = (text: string) => {
@@ -37,6 +38,12 @@ const ChatPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const getUserInfo = async () => {
+    const response = await fetch('/.auth/me');
+    const { clientPrincipal } = await response.json();
+    setUser(clientPrincipal);
+  };
+
   const handleConfirmExport = () => {
     // Create a simple text export of the conversation
     const conversationText = messages
@@ -57,14 +64,28 @@ const ChatPage: React.FC = () => {
   };
 
   const handleLogout = () => {
-    logout();
+    // e.preventDefault();
+    window.location.href = '/.auth/logout?post_logout_redirect_uri=/chat';
   };
+
+  function getInitialsFromEmail(email: string) {
+
+    if (!email) return '??';
+    
+    const namePart = email.split('@')[0]; // "mgarciap"
+
+    return namePart.slice(0, 2).toUpperCase();
+  }
+
+  useEffect(() => {
+    getUserInfo();
+  }, []);
 
   return (
     <div className="chat-page">
       <Header
-        userName={user?.name || 'User'}
-        userInitials={user?.initials || '??'}
+        userName={user?.userDetails || 'User'}
+        userInitials={getInitialsFromEmail(user?.userDetails) || '??'}
         onLogout={handleLogout}
       />
 
@@ -86,7 +107,7 @@ const ChatPage: React.FC = () => {
               </p>
             </div>
 
-            <ChatContainer messages={messages} userInitials={user?.initials} />
+            <ChatContainer messages={messages} userInitials={getInitialsFromEmail(user?.userDetails) || '??'} />
             <ChatInput
               onSendMessage={handleSendMessage}
               hasFiltersSelected={selectedFilters.length > 0}

@@ -10,12 +10,12 @@ import './App.css';
  * Inner App component that has access to AuthContext
  */
 function AppContent() {
-  const { getAccessToken } = useAuth();
+  // const { getAccessToken } = useAuth();
 
   // Initialize API service with the getAccessToken function
-  useEffect(() => {
-    initializeApiService(getAccessToken);
-  }, [getAccessToken]);
+  // useEffect(() => {
+  //   // initializeApiService(getAccessToken);
+  // }, [getAccessToken]);
 
   return (
     <ChatProvider>
@@ -23,6 +23,14 @@ function AppContent() {
         <Routes>
           <Route
             path="/"
+            element={
+              <AuthGuard>
+                <ChatPage />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/chat"
             element={
               <AuthGuard>
                 <ChatPage />

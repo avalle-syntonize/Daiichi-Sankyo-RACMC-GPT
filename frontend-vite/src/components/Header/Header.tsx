@@ -4,7 +4,7 @@ import './Header.css';
 interface HeaderProps {
   userName?: string;
   userInitials?: string;
-  onLogout?: () => void;
+  onLogout?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({

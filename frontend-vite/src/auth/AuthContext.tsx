@@ -94,30 +94,30 @@ interface AuthProviderProps {
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { instance, inProgress, accounts } = useMsal();
-  const isAuthenticated = useIsAuthenticated();
+  // const isAuthenticated = useIsAuthenticated();
   const account = useAccount(accounts[0] || null);
   const [error, setError] = useState<Error | null>(null);
 
   // Use MSAL hook for automatic authentication on load
-  const { error: authError } = useMsalAuthentication(
-    InteractionType.Redirect,
-    loginRequest
-  );
+  // const { error: authError } = useMsalAuthentication(
+  //   InteractionType.Redirect,
+  //   loginRequest
+  // );
 
   // Handle authentication errors
-  useEffect(() => {
-    if (authError) {
-      console.error('Authentication error:', authError);
-      setError(authError);
-    }
-  }, [authError]);
+  // useEffect(() => {
+  //   if (authError) {
+  //     console.error('Authentication error:', authError);
+  //     setError(authError);
+  //   }
+  // }, [authError]);
 
   // Set active account when available
-  useEffect(() => {
-    if (accounts.length > 0 && !instance.getActiveAccount()) {
-      instance.setActiveAccount(accounts[0]);
-    }
-  }, [accounts, instance]);
+  // useEffect(() => {
+  //   if (accounts.length > 0 && !instance.getActiveAccount()) {
+  //     instance.setActiveAccount(accounts[0]);
+  //   }
+  // }, [accounts, instance]);
 
   /**
    * Initiate login flow using redirect
@@ -198,7 +198,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const user = extractUserInfo(account);
 
   const value: AuthContextType = {
-    isAuthenticated,
+    isAuthenticated: false,
     isLoading,
     user,
     login,

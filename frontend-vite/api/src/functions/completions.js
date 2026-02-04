@@ -13,7 +13,7 @@ const handler = async (request, context) => {
 
     const requestBody = await request.json();
 
-    const response = await fetch(`https://racmc-gpt-dev-func-backend.azurewebsites.net/api/stream/completions`, {
+    const response = await fetch(`${process.env.BASE_API_URL}/stream/completions`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -375,12 +375,18 @@ const ChatPage: React.FC = () => {
   };
 
   const handleConfirmExport = () => {
-    // Create a simple text export of the conversation
+    // Get user initials for the export
+    const userInitials = getInitialsFromEmail(user?.userDetails) || 'USER';
+    
+    // Create formatted text export of the conversation
     const conversationText = messages
-      .map(msg => `[${msg.role.toUpperCase()}]: ${msg.content}`)
+      .map(msg => {
+        const sender = msg.role === 'user' ? userInitials : 'RACMC-GPT';
+        return `${sender}:\n${msg.content}`;
+      })
       .join('\n\n');
 
-    const blob = new Blob([conversationText], { type: 'text/plain' });
+    const blob = new Blob([conversationText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

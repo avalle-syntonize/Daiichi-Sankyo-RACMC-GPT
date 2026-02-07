@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "swa": "swa start frontend-vite --api-location ./api",
+    "swa:deploy": "npm run build && npx swa deploy --api-location ./api  --api-language node --env production --resource-group rg-racmc-dev --app-name swa-racmc-gpt-dev"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.0.2",

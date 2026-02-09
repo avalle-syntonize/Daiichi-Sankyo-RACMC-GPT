@@ -1,6 +1,6 @@
 const { app } = require('@azure/functions');
 const { getAppAccessToken } = require('../utils');
-
+const { ReadableStream } = require('stream/web');
 
 
 
@@ -37,13 +37,23 @@ const handler = async (request, context) => {
     return {
         status: response.status,
         headers: {
-            'Content-Type': 'application/x-ndjson',
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
         },
-        body: response.body
+        body: response.body.pipeThrough(new TransformStream({
+            transform(chunk, controller) {
+                const text = new TextDecoder().decode(chunk);
+                const lines = text.split('\n').filter(l => l.trim());
+                for (const line of lines) {
+                    controller.enqueue(new TextEncoder().encode(`data: ${line}\n\n`));
+                }
+            }
+        }))
     };
 };
 
-app.setup({ enableHttpStreaming: true });
+app.setup({ enableHttpStream: true });
 
 app.http('completions', {
     methods: ['POST'],

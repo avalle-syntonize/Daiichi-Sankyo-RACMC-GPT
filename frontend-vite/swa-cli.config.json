@@ -6,7 +6,7 @@
       "outputLocation": "dist",
       "appBuildCommand": "npm run build",
       "run": "npm run dev",
-      "appDevserverUrl": "http://localhost:4280",
+      "appDevserverUrl": "http://localhost:4281",
       "devServerProxy": true,
       "appName": "swa-racmc-gpt-dev",
       "resourceGroup": "rg-racmc-dev"

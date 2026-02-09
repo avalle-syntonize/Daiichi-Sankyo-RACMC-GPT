@@ -74,7 +74,7 @@ const ChatPage: React.FC = () => {
   const parseErrorMessage = (errorMessage: string): string => {
     let errorCodeMessage = errorMessage.substring(0, errorMessage.indexOf('-') + 1);
     const innerErrorCue = "{\\'error\\': {\\'message\\': ";
-    
+
     if (errorMessage.includes(innerErrorCue)) {
       try {
         let innerErrorString = errorMessage.substring(errorMessage.indexOf(innerErrorCue));
@@ -104,7 +104,7 @@ const ChatPage: React.FC = () => {
           .replace(/\bFalse\b/g, 'false');
         const innerErrorJson = JSON.parse(fixedJson);
         let reason = '';
-        
+
         const jailbreak = innerErrorJson.content_filter_result?.jailbreak;
         if (jailbreak?.filtered === true) {
           reason = 'Jailbreak';
@@ -131,7 +131,7 @@ const ChatPage: React.FC = () => {
    * Based on makeApiRequestWithoutCosmosDB from the old implementation
    */
   const getCompletions = async (
-    question: string, 
+    question: string,
     conversationId?: string,
     imageFile?: File | null,
     docFile?: File | null
@@ -140,7 +140,7 @@ const ChatPage: React.FC = () => {
     setShowLoadingMessage(true);
     const abortController = new AbortController();
     abortFuncs.current.unshift(abortController);
-    
+
     // Create user message with file attachment if present
     let userMessage: ChatMessage;
 
@@ -200,7 +200,7 @@ const ChatPage: React.FC = () => {
     }
 
     setCurrentConversation(conversation);
-    
+
     // Add user message to UI
     addMessage({
       id: userMessage.id,
@@ -218,14 +218,14 @@ const ChatPage: React.FC = () => {
     let assistantContent = '';
     let assistantMessage: ChatMessage | null = null;
     let toolMessage: ChatMessage | null = null;
-    
+
     // ID para el mensaje del asistente que vamos a ir actualizando en streaming
     const assistantMessageId = generateId();
     let hasAddedAssistantMessage = false;
 
     try {
       const response = await conversationApi(request, abortController.signal);
-      
+
       if (response?.body) {
         const reader = response.body.getReader();
         let runningText = '';
@@ -236,62 +236,67 @@ const ChatPage: React.FC = () => {
           if (done) break;
 
           const text = new TextDecoder('utf-8').decode(value);
-          const objects = text.split('\n');
-          
-          objects.forEach(obj => {
+          const lines = text.split('\n');
+
+          lines.forEach(line => {
             try {
-              if (obj !== '' && obj !== '{}') {
-                runningText += obj;
-                result = JSON.parse(runningText);
-                
-                if (result.choices?.length > 0) {
-                  result.choices[0].messages.forEach(msg => {
-                    msg.id = result.id;
-                    msg.date = new Date().toISOString();
-                    
-                    if (msg.role === ASSISTANT) {
-                      assistantContent += msg.content;
-                      assistantMessage = {
-                        ...msg,
+              const trimmed = line.trim();
+              if (!trimmed || trimmed === 'data: [DONE]' || trimmed === 'data: {}') return;
+
+              // Extraer JSON quitando el prefijo "data: " de SSE
+              const jsonStr = trimmed.startsWith('data: ')
+                ? trimmed.slice(6)
+                : trimmed;
+
+              if (!jsonStr || jsonStr === '{}') return;
+
+              runningText += jsonStr;
+              result = JSON.parse(runningText);
+
+              if (result.choices?.length > 0) {
+                result.choices[0].messages.forEach(msg => {
+                  msg.id = result.id;
+                  msg.date = new Date().toISOString();
+
+                  if (msg.role === ASSISTANT) {
+                    assistantContent += msg.content;
+                    assistantMessage = {
+                      ...msg,
+                      id: assistantMessageId,
+                      content: assistantContent
+                    };
+
+                    if (!hasAddedAssistantMessage) {
+                      addMessage({
                         id: assistantMessageId,
-                        content: assistantContent
+                        role: 'assistant',
+                        content: assistantContent,
+                        timestamp: new Date(),
+                      });
+                      hasAddedAssistantMessage = true;
+                      setShowLoadingMessage(false);
+                    } else {
+                      updateMessage(assistantMessageId, assistantContent);
+                    }
+
+                    if (msg.context) {
+                      toolMessage = {
+                        id: generateId(),
+                        role: TOOL,
+                        content: msg.context,
+                        date: new Date().toISOString()
                       };
-                      
-                      // Streaming en tiempo real: agregar o actualizar mensaje
-                      if (!hasAddedAssistantMessage) {
-                        // Primera vez: agregar el mensaje
-                        addMessage({
-                          id: assistantMessageId,
-                          role: 'assistant',
-                          content: assistantContent,
-                          timestamp: new Date(),
-                        });
-                        hasAddedAssistantMessage = true;
-                        setShowLoadingMessage(false);
-                      } else {
-                        // Actualizar el mensaje existente con el nuevo contenido
-                        updateMessage(assistantMessageId, assistantContent);
-                      }
-                      
-                      if (msg.context) {
-                        toolMessage = {
-                          id: generateId(),
-                          role: TOOL,
-                          content: msg.context,
-                          date: new Date().toISOString()
-                        };
-                      }
                     }
-                    
-                    if (msg.role === TOOL) {
-                      toolMessage = msg;
-                    }
-                  });
-                } else if (result.error) {
-                  throw Error(result.error);
-                }
-                runningText = '';
+                  }
+
+                  if (msg.role === TOOL) {
+                    toolMessage = msg;
+                  }
+                });
+              } else if (result.error) {
+                throw Error(result.error);
               }
+              runningText = '';
             } catch (e) {
               if (!(e instanceof SyntaxError)) {
                 console.error(e);
@@ -303,13 +308,12 @@ const ChatPage: React.FC = () => {
           });
         }
 
-        // Actualizar conversación con el mensaje final del asistente
         if (assistantMessage !== null) {
           const finalAssistantMessage = assistantMessage as ChatMessage;
-          const updatedMessages = toolMessage 
+          const updatedMessages = toolMessage
             ? [...conversation.messages, toolMessage, finalAssistantMessage]
             : [...conversation.messages, finalAssistantMessage];
-          
+
           setCurrentConversation({
             ...conversation,
             messages: updatedMessages
@@ -320,7 +324,7 @@ const ChatPage: React.FC = () => {
       if (!abortController.signal.aborted) {
         let errorMessage =
           'An error occurred. Please try again. If the problem persists, please contact the site administrator.';
-        
+
         if (result.error?.message) {
           errorMessage = result.error.message;
         } else if (typeof result.error === 'string') {
@@ -353,14 +357,14 @@ const ChatPage: React.FC = () => {
     if (files && files.length > 0) {
       const file = files[0]; // Take the first file
       const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
-      
+
       if (imageTypes.includes(file.type)) {
         imageFile = file;
       } else {
         docFile = file;
       }
     }
-    
+
     getCompletions(text, currentConversation?.id, imageFile, docFile);
   };
 
@@ -377,7 +381,7 @@ const ChatPage: React.FC = () => {
   const handleConfirmExport = () => {
     // Get user initials for the export
     const userInitials = getInitialsFromEmail(user?.userDetails) || 'USER';
-    
+
     // Create formatted text export of the conversation
     const conversationText = messages
       .map(msg => {
@@ -407,7 +411,7 @@ const ChatPage: React.FC = () => {
   function getInitialsFromEmail(email: string) {
 
     if (!email) return '??';
-    
+
     const namePart = email.split('@')[0]; // "mgarciap"
 
     return namePart.slice(0, 2).toUpperCase();

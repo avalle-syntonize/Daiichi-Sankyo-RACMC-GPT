@@ -9,7 +9,7 @@ export async function getAppAccessToken() {
     urlencoded.append("client_id", process.env.AZURE_AD_APP_CLIENT_ID);
     urlencoded.append("client_secret", process.env.AZURE_AD_APP_CLIENT_SECRET);
     urlencoded.append("grant_type", "client_credentials");
-    urlencoded.append("scope", `${process.env.TENANT_ID}/.default`);
+    urlencoded.append("scope", `${process.env.AZURE_AD_APP_CLIENT_ID}/.default`);
 
     const requestOptions = {
         method: "POST",
@@ -18,7 +18,7 @@ export async function getAppAccessToken() {
         redirect: "follow"
     };
 
-    const response = await fetch(`https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/token`, requestOptions)
+    const response = await fetch(`https://login.microsoftonline.com/${process.env.TENANT_ID}/oauth2/v2.0/token`, requestOptions)
 
     if (!response.ok) {
         throw new Error(`Failed to get access token: ${response.statusText}`);

@@ -27,8 +27,8 @@ export async function conversationApi(
         body: JSON.stringify({ context: request }),
         signal: abortSignal,
     });
-    const json = await response.text();
-    console.log('Received response:', json);
+    // const json = await response.text();
+    // console.log('Received response:', json);
     return response;
 }
 

@@ -447,7 +447,7 @@ const ChatPage: React.FC = () => {
               </p>
             </div>
 
-            <ChatContainer messages={messages} userInitials={getInitialsFromEmail(user?.userDetails) || '??'} />
+            <ChatContainer messages={messages} userInitials={getInitialsFromEmail(user?.userDetails) || '??'} isLoading={showLoadingMessage} />
             <ChatInput
               onSendMessage={handleSendMessage}
               hasFiltersSelected={selectedFilters.length > 0}

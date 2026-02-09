@@ -116,9 +116,89 @@
   color: white;
 }
 
+.message-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding: 0 4px;
+}
+
 .message-time {
   font-size: 11px;
   color: #999;
-  margin-top: 4px;
-  padding: 0 4px;
+}
+
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+  background: #f0f0f0;
+  color: #005baa;
+}
+
+.copy-button.copied {
+  color: #22c55e;
+}
+
+.copy-button.copied:hover {
+  background: #f0fdf4;
+  color: #22c55e;
+}
+
+/* Generating answer placeholder */
+.generating-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #888;
+  font-style: italic;
+}
+
+.generating-dots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.generating-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #005baa, #00acea);
+  animation: dotPulse 1.4s infinite ease-in-out both;
+}
+
+.generating-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.generating-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.generating-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

@@ -79,7 +79,7 @@
       "statusCode": 400
     },
     "401": {
-      "redirect": "/.auth/login/aad",
+      "redirect": "/.auth/login/azureActiveDirectory",
       "statusCode": 302
     },
     "403": {

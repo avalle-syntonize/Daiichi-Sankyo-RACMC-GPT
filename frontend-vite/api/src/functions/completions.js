@@ -24,7 +24,12 @@ const handler = async (request, context) => {
     // }
 
     const requestBody = await request.json();
-
+    try {
+        console.log('Received request body:', requestBody);
+    } catch (err) {
+        console.error('Error parsing request body:', err);
+        return { status: 400, body: "Invalid JSON in request body." };
+    }
     const response = await fetch(`${process.env.BASE_API_URL}/stream/completions`, {
         method: 'POST',
         headers: {

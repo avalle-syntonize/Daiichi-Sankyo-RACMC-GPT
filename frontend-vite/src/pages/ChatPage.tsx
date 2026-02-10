@@ -164,6 +164,7 @@ const ChatPage: React.FC = () => {
         content: question + ' _(retrieved using ' + docFile.name + ')_',
         attachment_type: docFile.type,
         file_content: base64String,
+        attachment_name: docFile.name,
         date: new Date().toISOString()
       };
     } else {

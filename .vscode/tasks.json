@@ -3,11 +3,43 @@
 	"tasks": [
 		{
 			"type": "func",
-			"label": "func: host start",
+			"label": "func: python host start",
 			"command": "host start",
 			"problemMatcher": "$func-python-watch",
 			"isBackground": true,
 			"dependsOn": "pip install (functions)"
+		},
+		{
+			"type": "func",
+			"label": "func: node host start",
+			"command": "host start",
+			"problemMatcher": "$func-node-watch",
+			"options": {
+				"cwd": "${workspaceFolder}/frontend-vite/api",
+				"env": {}
+			},
+			"isBackground": true,
+			"dependsOn": "npm build (functions)"
+		},
+		{
+			"type": "shell",
+			"label": "npm install (functions)",
+			"options": {
+				"cwd": "${workspaceFolder}/frontend-vite/api",
+				"env": {}
+			},
+			"command": "npm install"
+		},
+		{
+			"type": "shell",
+			"label": "npm prune (functions)",
+			"command": "npm prune --production",
+			"dependsOn": "npm build (functions)",
+			"options": {
+				"cwd": "${workspaceFolder}/frontend-vite/api",
+				"env": {}
+			},
+			"problemMatcher": []
 		},
 		{
 			"label": "pip install (functions)",

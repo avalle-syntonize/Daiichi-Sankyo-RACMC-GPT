@@ -27,5 +27,6 @@ dependencies = [
     "uuid>=1.30",
     "uvicorn[standard]>=0.40.0",
     "azurefunctions-extensions-http-fastapi>=1.0.1",
+    "docx2txt>=0.9",
 ]
 

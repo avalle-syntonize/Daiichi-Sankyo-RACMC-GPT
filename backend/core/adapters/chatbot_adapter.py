@@ -112,6 +112,19 @@ mime_to_extension = {
     'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',      
     'text/csv': '.csv'
 }  
+
+loaders = {
+".pdf": PyPDFLoader,
+".xlsx": UnstructuredExcelLoader,
+".xls": UnstructuredExcelLoader,
+".pptx": UnstructuredPowerPointLoader,
+".ppt": UnstructuredPowerPointLoader,
+".docx": Docx2txtLoader,
+".doc": Docx2txtLoader,
+".csv": UnstructuredCSVLoader,
+".txt": TextLoader,
+}
+
 SHOULD_USE_DATA = False
 
 class ChatbotAdapter(ChatbotRepository):
@@ -129,7 +142,7 @@ class ChatbotAdapter(ChatbotRepository):
             embedding_function=embeddings
         )
 
-    def get_extension_from_mime(mime_type):  
+    def get_extension_from_mime(self, mime_type):  
         """  
         Get the file extension for a given MIME type.  
     
@@ -141,7 +154,7 @@ class ChatbotAdapter(ChatbotRepository):
         """  
         return mime_to_extension.get(mime_type, None) 
 
-    def delimiter(data):
+    def delimiter(self,data):
         rows = data[:100].split("\n")
         if rows[0].count(";") > 0:
             return ";"
@@ -149,28 +162,37 @@ class ChatbotAdapter(ChatbotRepository):
             return "\t"
         return ","
 
-    async def process_file_into_document_chunks(self, binary_data, mime_type):
+    async def process_file_into_document_chunks(self, binary_data, mime_type, filename=None):
         suffix = self.get_extension_from_mime(mime_type)
-        with tempfile.NamedTemporaryFile(suffix=suffix, delete=True) as temp:
-            temp.write(binary_data)
-            temp.flush()
-            
-            loaders = {
-            ".pdf": PyPDFLoader,
-            ".xlsx": UnstructuredExcelLoader,
-            ".xls": UnstructuredExcelLoader,
-            ".pptx": UnstructuredPowerPointLoader,
-            ".ppt": UnstructuredPowerPointLoader,
-            ".docx": Docx2txtLoader,
-            ".doc": Docx2txtLoader,
-            ".csv": UnstructuredCSVLoader,
-            ".txt": TextLoader,
-            }
+
+        # add try catch and logging
+        try:
+            os.makedirs("/tmp", exist_ok=True)
+
+            with tempfile.NamedTemporaryFile(suffix=suffix, delete=False, dir="/tmp") as temp:
+                temp.write(binary_data)
+                temp.flush()
+                temp_path = temp.name
+
+
             if suffix == "csv":
                 loader = loaders.get(suffix, csv_args={"delimiter": self.delimiter(binary_data)})(file_path=temp.name)
             loader = loaders.get(suffix)(file_path=temp.name)
             document_chunks = loader.load()
+
+            for doc in document_chunks:
+                doc.metadata["filepath"] = filename or f"uploaded_file{suffix}"
+                doc.metadata["title"] = filename or f"uploaded_file{suffix}"
+                doc.metadata["url"] = ""  # Archivo subido por usuario, sin URL pública
+                doc.metadata["source_type"] = "user_upload"
+
             return document_chunks
+        except Exception as e:
+            logging.exception("Error processing file into document chunks: %s", e)
+            raise e
+        finally:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
   
     async def add_documents_to_store(self, vector_store: Chroma, documents: List[str] ) -> None:  
         uuids = [str(uuid.uuid4()) for _ in range(len(documents))]
@@ -206,7 +228,7 @@ class ChatbotAdapter(ChatbotRepository):
             if message.get('file_content', None) is not None:
                 if has_last_file_content:
                     file_bytes = base64.b64decode(message.get('file_content', None))  
-                    documents = await self.process_file_into_document_chunks(file_bytes, message.get("attachment_type", None))
+                    documents = await self.process_file_into_document_chunks(file_bytes, message.get("attachment_type", None), filename=message.get("attachment_name", None))
                     await self.add_documents_to_store(vector_store, documents)
                 message.pop("file_content")
                 messageContainsAttachment = True

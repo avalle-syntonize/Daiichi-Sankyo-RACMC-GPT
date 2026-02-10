@@ -30,6 +30,7 @@ export type ChatMessage = {
   image_content?: string
   file_content?: string
   attachment_type?: string
+  attachment_name?: string 
   end_turn?: boolean
   date: string
   feedback?: Feedback

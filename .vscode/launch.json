@@ -35,5 +35,12 @@
             },
             "preLaunchTask": "func: start function backend"
         },
+        {
+            "name": "Attach to Node SWA Functions",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "preLaunchTask": "func: host start"
+        }
     ]
 }

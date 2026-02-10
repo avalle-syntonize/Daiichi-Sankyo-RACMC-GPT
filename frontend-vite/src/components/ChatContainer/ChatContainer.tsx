@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ChatContainer.css';
 import type { Citation } from '../../models';
 
@@ -31,6 +31,13 @@ const CheckIcon: React.FC = () => (
 
 const ChatContainer: React.FC<ChatContainerProps> = ({ messages, userInitials = 'U', isLoading = false }) => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [messages, isLoading]);
 
   const handleCopy = async (content: string, id: string) => {
     try {
@@ -44,7 +51,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ messages, userInitials = 
 
   return (
     <div className="chat-area">
-      <div className="messages-container">
+      <div className="messages-container" ref={containerRef}>
         {messages.length === 0 && !isLoading ? (
           <div className="placeholder-message">
             <svg

@@ -31,7 +31,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     if ((message.trim() || selectedFiles.length > 0) && hasFiltersSelected) {
       onSendMessage(message, selectedFiles);
       setMessage('');
-      setSelectedFiles([]);
+      // setSelectedFiles([]); Clear selected files after sending
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }

@@ -82,6 +82,7 @@ class PDFProcessor(BaseDocumentProcessor):
         # Add PDF-specific metadata from first page
         if docs and docs[0].metadata:
             metadata.update(docs[0].metadata)
+            # self.safe_merge_metadata(metadata, docs[0].metadata)
 
         # Combine all page content
         for doc in docs:

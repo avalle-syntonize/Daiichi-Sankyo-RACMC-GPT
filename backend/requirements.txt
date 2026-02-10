@@ -16,3 +16,4 @@ langchain-classic>=1.0.1
 pypdf>=6.6.2
 temp>=2020.7.2
 fastapi>=0.128.0
+docx2txt==0.9

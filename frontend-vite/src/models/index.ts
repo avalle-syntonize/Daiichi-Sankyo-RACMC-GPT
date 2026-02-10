@@ -69,6 +69,7 @@ export type ChatResponse = {
 
 export type ConversationRequest = {
   messages: ChatMessage[]
+  filters?: string[]
 }
 
 export type UserInfo = {

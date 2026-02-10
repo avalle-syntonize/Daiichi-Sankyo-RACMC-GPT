@@ -7,7 +7,7 @@ import ChatContainer from '../components/ChatContainer/ChatContainer';
 import ChatInput from '../components/ChatInput/ChatInput';
 import Modal from '../components/Modal/Modal';
 import { conversationApi } from '../services/conversationService';
-import type { ChatMessage, ConversationRequest, ChatResponse, Conversation } from '../models';
+import type { ChatMessage, ConversationRequest, ChatResponse, Conversation, ToolMessageContent, Citation } from '../models';
 import './ChatPage.css';
 
 // Generate unique ID
@@ -212,7 +212,8 @@ const ChatPage: React.FC = () => {
 
     // Prepare request
     const request: ConversationRequest = {
-      messages: [...conversation.messages.filter(msg => msg.role !== ERROR)]
+      messages: [...conversation.messages.filter(msg => msg.role !== ERROR)],
+      ...(selectedFilters.length > 0 && { filters: selectedFilters }),
     };
 
     let result = {} as ChatResponse;
@@ -311,6 +312,28 @@ const ChatPage: React.FC = () => {
 
         if (assistantMessage !== null) {
           const finalAssistantMessage = assistantMessage as ChatMessage;
+
+          // Extract citations from toolMessage
+          let citations: Citation[] = [];
+          if (toolMessage) {
+            try {
+              const tm = toolMessage as ChatMessage;
+              const toolContent: ToolMessageContent = JSON.parse(tm.content);
+              const seen = new Set<string>();
+              citations = (toolContent.citations || []).filter(c => {
+                const key = c.filepath || c.title || c.content;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+            } catch (e) {
+              console.warn('Could not parse tool message citations:', e);
+            }
+          }
+
+          // Update assistant message with citations
+          updateMessage(assistantMessageId, assistantContent, citations);
+
           const updatedMessages = toolMessage
             ? [...conversation.messages, toolMessage, finalAssistantMessage]
             : [...conversation.messages, finalAssistantMessage];

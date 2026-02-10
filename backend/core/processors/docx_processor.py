@@ -76,6 +76,7 @@ class DOCXProcessor(BaseDocumentProcessor):
         # Add DOCX-specific metadata from first document
         if docs and docs[0].metadata:
             metadata.update(docs[0].metadata)
+            # self.safe_merge_metadata(metadata, docs[0].metadata)
 
         # Combine all content
         for doc in docs:

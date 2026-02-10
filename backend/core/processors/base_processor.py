@@ -98,3 +98,18 @@ class BaseDocumentProcessor(ABC):
             "processor": self.__class__.__name__,
             "processor_version": self.version,
         }
+
+    # Fields that should never be overwritten by loader metadata
+    PROTECTED_FIELDS = {"title", "filepath", "url", "language", "project_id"}
+
+    def safe_merge_metadata(self, base_metadata: dict, loader_metadata: dict) -> None:
+        """
+        Merge loader metadata into base metadata without overwriting protected fields.
+
+        Args:
+            base_metadata (dict): Our controlled metadata (modified in place)
+            loader_metadata (dict): Metadata extracted by the document loader
+        """
+        for key, value in loader_metadata.items():
+            if key not in self.PROTECTED_FIELDS:
+                base_metadata[key] = value

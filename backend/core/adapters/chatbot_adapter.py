@@ -183,7 +183,7 @@ class ChatbotAdapter(ChatbotRepository):
             for doc in document_chunks:
                 doc.metadata["filepath"] = filename or f"uploaded_file{suffix}"
                 doc.metadata["title"] = filename or f"uploaded_file{suffix}"
-                doc.metadata["url"] = ""  # Archivo subido por usuario, sin URL pública
+                doc.metadata["url"] = ""
                 doc.metadata["source_type"] = "user_upload"
 
             return document_chunks
@@ -204,6 +204,7 @@ class ChatbotAdapter(ChatbotRepository):
         vector_store = self.create_vector_store(embeddings=embeddings, collection_name=collection_name)
         filtered_messages = []  
         messages = context.get("messages", [])
+        project_filters = context.get("filters", [])
         messageContainsAttachment = False
         has_last_image_content = False
         has_last_file_content = False
@@ -244,7 +245,7 @@ class ChatbotAdapter(ChatbotRepository):
             if has_last_image_content:  
                 response = await self.stream_image_request(model_args, history_metadata)
             else:  
-                response = await self.conversation_history(model_args, history_metadata, vector_store, ignore_external_documents=has_last_file_content,stream=stream_response)  
+                response = await self.conversation_history(model_args, history_metadata, vector_store, ignore_external_documents=has_last_file_content, stream=stream_response, project_filters=project_filters)  
         except Exception as e:  
             logging.exception("Exception in send_chat_request")  
             raise e
@@ -306,20 +307,34 @@ class ChatbotAdapter(ChatbotRepository):
         language = language_prompt | llm.with_structured_output(Language)
         return language
         
-    def build_retriever(self,vector_store, ignore_external_documents, language) -> VectorStoreRetriever:
+    def build_retriever(self, vector_store, ignore_external_documents, language, project_filters: list = None) -> VectorStoreRetriever:
         """
         Builds a retriever object that retrieves vectors from an Azure Search store using an embeddings model.
+
+        Args:
+            vector_store: The Chroma vector store for uploaded documents.
+            ignore_external_documents: Whether to skip the Azure Search retriever.
+            language: Detected language of the user query.
+            project_filters: List of project_id values to filter by (e.g. ['DS-1062', 'ema']).
 
         Returns:
             VectorStoreRetriever: A retriever object configured to retrieve vectors from an Azure Search store.
         """
-        azure = build_azure_search_store_async(build_embeddings_model()).as_retriever(search_kwargs={"filters": f"language eq '{language}' or language eq 'EN'"})
+        search_kwargs = {}
+        if project_filters:
+            odata_conditions = " or ".join([f"project_id eq '{pid}'" for pid in project_filters])
+            odata_filter = f"({odata_conditions})"
+            # TODO: uncomment the next line to enable project_id filtering in Azure Search
+            # search_kwargs["filters"] = odata_filter
+            logging.info(f"Project filter built (not applied): {odata_filter}")
+            
+        azure = build_azure_search_store_async(build_embeddings_model()).as_retriever(search_kwargs=search_kwargs)
         chroma = vector_store.as_retriever()
         retrievers = [azure, chroma] if not ignore_external_documents else [chroma]
         weights=[0.5, 0.5] if not ignore_external_documents else [1.0]
         return EnsembleRetriever(retrievers=retrievers, weights=weights)
     
-    def build_chain(self, vector_store, ignore_external_documents,language) -> RunnableSerializable:
+    def build_chain(self, vector_store, ignore_external_documents, language, project_filters: list = None) -> RunnableSerializable:
         """Builds a chain of components for a conversational AI system.
         
         This function constructs a chain of components for a conversational AI system, including a language model, chatbot prompt, retrievers, parsers, and more.
@@ -329,7 +344,7 @@ class ChatbotAdapter(ChatbotRepository):
         """
         llm = self.build_model()
         prompt = build_chatbot_prompt()
-        retriever = self.build_retriever(vector_store, ignore_external_documents, language)
+        retriever = self.build_retriever(vector_store, ignore_external_documents, language, project_filters)
         question_answer_chain = create_stuff_documents_chain(llm, prompt)
         history_aware_retriever = create_history_aware_retriever(
             llm, retriever, build_contextualize_prompt()
@@ -357,13 +372,13 @@ class ChatbotAdapter(ChatbotRepository):
                 history.add_ai_message(message['content'])
         return history
 
-    def build_message_history(self, vector_store, ignore_external_documents, language) -> RunnableWithMessageHistory:
+    def build_message_history(self, vector_store, ignore_external_documents, language, project_filters: list = None) -> RunnableWithMessageHistory:
         """Builds a message history for a RunnableWithMessageHistory object.
         
         Returns:
             RunnableWithMessageHistory: A RunnableWithMessageHistory object with specified parameters.
         """
-        return RunnableWithMessageHistory(self.build_chain(vector_store, ignore_external_documents, language),
+        return RunnableWithMessageHistory(self.build_chain(vector_store, ignore_external_documents, language, project_filters),
                  self.get_session_history,
                 input_messages_key="input",
                 history_messages_key="chat_history",
@@ -372,7 +387,7 @@ class ChatbotAdapter(ChatbotRepository):
                                         (id="messages",annotation=List[Dict[str, str]], name="messages",description="List of messages from history",
                                         default="",is_shared=True)])
 
-    async def conversation_history(self, model_args, history_metadata, vector_store, ignore_external_documents, stream: bool = True):
+    async def conversation_history(self, model_args, history_metadata, vector_store, ignore_external_documents, stream: bool = True, project_filters: list = None):
         """
         Retrieves the conversation history and returns either a streaming response or full JSON.
 
@@ -382,6 +397,7 @@ class ChatbotAdapter(ChatbotRepository):
             vector_store: Vector store instance for retrieval.
             ignore_external_documents (bool): Whether to ignore external documents.
             stream (bool): If True, return StreamingResponse; if False, return JSONResponse.
+            project_filters (list): List of project_id values to filter by.
 
         Returns:
             StreamingResponse or JSONResponse: Conversation history in the requested format.
@@ -395,7 +411,7 @@ class ChatbotAdapter(ChatbotRepository):
             ).language.value
 
             # Build conversational chain
-            conversational_chain = self.build_message_history(vector_store, ignore_external_documents, language)
+            conversational_chain = self.build_message_history(vector_store, ignore_external_documents, language, project_filters)
             
             # Stream generator
             response = conversational_chain.astream(

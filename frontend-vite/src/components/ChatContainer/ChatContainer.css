@@ -202,3 +202,50 @@
     transform: scale(1);
   }
 }
+
+/* Citations */
+.citations-container {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f0f7ff;
+  border-left: 3px solid #005baa;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+}
+
+.citations-title {
+  font-weight: 600;
+  color: #005baa;
+  margin-bottom: 4px;
+}
+
+.citations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.citation-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.citation-link {
+  color: #005baa;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.citation-link:hover {
+  text-decoration: underline;
+}
+
+.citation-filename {
+  color: #555;
+  font-size: 13px;
+  font-style: italic;
+}

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import './ChatContainer.css';
+import type { Citation } from '../../models';
 
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp?: Date;
+  citations?: Citation[];
 }
 
 interface ChatContainerProps {
@@ -65,6 +67,26 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ messages, userInitials = 
                 <div className="message-avatar">{message.role === 'user' ? userInitials : 'AI'}</div>
                 <div className="message-content">
                   <div className="message-text">{message.content}</div>
+                  {message.role === 'assistant' && message.citations && message.citations.length > 0 && (
+                    <div className="citations-container">
+                      <div className="citations-title">📄 Sources:</div>
+                      <ul className="citations-list">
+                        {message.citations.map((citation, index) => (
+                          <li key={index} className="citation-item">
+                            {citation.url ? (
+                              <a href={citation.url} target="_blank" rel="noopener noreferrer" className="citation-link">
+                                {citation.filepath || citation.title || `Source ${index + 1}`}
+                              </a>
+                            ) : (
+                              <span className="citation-filename">
+                                {citation.filepath || citation.title || `Source ${index + 1}`}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <div className="message-footer">
                     {message.timestamp && (
                       <div className="message-time">

@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Message } from '../components/ChatContainer/ChatContainer';
+import type { Citation } from '../models';
 
 interface ChatContextType {
   messages: Message[];
   selectedFilters: string[];
   addMessage: (message: Message) => void;
-  updateMessage: (id: string, newContent: string) => void;
+  updateMessage: (id: string, newContent: string, citations?: Citation[]) => void;
   setSelectedFilters: (filters: string[]) => void;
   clearMessages: () => void;
 }
@@ -34,10 +35,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     setMessages(prev => [...prev, message]);
   };
 
-  const updateMessage = (id: string, newContent: string) => {
+  const updateMessage = (id: string, newContent: string, citations?: Citation[]) => {
     setMessages(prev =>
       prev.map(msg =>
-        msg.id === id ? { ...msg, content: newContent } : msg
+        msg.id === id ? { ...msg, content: newContent, ...(citations && { citations }) } : msg
       )
     );
   };

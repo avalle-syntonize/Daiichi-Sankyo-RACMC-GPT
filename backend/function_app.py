@@ -13,13 +13,13 @@ app = func.FunctionApp()
 # ----------------------------
 # Completions (no streaming)
 # ----------------------------
-@app.route(route="completions", methods=["POST"])
-async def completions(req: FastApiRequest):
-    body = await req.json()
-    payload = CompletionsRequest(**body)
-    context = payload.context
-    response = await app_chatbot.get_completions(context, stream_response=False)
-    return JSONResponse(response)
+# @app.route(route="completions", methods=["POST"])
+# async def completions(req: FastApiRequest):
+#     body = await req.json()
+#     payload = CompletionsRequest(**body)
+#     context = payload.context
+#     response = await app_chatbot.get_completions(context, stream_response=False)
+#     return JSONResponse(response)
 
 
 # ----------------------------

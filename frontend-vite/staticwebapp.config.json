@@ -20,7 +20,7 @@
     },
     {
       "route": "/login",
-      "redirect": "/.auth/login/azureActiveDirectory"
+      "redirect": "/.auth/login/aad"
     },
     {
       "route": "/",
@@ -79,7 +79,7 @@
       "statusCode": 400
     },
     "401": {
-      "redirect": "/.auth/login/azureActiveDirectory",
+      "redirect": "/.auth/login/aad",
       "statusCode": 302
     },
     "403": {

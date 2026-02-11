@@ -30,32 +30,39 @@ const handler = async (request, context) => {
         console.error('Error parsing request body:', err);
         return { status: 400, body: "Invalid JSON in request body." };
     }
-    const response = await fetch(`${process.env.BASE_API_URL}/stream/completions`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify(requestBody)
-    });
 
-    return {
-        status: response.status,
-        headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-        },
-        body: response.body.pipeThrough(new TransformStream({
-            transform(chunk, controller) {
-                const text = new TextDecoder().decode(chunk);
-                const lines = text.split('\n').filter(l => l.trim());
-                for (const line of lines) {
-                    controller.enqueue(new TextEncoder().encode(`data: ${line}\n\n`));
+    try {
+        const response = await fetch(`${process.env.BASE_API_URL}/stream/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        return {
+            status: response.status,
+            headers: {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+            },
+            body: response.body.pipeThrough(new TransformStream({
+                transform(chunk, controller) {
+                    const text = new TextDecoder().decode(chunk);
+                    const lines = text.split('\n').filter(l => l.trim());
+                    for (const line of lines) {
+                        controller.enqueue(new TextEncoder().encode(`data: ${line}\n\n`));
+                    }
                 }
-            }
-        }))
-    };
+            }))
+        };
+    } catch (error) {
+        context.log.error('Error fetching completions:', error);
+        console.error('Error fetching completions:', error);
+        return { status: 500, body: "Error fetching completions." };
+    }
 };
 
 app.setup({ enableHttpStream: true });

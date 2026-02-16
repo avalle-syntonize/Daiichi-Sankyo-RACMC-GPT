@@ -80,6 +80,11 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ messages, userInitials = 
                       <ul className="citations-list">
                         {message.citations.map((citation, index) => (
                           <li key={index} className="citation-item">
+                            {
+                              citation.page_label ? (
+                                <span className="citation-page">Page - {citation.page_label}</span>
+                              ) : null
+                            }
                             {citation.url ? (
                               <a href={citation.url} target="_blank" rel="noopener noreferrer" className="citation-link">
                                 {citation.filepath || citation.title || `Source ${index + 1}`}

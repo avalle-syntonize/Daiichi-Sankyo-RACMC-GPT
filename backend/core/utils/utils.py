@@ -250,6 +250,7 @@ def format_streaming_response_langchain(chatCompletionChunk, history_metadata, l
                 url = doc.metadata.get('url', '')
                 title = doc.metadata.get('title', '')
                 page = doc.metadata.get('page', '')
+                page_label = doc.metadata.get('page_label', '')
                 content = doc.page_content
                 
                 parsed_data["citations"].append({
@@ -257,8 +258,11 @@ def format_streaming_response_langchain(chatCompletionChunk, history_metadata, l
                     "title": title,
                     "url": url,
                     "filepath": filepath,
+                    "page_label": page_label,
+                    "page_index": page,
                     "chunk_id": str(page)
                 })
+                
             parsed_data["intent"]= last_message
             response_obj["choices"][0]["messages"].append(
                     {

@@ -321,7 +321,7 @@ const ChatPage: React.FC = () => {
               const toolContent: ToolMessageContent = JSON.parse(tm.content);
               const seen = new Set<string>();
               citations = (toolContent.citations || []).filter(c => {
-                const key = c.filepath || c.title || c.content;
+                const key = c.filepath || c.title || c.content || c.page_label || c.page_index;
                 if (seen.has(key)) return false;
                 seen.add(key);
                 return true;

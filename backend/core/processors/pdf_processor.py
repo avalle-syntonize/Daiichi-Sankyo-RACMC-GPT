@@ -77,24 +77,44 @@ class PDFProcessor(BaseDocumentProcessor):
         language_code = '' #cfg.LANGUAGES_CODE[language]
 
         # Get base metadata
-        metadata = self.get_metadata_base(blob_name, blob_url, language, language_code, project_id)
+        # metadata = self.get_metadata_base(blob_name, blob_url, language, language_code, project_id)
 
         # Add PDF-specific metadata from first page
-        if docs and docs[0].metadata:
-            metadata.update(docs[0].metadata)
+        # if docs and docs[0].metadata:
+        #     metadata.update(docs[0].metadata)
             # self.safe_merge_metadata(metadata, docs[0].metadata)
 
         # Combine all page content
+        # for doc in docs:
+        #     text += doc.page_content
+        #     text += "\n"
+
+        # # Add character count
+        # metadata["char_count"] = len(text)
+
+        # # Add page count if available
+        # if docs:
+        #     metadata["page_count"] = len(docs)
+
+        # return [
+        #     Document(
+        #         page_content=text,
+        #         metadata=metadata,
+        #     )
+        # ]
+
+        documents = []
         for doc in docs:
-            text += doc.page_content
-            text += "\n"
-
-        # Add character count
-        metadata["char_count"] = len(text)
-
-        # Add page count if available
-        if docs:
+            metadata = self.get_metadata_base(blob_name, blob_url, language, language_code, project_id)
+            metadata.update(doc.metadata)
+            metadata["char_count"] = len(doc.page_content)
             metadata["page_count"] = len(docs)
+            documents.append(
+                Document(
+                    page_content=doc.page_content,
+                    metadata=metadata,
+                )
+            )
 
         logging.info(
             "Extracted %d pages from PDF %s (total chars: %d)",
@@ -102,10 +122,5 @@ class PDFProcessor(BaseDocumentProcessor):
             blob_name,
             len(text),
         )
-
-        return [
-            Document(
-                page_content=text,
-                metadata=metadata,
-            )
-        ]
+            
+        return documents

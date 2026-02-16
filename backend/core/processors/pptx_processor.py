@@ -78,30 +78,53 @@ class PPTXProcessor(BaseDocumentProcessor):
         language = ''
 
         # Get base metadata
-        metadata = self.get_metadata_base(blob_name, blob_url, language, language_code, project_id)
+        # metadata = self.get_metadata_base(blob_name, blob_url, language, language_code, project_id)
 
         # Add PPTX-specific metadata from first document
-        if docs and docs[0].metadata:
-            metadata.update(docs[0].metadata)
-            # self.safe_merge_metadata(metadata, docs[0].metadata)
+        # if docs and docs[0].metadata:
+        #     metadata.update(docs[0].metadata)
+        #     # self.safe_merge_metadata(metadata, docs[0].metadata)
 
-        # Combine all content
+        # # Combine all content
+        # for doc in docs:
+        #     text += doc.page_content
+        #     text += "\n"
+
+        # # Add character count
+        # metadata["char_count"] = len(text)
+
+        # logging.info(
+        #     "Extracted PPTX %s (total chars: %d)",
+        #     blob_name,
+        #     len(text),
+        # )
+
+        # return [
+        #     Document(
+        #         page_content=text,
+        #         metadata=metadata,
+        #     )
+        # ]
+
+        documents = []
         for doc in docs:
-            text += doc.page_content
-            text += "\n"
+            metadata = self.get_metadata_base(blob_name, blob_url, language, language_code, project_id)
+            metadata.update(doc.metadata)
+            metadata["char_count"] = len(doc.page_content)
+            metadata["page_count"] = len(docs)
+            documents.append(
+                Document(
+                    page_content=doc.page_content,
+                    metadata=metadata,
+                )
+            )
 
-        # Add character count
-        metadata["char_count"] = len(text)
 
         logging.info(
-            "Extracted PPTX %s (total chars: %d)",
+            "Extracted %d pages from PPTX %s (total chars: %d)",
+            len(docs),
             blob_name,
             len(text),
         )
-
-        return [
-            Document(
-                page_content=text,
-                metadata=metadata,
-            )
-        ]
+            
+        return documents

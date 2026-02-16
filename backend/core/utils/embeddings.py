@@ -6,7 +6,8 @@ from langchain_experimental.text_splitter import SemanticChunker
 from langchain_openai.embeddings import AzureOpenAIEmbeddings
 from langchain_community.vectorstores.azuresearch import AzureSearch
 from langchain_core.documents import Document
-
+from azure.search.documents import SearchClient
+from azure.core.credentials import AzureKeyCredential
 
 def semantic_chunk_documents_generic(documents: List[Document]) -> List[Document]:
     """
@@ -83,6 +84,12 @@ def load_chunks_azure_search(docs: List[Document], blob_name: str = None) -> Non
         fields=cfg.FIELDS,
     )
 
+    # client = SearchClient(
+    #     endpoint=cfg.VECTOR_STORE_ADDRESS,
+    #     index_name=cfg.INDEX_NAME,
+    #     credential=AzureKeyCredential(cfg.VECTOR_STORE_PASSWORD)
+    # )    
+
     if blob_name:
         logging.info("Checking for existing documents with blob_name: %s", blob_name)
         try:
@@ -93,5 +100,16 @@ def load_chunks_azure_search(docs: List[Document], blob_name: str = None) -> Non
             logging.warning(
                 "Error deleting documents with blob_name %s: %s", blob_name, str(e)
             )
+
+    # total = 0
+    # while True:
+    #     results = client.search("*", top=1000, select=["id"])
+    #     docs = [{"id": r["id"]} for r in results]
+    #     if not docs:    
+    #         break
+    #     client.delete_documents(documents=docs)
+    #     total += len(docs)
+    #     print(f"Eliminados {len(docs)} documentos (total: {total})")
+
 
     vector_store.add_documents(documents=docs)

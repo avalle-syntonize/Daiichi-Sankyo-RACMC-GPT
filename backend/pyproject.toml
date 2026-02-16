@@ -28,5 +28,8 @@ dependencies = [
     "uvicorn[standard]>=0.40.0",
     "azurefunctions-extensions-http-fastapi>=1.0.1",
     "docx2txt>=0.9",
+    "unstructured[doc,docx,ppt,pptx]>=0.20.2",
+    "nltk>=3.9.2",
+    "python-pptx>=1.0.2"
 ]
 

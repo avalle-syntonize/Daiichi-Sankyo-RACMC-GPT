@@ -17,3 +17,6 @@ pypdf>=6.6.2
 temp>=2020.7.2
 fastapi>=0.128.0
 docx2txt==0.9
+python-pptx>=1.0.2
+unstructured[docx,ppt,pptx]>=0.20.2
+nltk==3.9.2

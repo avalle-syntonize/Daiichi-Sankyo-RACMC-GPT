@@ -61,6 +61,13 @@ class PPTXProcessor(BaseDocumentProcessor):
 
         logging.info("Processing PPTX: %s", blob_name)
 
+        try:
+            import nltk
+            nltk.download("averaged_perceptron_tagger")
+        except Exception:
+            logging.debug("NLTK tagger 'averaged_perceptron_tagger' not found; skipping download here.")
+        # Load PPTX using UnstructuredPowerPointLoader
+
         # Load PPTX using UnstructuredPowerPointLoader
         loader = UnstructuredPowerPointLoader(file_path)
         docs = loader.load()

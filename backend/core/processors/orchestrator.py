@@ -12,6 +12,8 @@ from typing import Dict, List
 from azure.storage.blob import BlobServiceClient
 from langchain_core.documents import Document
 
+from core.processors.docx_processor import DOCXProcessor
+from core.processors.pptx_processor import PPTXProcessor
 from core.processors.base_processor import BaseDocumentProcessor
 from core.processors.pdf_processor import PDFProcessor
 import tempfile
@@ -37,8 +39,18 @@ class ProcessorOrchestrator:
         file extensions they support.
         """
         # Register PDF processor
+     # Register PDF processor
         pdf_processor = PDFProcessor()
         self.processors[".pdf"] = pdf_processor
+
+        # Register docx processor
+        docx_processor = DOCXProcessor()
+        self.processors[".docx"] = docx_processor
+
+        # Register pptx processor
+        pptx_processor = PPTXProcessor()
+        self.processors[".pptx"] = pptx_processor
+        self.processors[".ppt"] = pptx_processor  # pptx processor can also handle ppt files
 
         logging.info(
             "Registered processors: %s",

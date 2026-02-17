@@ -30,16 +30,6 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables import ConfigurableFieldSpec
 from langchain_classic.retrievers import EnsembleRetriever
 from langchain_core.vectorstores import VectorStoreRetriever
-# from quart import (
-#     Blueprint,
-#     Quart,
-#     jsonify,
-#     make_response,
-#     request,
-#     send_from_directory,
-#     render_template,
-# )
-
 # from fastapi.responses import JSONResponse, StreamingResponse
 from azurefunctions.extensions.http.fastapi import JSONResponse, StreamingResponse
 
@@ -126,6 +116,30 @@ loaders = {
 }
 
 SHOULD_USE_DATA = False
+
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.documents import Document
+from typing import List, Optional
+
+class AzureThresholdRetriever(BaseRetriever):
+
+    vector_store: Any
+    k: int = 10
+    threshold: float = 0.80
+    filters: Optional[str] = None
+
+    def _get_relevant_documents(self, query: str) -> List[Document]:
+
+        results = self.vector_store.similarity_search_with_relevance_scores(
+            query,
+            k=self.k,
+            filters=self.filters
+        )
+
+        return [
+            doc for doc, score in results
+            if score >= self.threshold
+        ]
 
 class ChatbotAdapter(ChatbotRepository):
     
@@ -323,12 +337,20 @@ class ChatbotAdapter(ChatbotRepository):
         search_kwargs = {}
         if project_filters:
             odata_conditions = " or ".join([f"project_id eq '{pid}'" for pid in project_filters])
-            odata_filter = f"({odata_conditions})"
+            odata_filter = ""#f"({odata_conditions})"
             # TODO: uncomment the next line to enable project_id filtering in Azure Search
             # search_kwargs["filters"] = odata_filter
             logging.info(f"Project filter built (not applied): {odata_filter}")
-            
-        azure = build_azure_search_store_async(build_embeddings_model()).as_retriever(search_kwargs=search_kwargs)
+        # azure = build_azure_search_store_async(build_embeddings_model()).as_retriever(search_kwargs=search_kwargs)
+        azure_store = build_azure_search_store_async(build_embeddings_model())
+        
+        azure = AzureThresholdRetriever(
+            vector_store=azure_store,
+            k=10,
+            threshold=0.70,
+            filters=odata_filter
+        )
+  
         chroma = vector_store.as_retriever()
         retrievers = [azure, chroma] if not ignore_external_documents else [chroma]
         weights=[0.5, 0.5] if not ignore_external_documents else [1.0]

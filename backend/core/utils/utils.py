@@ -273,11 +273,11 @@ def format_streaming_response_langchain(chatCompletionChunk, history_metadata, l
             return response_obj
         
         if answer_chunk := chatCompletionChunk.get("answer"):
-            context_present = "┐" in answer_chunk
-            counter_string = ' '.join([f'[doc{doc}]' for doc in range(1, 5)]) if context_present else ""
+            # context_present = "┐" in answer_chunk
+            # counter_string = ' '.join([f'[doc{doc}]' for doc in range(1, 5)]) if context_present else ""
             messageObj = {
                 "role": "assistant",
-                "content": answer_chunk.replace("┐", "") + counter_string,
+                "content": answer_chunk.replace("┐", ""),
             }
             response_obj["choices"][0]["messages"].append(messageObj)
             return response_obj

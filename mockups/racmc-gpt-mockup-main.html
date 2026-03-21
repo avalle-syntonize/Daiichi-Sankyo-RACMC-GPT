@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RA CMC-GPT - Daiichi Sankyo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        /* Header con gradiente Daiichi Sankyo */
+        .header {
+            background: linear-gradient(90deg, #005BAA 0%, #00ACEA 37.56%, #89BA17 80.63%, #CFD300 98.85%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 700;
+            color: #005BAA;
+            font-size: 18px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius:  50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #005BAA;
+        }
+        
+        /* Container principal */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        /* Panel de control superior */
+        .control-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom:  20px;
+            box-shadow:  0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .control-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .control-row: last-child {
+            margin-bottom: 0;
+        }
+        
+        .control-label {
+            font-weight: 500;
+            color: #333;
+            min-width: 120px;
+        }
+        
+        .select-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        select {
+            width: 100%;
+            padding:  12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius:  6px;
+            font-size: 15px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #00B4ED;
+        }
+        
+        .export-btn {
+            background: white;
+            border: 2px solid #00B4ED;
+            color: #00B4ED;
+            padding: 10px 24px;
+            border-radius:  6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .export-btn:hover {
+            background: #00B4ED;
+            color: white;
+        }
+        
+        /* Área de conversación */
+        .chat-area {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+        
+        .messages-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y:  auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+        }
+        
+        .message. user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .message. user . message-avatar {
+            background:  #00B4ED;
+            color: white;
+        }
+        
+        .message. assistant . message-avatar {
+            background:  linear-gradient(135deg, #005BAA, #00ACEA);
+            color: white;
+        }
+        
+        .message-content {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 12px;
+            line-height: 1.6;
+        }
+        
+        .message. user .message-content {
+            background: #00B4ED;
+            color:  white;
+        }
+        
+        .citation {
+            display: inline-block;
+            background: rgba(0, 180, 237, 0.1);
+            color: #00B4ED;
+            padding: 2px 6px;
+            border-radius:  4px;
+            font-size: 13px;
+            font-weight:  500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .citation:hover {
+            background: rgba(0, 180, 237, 0.2);
+        }
+        
+        /* Input area */
+        .input-area {
+            padding: 20px 24px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius:  24px;
+            font-size:  15px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            transition: border-color 0.3s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #00B4ED;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #005BAA, #00ACEA);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius:  24px;
+            font-size: 15px;
+            font-weight:  500;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .send-btn:hover {
+            transform:  scale(1.05);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Info box */
+        .info-box {
+            background: #e3f5ff;
+            border-left: 4px solid #00B4ED;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom:  20px;
+        }
+        
+        .info-box p {
+            color: #005BAA;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">DS</div>
+            <h1>RA CMC-GPT</h1>
+        </div>
+        <div class="user-info">
+            <div>
+                <span style="color: white; font-size: 14px;">Tobias Schmidt</span>
+                <br>
+                <a href="#" style="color: white; font-size: 12px; text-decoration: none; opacity: 0.9; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Logout</a>
+            </div>
+            <div class="user-avatar">TS</div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Info Box -->
+        <div class="info-box">
+            <p><strong>ℹ️ Important: </strong> This system is designed for Regulatory Affairs - Chemistry, Manufacturing and Controls (RA CMC) use only. All responses are based on internal documentation and should be verified before regulatory submission.</p>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="control-row">
+                <label class="control-label">Select Project:</label>
+                <div class="select-wrapper">
+                    <select id="projectFilter">
+                        <option value="">All Projects</option>
+                        <option value="impd">IMPD Guidelines Project</option>
+                        <option value="project-alpha">Project Alpha - CMC Module</option>
+                        <option value="project-beta">Project Beta - Quality Assessment</option>
+                        <option value="manufacturing">Manufacturing Process Validation</option>
+                    </select>
+                </div>
+                <button class="export-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export History
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="messages-container" id="messagesContainer">
+                <!-- Placeholder message -->
+                <div style="text-align: center; color: #999; margin:  auto;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#00B4ED" stroke-width="1.5" style="margin-bottom: 12px;">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <p style="font-size: 18px; margin-bottom: 8px; color: #333;">Welcome to RA CMC-GPT</p>
+                    <p style="font-size:  14px;">Select a project and start asking questions about your regulatory documentation. </p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        class="input-field" 
+                        placeholder="Ask a question about your regulatory documentation..."
+                        id="messageInput"
+                    >
+                    <button class="send-btn" id="sendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const projectFilter = document.getElementById('projectFilter');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesContainer = document.getElementById('messagesContainer');
+
+        // Disable send if no project selected
+        projectFilter.addEventListener('change', function() {
+            if (this.value) {
+                messageInput.disabled = false;
+                sendBtn.disabled = false;
+            } else {
+                messageInput.disabled = true;
+                sendBtn.disabled = true;
+            }
+        });
+
+        // Initial state
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+
+        // Demo: Send message functionality
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !sendBtn.disabled) {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (! text) return;
+
+            // Clear placeholder
+            if (messagesContainer.children.length === 1 && 
+                messagesContainer.children[0].style.textAlign === 'center') {
+                messagesContainer.innerHTML = '';
+            }
+
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg. innerHTML = `
+                <div class="message-avatar">TS</div>
+                <div class="message-content">${text}</div>
+            `;
+            messagesContainer.appendChild(userMsg);
+
+            // Clear input
+            messageInput.value = '';
+
+            // Simulate assistant response
+            setTimeout(() => {
+                const assistantMsg = document. createElement('div');
+                assistantMsg.className = 'message assistant';
+                assistantMsg.innerHTML = `
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        Based on the IMPD Guidelines documentation, the required documentation for manufacturing process validation includes:
+                        <br><br>
+                        1. Process validation protocol <span class="citation">[Document:  IMPD_Guidelines_v2.3. pdf, p. 47]</span>
+                        <br>
+                        2. Manufacturing batch records <span class="citation">[Document: Manufacturing_SOP_2024. docx, p. 12]</span>
+                        <br>
+                        3. Quality control testing results <span class="citation">[Document: QC_Procedures. xlsx, Sheet:  Validation]</span>
+                        <br><br>
+                        All documentation must follow the format specified in Annex 15 of the EU GMP guidelines.
+                    </div>
+                `;
+                messagesContainer.appendChild(assistantMsg);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>

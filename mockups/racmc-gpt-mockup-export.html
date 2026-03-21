@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RA CMC-GPT - Export History - Daiichi Sankyo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #005BAA 0%, #00ACEA 37.56%, #89BA17 80.63%, #CFD300 98.85%);
+            color: white;
+            padding: 20px 40px;
+        }
+        
+        .logo {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 700;
+            color: #005BAA;
+            font-size: 18px;
+            display: inline-block;
+        }
+        
+        .header h1 {
+            display: inline-block;
+            margin-left: 20px;
+            font-size: 24px;
+            font-weight: 500;
+            vertical-align: middle;
+        }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom:  0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 600px;
+            max-width:  90%;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #005BAA, #00ACEA);
+            color: white;
+            padding: 24px;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight:  600;
+            margin-bottom: 8px;
+        }
+        
+        .modal-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .export-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+        }
+        
+        .export-option:hover {
+            border-color: #00B4ED;
+            background:  #f8f9fa;
+        }
+        
+        .export-option.selected {
+            border-color: #00B4ED;
+            background: #e3f5ff;
+        }
+        
+        .option-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .radio-btn {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccc;
+            border-radius:  50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .export-option.selected .radio-btn {
+            border-color: #00B4ED;
+        }
+        
+        .radio-btn-inner {
+            width: 10px;
+            height: 10px;
+            background: #00B4ED;
+            border-radius: 50%;
+            display: none;
+        }
+        
+        .export-option.selected .radio-btn-inner {
+            display: block;
+        }
+        
+        .option-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .option-description {
+            font-size: 14px;
+            color: #666;
+            margin-left: 32px;
+        }
+        
+        .privacy-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .privacy-notice strong {
+            color: #856404;
+        }
+        
+        .modal-footer {
+            padding: 24px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight:  500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #ccc;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #005BAA, #00ACEA);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 180, 237, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">DS</div>
+        <h1>RA CMC-GPT</h1>
+    </div>
+
+    <div class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Export Conversation History</div>
+                <div class="modal-subtitle">Download as Plain Text</div>
+            </div>
+
+            <div class="modal-body">
+                <p style="color: #555; line-height: 1.6; margin-bottom: 16px;">Your conversation will be downloaded as a Plain Text file (.txt), suitable for documentation and archiving. This file includes your conversation with all citations.</p>
+                
+                <div class="privacy-notice">
+                    <strong>🔒 Privacy Notice:</strong> Conversation histories are not stored on our servers. This export is a one-time download of your current session only. Once you close this session, the conversation will not be retrievable.
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary">Cancel</button>
+                <button class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download Export
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

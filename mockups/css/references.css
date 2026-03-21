@@ -1,0 +1,180 @@
+/* ============================================
+   References Panel
+   ============================================ */
+
+.references-panel {
+    background-color: var(--color-bg-white);
+    border-left: 1px solid var(--color-border);
+    display: none;
+    flex-direction: column;
+    overflow:  hidden;
+}
+
+.references-panel.open {
+    display: flex;
+}
+
+.references-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg-light);
+}
+
+.references-header h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.btn-close-panel {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition:  all var(--transition-fast);
+}
+
+.btn-close-panel:hover {
+    background-color: var(--color-bg-light);
+    color: var(--color-text-primary);
+}
+
+.references-content {
+    flex: 1;
+    padding:  var(--spacing-md);
+    overflow-y: auto;
+}
+
+.references-empty {
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-xl);
+}
+
+/* ============================================
+   Reference Card
+   ============================================ */
+
+.reference-card {
+    padding: var(--spacing-md);
+    background-color: var(--color-bg-light);
+    border:  1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+    transition: all var(--transition-fast);
+}
+
+.reference-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.reference-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.doc-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.reference-title {
+    flex: 1;
+}
+
+. doc-name {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+
+.doc-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.doc-page {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.doc-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.reference-actions {
+    margin-top: var(--spacing-sm);
+}
+
+.btn-sharepoint {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--color-primary);
+    color: white;
+    border:  none;
+    border-radius:  var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-sharepoint:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-sharepoint svg {
+    flex-shrink: 0;
+}
+
+/* ============================================
+   Citation Badge in Chat
+   ============================================ */
+
+.inline-citation {
+    display: inline-block;
+    padding: 2px 6px;
+    margin:  0 2px;
+    background-color:  rgba(0, 102, 204, 0.1);
+    color: var(--color-primary);
+    border-radius:  var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.inline-citation:hover {
+    background-color: var(--color-primary);
+    color: white;
+    transform: translateY(-1px);
+}

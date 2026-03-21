@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RA CMC-GPT - References View - Daiichi Sankyo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        /* Header con gradiente Daiichi Sankyo */
+        .header {
+            background: linear-gradient(90deg, #005BAA 0%, #00ACEA 37.56%, #89BA17 80.63%, #CFD300 98.85%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 700;
+            color: #005BAA;
+            font-size: 18px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #005BAA;
+        }
+        
+        /* Main Wrapper */
+        .main-wrapper {
+            display: flex;
+            height: calc(100vh - 76px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+        }
+        
+        .sidebar-header {
+            padding: 24px 16px 16px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        /* Projects List */
+        .projects-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        
+        .projects-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .projects-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .projects-container::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+        
+        .projects-container::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+        
+        .project-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .project-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .project-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #00B4ED;
+        }
+        
+        .project-label {
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            flex: 1;
+            user-select: none;
+        }
+        
+        .project-item:hover .project-label {
+            color: #00B4ED;
+            font-weight: 500;
+        }
+        
+        /* Category Headers */
+        .project-category {
+            font-size: 12px;
+            font-weight: 700;
+            color: #005BAA;
+            text-transform: uppercase;
+            padding: 12px 12px 8px;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        
+        .project-category:first-of-type {
+            margin-top: 0;
+        }
+        
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid #e0e0e0;
+            background: #fafafa;
+        }
+        
+        .export-btn {
+            width: 100%;
+            background: white;
+            border: 2px solid #00B4ED;
+            color: #00B4ED;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .export-btn:hover {
+            background: #00B4ED;
+            color: white;
+        }
+        
+        .export-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            width: 100%;
+        }
+        
+        /* Info box */
+        .info-box {
+            background: #e3f5ff;
+            border-left: 4px solid #00B4ED;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box p {
+            color: #005BAA;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Área de conversación */
+        .chat-area {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
+        }
+        
+        .messages-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+            max-width: 85%;
+        }
+        
+        .message.assistant {
+            max-width: 100%;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .message.user .message-avatar {
+            background: #00B4ED;
+            color: white;
+        }
+        
+        .message.assistant .message-avatar {
+            background: linear-gradient(135deg, #005BAA, #00ACEA);
+            color: white;
+        }
+        
+        .message-content {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 12px;
+            line-height: 1.6;
+        }
+        
+        .message.user .message-content {
+            background: #00B4ED;
+            color: white;
+        }
+        
+        .citation {
+            display: inline-block;
+            background: rgba(0, 180, 237, 0.1);
+            color: #00B4ED;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: 1px solid rgba(0, 180, 237, 0.3);
+            text-decoration: none;
+        }
+        
+        .citation:hover {
+            background: rgba(0, 180, 237, 0.2);
+            border-color: #00B4ED;
+        }
+        
+        .citation-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 11px;
+        }
+        
+        .citation-doc {
+            font-weight: 600;
+        }
+        
+        .citation-meta {
+            color: #666;
+        }
+        
+        /* Input area */
+        .input-area {
+            padding: 20px 24px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .file-preview-area {
+            display: flex;
+            gap: 8px;
+            padding: 8px 0;
+            flex-wrap: wrap;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        
+        .file-badge {
+            background: #e3f5ff;
+            border: 1px solid #00B4ED;
+            color: #005BAA;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .file-badge button {
+            background: none;
+            border: none;
+            color: #005BAA;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 15px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            transition: border-color 0.3s;
+            resize: none;
+            max-height: 100px;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #00B4ED;
+        }
+        
+        .input-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .upload-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: #666;
+        }
+        
+        .upload-btn:hover {
+            border-color: #00B4ED;
+            color: #00B4ED;
+            background: #f8f9fa;
+        }
+        
+        .upload-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #005BAA, #00ACEA);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+
+         /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom:  0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 600px;
+            max-width:  90%;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #005BAA, #00ACEA);
+            color: white;
+            padding: 24px;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight:  600;
+            margin-bottom: 8px;
+        }
+        
+        .modal-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+
+         .privacy-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .privacy-notice strong {
+            color: #856404;
+        }
+
+         
+        .modal-footer {
+            padding: 24px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight:  500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #ccc;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #005BAA, #00ACEA);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 180, 237, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">DS</div>
+            <h1>RA CMC-GPT - References</h1>
+        </div>
+        <div class="user-info">
+            <div>
+                <span style="color: white; font-size: 14px;">Tobias Schmidt</span>
+                <br>
+                <a href="#" style="color: white; font-size: 12px; text-decoration: none; opacity: 0.9; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">Logout</a>
+            </div>
+            <div class="user-avatar">TS</div>
+        </div>
+    </div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Filter by Source</div>
+                <div class="sidebar-subtitle">Select one or more</div>
+            </div>
+
+            <div class="projects-container" id="projectsContainer">
+                <!-- DOSSIERS -->
+                <div class="project-category">Dossiers</div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="DS-1062" id="proj-ds1062">
+                    <label for="proj-ds1062" class="project-label">DS-1062</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="U3-1402" id="proj-u31402">
+                    <label for="proj-u31402" class="project-label">U3-1402</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="DS-8201" id="proj-ds8201">
+                    <label for="proj-ds8201" class="project-label">DS-8201</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="impd" id="proj-impd">
+                    <label for="proj-impd" class="project-label">IMPD</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="maa" id="proj-maa">
+                    <label for="proj-maa" class="project-label">MAA</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="bla" id="proj-bla">
+                    <label for="proj-bla" class="project-label">BLA</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="core" id="proj-core">
+                    <label for="proj-core" class="project-label">Core</label>
+                </div>
+
+                <!-- GUIDELINES -->
+                <div class="project-category">Guidelines</div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="ema" id="guide-ema">
+                    <label for="guide-ema" class="project-label">EMA</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="ich" id="guide-ich">
+                    <label for="guide-ich" class="project-label">ICH</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="fda" id="guide-fda">
+                    <label for="guide-fda" class="project-label">FDA</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="jp" id="guide-jp">
+                    <label for="guide-jp" class="project-label">JP</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="cn" id="guide-cn">
+                    <label for="guide-cn" class="project-label">CN</label>
+                </div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="row" id="guide-row">
+                    <label for="guide-row" class="project-label">RoW</label>
+                </div>
+
+                <!-- INTERNAL GUIDANCE -->
+                <div class="project-category">Internal Guidance</div>
+                
+                <div class="project-item">
+                    <input type="checkbox" class="project-checkbox" value="internal-guidance" id="guide-internal">
+                    <label for="guide-internal" class="project-label">Internal Documents</label>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="export-btn" id="exportBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export History
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="container">
+                <!-- Info Box -->
+                <div class="info-box">
+                    <p><strong>ℹ️ Important: </strong> This system is designed for Regulatory Affairs - Chemistry, Manufacturing and Controls (RA CMC) use only. All responses are based on internal documentation and should be verified before regulatory submission.</p>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="chat-area">
+                    <div class="messages-container" id="messagesContainer">
+                        <!-- User Message 1 -->
+                        <div class="message user">
+                            <div class="message-avatar">TS</div>
+                            <div class="message-content">
+                                What documentation is required for manufacturing process validation in IMPD submissions?
+                            </div>
+                        </div>
+
+                        <!-- Assistant Response 1 -->
+                        <div class="message assistant">
+                            <div class="message-avatar">AI</div>
+                            <div class="message-content">
+                                Based on the IMPD Guidelines documentation, the required documentation for manufacturing process validation includes:
+                                <br><br>
+                                <strong>1. Process Validation Protocol</strong><br>
+                                This must include a detailed description of the manufacturing process, critical process parameters, and acceptance criteria. 
+                                <a href="#" class="citation" title="Click to view document">
+                                    <div class="citation-details">
+                                        <span class="citation-doc">IMPD_Guidelines_v2.3.pdf</span>
+                                        <span class="citation-meta">Page 47 | Uploaded: 2024-01-15</span>
+                                    </div>
+                                </a>
+                                <br><br>
+                                <strong>2. Manufacturing Batch Records</strong><br>
+                                Complete batch manufacturing records for at least three consecutive batches must be provided to demonstrate process consistency. 
+                                <a href="#" class="citation" title="Click to view document">
+                                    <div class="citation-details">
+                                        <span class="citation-doc">Manufacturing_SOP_2024.docx</span>
+                                        <span class="citation-meta">Page 12 | Uploaded: 2023-11-20</span>
+                                    </div>
+                                </a>
+                                <br><br>
+                                <strong>3. Quality Control Testing Results</strong><br>
+                                All in-process and final product testing results must be documented and compared against specifications. 
+                                <a href="#" class="citation" title="Click to view document">
+                                    <div class="citation-details">
+                                        <span class="citation-doc">QC_Procedures.xlsx</span>
+                                        <span class="citation-meta">Sheet: Validation | Uploaded: 2024-02-03</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- User Message 2 -->
+                        <div class="message user">
+                            <div class="message-avatar">TS</div>
+                            <div class="message-content">
+                                Are there any specific requirements for the risk assessment documentation?
+                            </div>
+                        </div>
+
+                        <!-- Assistant Response 2 -->
+                        <div class="message assistant">
+                            <div class="message-avatar">AI</div>
+                            <div class="message-content">
+                                Yes, a comprehensive quality risk management approach should be documented. This includes identifying potential failure modes and their mitigation strategies. 
+                                <a href="#" class="citation" title="Click to view document">
+                                    <div class="citation-details">
+                                        <span class="citation-doc">Risk_Management_ICH_Q9.pdf</span>
+                                        <span class="citation-meta">Page 23 | Uploaded: 2023-09-12</span>
+                                    </div>
+                                </a>
+                                <br><br>
+                                Additionally, all risk assessments must follow the format specified in <strong>Annex 15 of the EU GMP guidelines</strong> and comply with ICH Q10 requirements. You should also document how quality risk management is integrated throughout the product lifecycle. 
+                                <a href="#" class="citation" title="Click to view document">
+                                    <div class="citation-details">
+                                        <span class="citation-doc">EU_GMP_Annex15.pdf</span>
+                                        <span class="citation-meta">Page 5 | Uploaded: 2024-01-08</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="input-area">
+                        <div class="file-preview-area" id="filePreviewArea"></div>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                class="input-field" 
+                                placeholder="Ask a question about your regulatory documentation..."
+                                id="messageInput"
+                            >
+                            <div class="input-actions">
+                                <button class="upload-btn" id="uploadBtn" title="Upload document">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                </button>
+                                <button class="send-btn" id="sendBtn">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.xlsx,.txt,.pptx">
+
+     <div class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Export Conversation History</div>
+                <div class="modal-subtitle">Download as Plain Text</div>
+            </div>
+
+            <div class="modal-body">
+                <p style="color: #555; line-height: 1.6; margin-bottom: 16px;">Your conversation will be downloaded as a Plain Text file (.txt), suitable for documentation and archiving. This file includes your conversation with all citations.</p>
+                
+                <div class="privacy-notice">
+                    <strong>🔒 Privacy Notice:</strong> Conversation histories are not stored on our servers. This export is a one-time download of your current session only. Once you close this session, the conversation will not be retrievable.
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary">Cancel</button>
+                <button class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download Export
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const projectCheckboxes = document.querySelectorAll('.project-checkbox');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const exportBtn = document.getElementById('exportBtn');
+        const filePreviewArea = document.getElementById('filePreviewArea');
+        const uploadedFiles = [];
+
+        // Upload button click
+        uploadBtn.addEventListener('click', () => fileInput.click());
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                if (!uploadedFiles.find(f => f.name === file.name)) {
+                    uploadedFiles.push(file);
+                }
+            });
+            updateFilePreview();
+        });
+
+        // Update file preview
+        function updateFilePreview() {
+            filePreviewArea.innerHTML = uploadedFiles.map((file, index) => `
+                <div class="file-badge">
+                    📄 ${file.name}
+                    <button type="button" onclick="removeFile(${index})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        // Remove file from preview
+        window.removeFile = (index) => {
+            uploadedFiles.splice(index, 1);
+            updateFilePreview();
+        };
+
+        // Enable/disable send button based on selection and input
+        function updateSendButtonState() {
+            const hasSelection = Array.from(projectCheckboxes).some(cb => cb.checked);
+            const hasInput = messageInput.value.trim().length > 0;
+            sendBtn.disabled = !(hasSelection && hasInput);
+        }
+
+        // Listen for checkbox changes
+        projectCheckboxes.forEach(cb => {
+            cb.addEventListener('change', updateSendButtonState);
+        });
+
+        // Listen for input changes
+        messageInput.addEventListener('input', updateSendButtonState);
+
+        // Initial state
+        updateSendButtonState();
+
+        // Send message
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey && !sendBtn.disabled) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            const selectedFilters = Array.from(projectCheckboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            if (selectedFilters.length === 0) return;
+
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.innerHTML = `
+                <div class="message-avatar">TS</div>
+                <div class="message-content">${text}</div>
+            `;
+            messagesContainer.appendChild(userMsg);
+
+            // Clear input
+            messageInput.value = '';
+            uploadedFiles.length = 0;
+            updateFilePreview();
+            updateSendButtonState();
+
+            // Simulate assistant response
+            setTimeout(() => {
+                const assistantMsg = document.createElement('div');
+                assistantMsg.className = 'message assistant';
+                assistantMsg.innerHTML = `
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        Based on selected sources (${selectedFilters.join(', ')}), here are the findings:
+                        <br><br>
+                        1. Process validation protocol 
+                        <a href="#" class="citation" title="Click to view document">
+                            <div class="citation-details">
+                                <span class="citation-doc">IMPD_Guidelines_v2.3.pdf</span>
+                                <span class="citation-meta">Page 47 | Uploaded: 2024-01-15</span>
+                            </div>
+                        </a>
+                        <br>
+                        2. Manufacturing batch records 
+                        <a href="#" class="citation" title="Click to view document">
+                            <div class="citation-details">
+                                <span class="citation-doc">Manufacturing_SOP_2024.docx</span>
+                                <span class="citation-meta">Page 12 | Uploaded: 2023-11-20</span>
+                            </div>
+                        </a>
+                        <br>
+                        3. Quality control testing results 
+                        <a href="#" class="citation" title="Click to view document">
+                            <div class="citation-details">
+                                <span class="citation-doc">QC_Procedures.xlsx</span>
+                                <span class="citation-meta">Sheet: Validation | Uploaded: 2024-02-03</span>
+                            </div>
+                        </a>
+                        <br><br>
+                        All documentation must follow the format specified in Annex 15 of the EU GMP guidelines.
+                    </div>
+                `;
+                messagesContainer.appendChild(assistantMsg);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Export button
+        exportBtn.addEventListener('click', () => {
+            alert('Export functionality - modal would appear here');
+        });
+    </script>
+</body>
+</html>

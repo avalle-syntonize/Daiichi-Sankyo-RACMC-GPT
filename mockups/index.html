@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RACMC-GPT - Daiichi Sankyo</title>
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/chat.css">
+    <link rel="stylesheet" href="css/references.css">
+    
+    <!-- Fuente Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <img src="images/logo-daiichi.webp" alt="Daiichi Sankyo" class="logo">
+            <h1 class="app-title">RACMC-GPT</h1>
+            <span class="app-subtitle">Regulatory Affairs Assistant</span>
+        </div>
+        
+        <div class="header-right">
+            <div class="user-info">
+                <img src="images/icon-user. svg" alt="User" class="user-icon">
+                <span class="user-name" id="userName">Tobias Schmidt</span>
+            </div>
+            <button class="btn-logout" id="logoutBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar:  Project Filter -->
+        <aside class="sidebar">
+            <div class="filter-section">
+                <h3 class="filter-title">Select Project</h3>
+                <p class="filter-description">Choose a project to query documents</p>
+                
+                <div class="project-selector">
+                    <label for="projectSelect" class="sr-only">Project</label>
+                    <select id="projectSelect" class="project-select">
+                        <option value="">-- Select Project --</option>
+                        <option value="impd-guidelines">IMPD Guidelines</option>
+                        <option value="project-alpha">Project Alpha</option>
+                        <option value="project-beta">Project Beta</option>
+                        <option value="cmc-dossier">CMC Dossier</option>
+                        <option value="all-projects">All Projects</option>
+                    </select>
+                </div>
+                
+                <div class="filter-info" id="projectInfo">
+                    <p>⚠️ Please select a project to start querying</p>
+                </div>
+            </div>
+            
+            <!-- Export Button -->
+            <div class="export-section">
+                <button class="btn-export" id="exportBtn" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export Conversation
+                </button>
+                <p class="export-info">Download conversation as plain text (. txt)</p>
+            </div>
+        </aside>
+
+        <!-- Chat Area -->
+        <main class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Message -->
+                <div class="message-welcome">
+                    <h2>👋 Welcome to RACMC-GPT</h2>
+                    <p>Your AI assistant for Regulatory Affairs - CMC documentation. </p>
+                    <ul class="welcome-features">
+                        <li>✅ Query documents with page-level references</li>
+                        <li>✅ Filter by project for precise results</li>
+                        <li>✅ Export conversations for record-keeping</li>
+                        <li>✅ Strict railroading to prevent hallucinations</li>
+                    </ul>
+                    <p class="welcome-note"><strong>Note:</strong> Conversations are not stored.  Export important discussions. </p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea 
+                        id="chatInput" 
+                        class="chat-input" 
+                        placeholder="Ask a question about your regulatory documents..."
+                        rows="1"
+                        disabled
+                    ></textarea>
+                    <button class="btn-send" id="sendBtn" disabled>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+                <p class="input-info" id="inputInfo">Select a project to start querying</p>
+            </div>
+        </main>
+
+        <!-- References Panel (Initially Hidden) -->
+        <aside class="references-panel" id="referencesPanel">
+            <div class="references-header">
+                <h3>📚 Document References</h3>
+                <button class="btn-close-panel" id="closePanelBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="references-content" id="referencesContent">
+                <p class="references-empty">No references available.  Ask a question to see document citations.</p>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/export.js"></script>
+</body>
+</html>

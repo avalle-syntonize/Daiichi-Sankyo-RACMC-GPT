@@ -76,7 +76,7 @@
         
         /* Sidebar */
         .sidebar {
-            width: 280px;
+            width: 320px;
             background: white;
             border-right: 1px solid #e0e0e0;
             display: flex;
@@ -178,8 +178,15 @@
         }
         
         .accordion-icon {
-            font-size: 12px;
+            font-size: 14px;
             transition: transform 0.2s ease;
+            color: #005BAA;
+            opacity: 0.7;
+            padding: 4px;
+        }
+
+        .accordion-header:hover .accordion-icon {
+            opacity: 1;
         }
         
         .accordion-item.open > .accordion-header .accordion-icon {
@@ -211,6 +218,58 @@
         
         .accordion-content-inner {
             padding: 4px 8px 8px 8px;
+        }
+
+        /* Depth-aware indentation for leaf items */
+        .accordion-level-1 > .accordion-item > .accordion-content > .accordion-content-inner {
+            padding-left: 16px;
+        }
+        .accordion-level-2 > .accordion-item > .accordion-content > .accordion-content-inner {
+            padding-left: 28px;
+        }
+        .accordion-level-3 > .accordion-item > .accordion-content > .accordion-content-inner {
+            padding-left: 40px;
+        }
+
+        /* Checkbox inside accordion header */
+        .accordion-header .category-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #00B4ED;
+            margin-right: 4px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .accordion-title label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        /* Inherited (auto-selected by parent) state — light gray */
+        .accordion-item.inherited > .accordion-header {
+            color: #b0b0b0;
+        }
+        .accordion-item.inherited > .accordion-header .category-checkbox {
+            accent-color: #ccc;
+        }
+        .accordion-item.inherited > .accordion-header:hover {
+            color: #888;
+        }
+
+        .project-item.inherited .project-label {
+            color: #b0b0b0;
+        }
+        .project-item.inherited .project-checkbox {
+            accent-color: #ccc;
+        }
+        .project-item.inherited:hover .project-label {
+            color: #888;
         }
         
         /* Projects List */
@@ -841,225 +900,312 @@
                 <div class="sidebar-title">Filter by Source</div>
                 <div class="sidebar-subtitle">Select one or more</div>
             </div>
-
-            <div class="selected-filters" id="selectedFilters">
-                <div class="selected-filters-title">Selected sources</div>
-                <div class="selected-filters-list" id="selectedFiltersList"></div>
+            <div style="display: none;">
+                <div class="selected-filters" id="selectedFilters">
+                    <div class="selected-filters-title">Selected sources</div>
+                    <div class="selected-filters-list" id="selectedFiltersList"></div>
+                </div>
             </div>
-
             <div class="projects-container" id="projectsContainer">
                 <div class="accordion accordion-level-1">
-                    <!-- Dossiers -->
+
+                    <!-- ========== DOSSIERS ========== -->
                     <div class="accordion-item">
-                        <button class="accordion-header" type="button">
-                            <span class="accordion-title">Dossiers</span>
+                        <div class="accordion-header" role="button" tabindex="0">
+                            <span class="accordion-title">
+                                <input type="checkbox" class="category-checkbox">
+                                <span>Dossiers</span>
+                            </span>
                             <span class="accordion-icon">▶</span>
-                        </button>
+                        </div>
                         <div class="accordion-content">
                             <div class="accordion accordion-level-2">
+
+                                <!-- Biologics -->
                                 <div class="accordion-item">
-                                    <button class="accordion-header" type="button">
-                                        <span class="accordion-title">DS-1062</span>
+                                    <div class="accordion-header" role="button" tabindex="0">
+                                        <span class="accordion-title">
+                                            <input type="checkbox" class="category-checkbox">
+                                            <span>Biologics</span>
+                                        </span>
                                         <span class="accordion-icon">▶</span>
-                                    </button>
+                                    </div>
                                     <div class="accordion-content">
-                                        <div class="accordion-content-inner">
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-1062_IMPD" id="dossier-ds1062-impd">
-                                                <span class="project-label">IMPD</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-1062_MAA" id="dossier-ds1062-maa">
-                                                <span class="project-label">MAA</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-1062_BLA" id="dossier-ds1062-bla">
-                                                <span class="project-label">BLA</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-1062_CORE" id="dossier-ds1062-core">
-                                                <span class="project-label">Core</span>
-                                            </label>
+                                        <div class="accordion accordion-level-3">
+
+                                            <!-- Clinical -->
+                                            <div class="accordion-item">
+                                                <div class="accordion-header" role="button" tabindex="0">
+                                                    <span class="accordion-title">
+                                                        <input type="checkbox" class="category-checkbox">
+                                                        <span>Clinical</span>
+                                                    </span>
+                                                    <span class="accordion-icon">▶</span>
+                                                </div>
+                                                <div class="accordion-content">
+                                                    <div class="accordion-content-inner">
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_biologics_clinical_IMPD">
+                                                            <span class="project-label">IMPD</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_biologics_clinical_IND">
+                                                            <span class="project-label">IND</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_biologics_clinical_China">
+                                                            <span class="project-label">China</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_biologics_clinical_Japan">
+                                                            <span class="project-label">Japan</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Commercial -->
+                                            <div class="accordion-item">
+                                                <div class="accordion-header" role="button" tabindex="0">
+                                                    <span class="accordion-title">
+                                                        <input type="checkbox" class="category-checkbox">
+                                                        <span>Commercial</span>
+                                                    </span>
+                                                    <span class="accordion-icon">▶</span>
+                                                </div>
+                                                <div class="accordion-content">
+                                                    <div class="accordion-content-inner">
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_biologics_commercial_MAA">
+                                                            <span class="project-label">MAA</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_biologics_commercial_BLA">
+                                                            <span class="project-label">BLA</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_biologics_commercial_CoreDossier">
+                                                            <span class="project-label">Core Dossier</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_biologics_commercial_RoW">
+                                                            <span class="project-label">RoW</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
 
+                                <!-- Small Molecules -->
                                 <div class="accordion-item">
-                                    <button class="accordion-header" type="button">
-                                        <span class="accordion-title">U3-1402</span>
+                                    <div class="accordion-header" role="button" tabindex="0">
+                                        <span class="accordion-title">
+                                            <input type="checkbox" class="category-checkbox">
+                                            <span>Small Molecules</span>
+                                        </span>
                                         <span class="accordion-icon">▶</span>
-                                    </button>
+                                    </div>
                                     <div class="accordion-content">
-                                        <div class="accordion-content-inner">
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="U3-1402_IMPD" id="dossier-u31402-impd">
-                                                <span class="project-label">IMPD</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="U3-1402_MAA" id="dossier-u31402-maa">
-                                                <span class="project-label">MAA</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="U3-1402_BLA" id="dossier-u31402-bla">
-                                                <span class="project-label">BLA</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="U3-1402_CORE" id="dossier-u31402-core">
-                                                <span class="project-label">Core</span>
-                                            </label>
+                                        <div class="accordion accordion-level-3">
+
+                                            <!-- Clinical -->
+                                            <div class="accordion-item">
+                                                <div class="accordion-header" role="button" tabindex="0">
+                                                    <span class="accordion-title">
+                                                        <input type="checkbox" class="category-checkbox">
+                                                        <span>Clinical</span>
+                                                    </span>
+                                                    <span class="accordion-icon">▶</span>
+                                                </div>
+                                                <div class="accordion-content">
+                                                    <div class="accordion-content-inner">
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_smallmol_clinical_IMPD">
+                                                            <span class="project-label">IMPD</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_smallmol_clinical_IND">
+                                                            <span class="project-label">IND</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_smallmol_clinical_China">
+                                                            <span class="project-label">China</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_smallmol_clinical_Japan">
+                                                            <span class="project-label">Japan</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Commercial -->
+                                            <div class="accordion-item">
+                                                <div class="accordion-header" role="button" tabindex="0">
+                                                    <span class="accordion-title">
+                                                        <input type="checkbox" class="category-checkbox">
+                                                        <span>Commercial</span>
+                                                    </span>
+                                                    <span class="accordion-icon">▶</span>
+                                                </div>
+                                                <div class="accordion-content">
+                                                    <div class="accordion-content-inner">
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_smallmol_commercial_MAA">
+                                                            <span class="project-label">MAA</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_smallmol_commercial_BLA">
+                                                            <span class="project-label">BLA</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_smallmol_commercial_CoreDossier">
+                                                            <span class="project-label">Core Dossier</span>
+                                                        </label>
+                                                        <label class="project-item">
+                                                            <input type="checkbox" class="project-checkbox leaf-checkbox" value="dossiers_smallmol_commercial_RoW">
+                                                            <span class="project-label">RoW</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="accordion-item">
-                                    <button class="accordion-header" type="button">
-                                        <span class="accordion-title">DS-8201</span>
-                                        <span class="accordion-icon">▶</span>
-                                    </button>
-                                    <div class="accordion-content">
-                                        <div class="accordion-content-inner">
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-8201_IMPD" id="dossier-ds8201-impd">
-                                                <span class="project-label">IMPD</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-8201_MAA" id="dossier-ds8201-maa">
-                                                <span class="project-label">MAA</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-8201_BLA" id="dossier-ds8201-bla">
-                                                <span class="project-label">BLA</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-8201_CORE" id="dossier-ds8201-core">
-                                                <span class="project-label">Core</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Guidelines -->
+                    <!-- ========== GUIDELINES ========== -->
                     <div class="accordion-item">
-                        <button class="accordion-header" type="button">
-                            <span class="accordion-title">Guidelines</span>
+                        <div class="accordion-header" role="button" tabindex="0">
+                            <span class="accordion-title">
+                                <input type="checkbox" class="category-checkbox">
+                                <span>Guidelines</span>
+                            </span>
                             <span class="accordion-icon">▶</span>
-                        </button>
+                        </div>
                         <div class="accordion-content">
                             <div class="accordion accordion-level-2">
+
+                                <!-- Biologics -->
                                 <div class="accordion-item">
-                                    <button class="accordion-header" type="button">
-                                        <span class="accordion-title">DS-1062</span>
+                                    <div class="accordion-header" role="button" tabindex="0">
+                                        <span class="accordion-title">
+                                            <input type="checkbox" class="category-checkbox">
+                                            <span>Biologics</span>
+                                        </span>
                                         <span class="accordion-icon">▶</span>
-                                    </button>
+                                    </div>
                                     <div class="accordion-content">
                                         <div class="accordion-content-inner">
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-1062_EMA_EU" id="guide-ds1062-ema-eu">
-                                                <span class="project-label">EMA / EU</span>
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_biologics_EMA">
+                                                <span class="project-label">EMA</span>
                                             </label>
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-1062_FDA_US" id="guide-ds1062-fda-us">
-                                                <span class="project-label">FDA / US</span>
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_biologics_FDA">
+                                                <span class="project-label">FDA</span>
                                             </label>
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-1062_JP" id="guide-ds1062-jp">
-                                                <span class="project-label">JP</span>
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_biologics_ICH">
+                                                <span class="project-label">ICH</span>
                                             </label>
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-1062_CN" id="guide-ds1062-cn">
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_biologics_Japan">
+                                                <span class="project-label">Japan</span>
+                                            </label>
+                                            <label class="project-item">
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_biologics_CN">
                                                 <span class="project-label">CN</span>
                                             </label>
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-1062_ROW" id="guide-ds1062-row">
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_biologics_RoW">
                                                 <span class="project-label">RoW</span>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
 
+                                <!-- Small Molecules -->
                                 <div class="accordion-item">
-                                    <button class="accordion-header" type="button">
-                                        <span class="accordion-title">U3-1402</span>
+                                    <div class="accordion-header" role="button" tabindex="0">
+                                        <span class="accordion-title">
+                                            <input type="checkbox" class="category-checkbox">
+                                            <span>Small Molecules</span>
+                                        </span>
                                         <span class="accordion-icon">▶</span>
-                                    </button>
+                                    </div>
                                     <div class="accordion-content">
                                         <div class="accordion-content-inner">
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="U3-1402_EMA_EU" id="guide-u31402-ema-eu">
-                                                <span class="project-label">EMA / EU</span>
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_smallmol_EMA">
+                                                <span class="project-label">EMA</span>
                                             </label>
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="U3-1402_FDA_US" id="guide-u31402-fda-us">
-                                                <span class="project-label">FDA / US</span>
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_smallmol_FDA">
+                                                <span class="project-label">FDA</span>
                                             </label>
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="U3-1402_JP" id="guide-u31402-jp">
-                                                <span class="project-label">JP</span>
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_smallmol_ICH">
+                                                <span class="project-label">ICH</span>
                                             </label>
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="U3-1402_CN" id="guide-u31402-cn">
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_smallmol_Japan">
+                                                <span class="project-label">Japan</span>
+                                            </label>
+                                            <label class="project-item">
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_smallmol_CN">
                                                 <span class="project-label">CN</span>
                                             </label>
                                             <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="U3-1402_ROW" id="guide-u31402-row">
+                                                <input type="checkbox" class="project-checkbox leaf-checkbox" value="guidelines_smallmol_RoW">
                                                 <span class="project-label">RoW</span>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="accordion-item">
-                                    <button class="accordion-header" type="button">
-                                        <span class="accordion-title">DS-8201</span>
-                                        <span class="accordion-icon">▶</span>
-                                    </button>
-                                    <div class="accordion-content">
-                                        <div class="accordion-content-inner">
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-8201_EMA_EU" id="guide-ds8201-ema-eu">
-                                                <span class="project-label">EMA / EU</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-8201_FDA_US" id="guide-ds8201-fda-us">
-                                                <span class="project-label">FDA / US</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-8201_JP" id="guide-ds8201-jp">
-                                                <span class="project-label">JP</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-8201_CN" id="guide-ds8201-cn">
-                                                <span class="project-label">CN</span>
-                                            </label>
-                                            <label class="project-item">
-                                                <input type="checkbox" class="project-checkbox" value="DS-8201_ROW" id="guide-ds8201-row">
-                                                <span class="project-label">RoW</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Internal Guidance -->
+                    <!-- ========== INTERNAL GUIDANCE ========== -->
                     <div class="accordion-item">
-                        <button class="accordion-header" type="button">
-                            <span class="accordion-title">Internal Guidance</span>
+                        <div class="accordion-header" role="button" tabindex="0">
+                            <span class="accordion-title">
+                                <input type="checkbox" class="category-checkbox">
+                                <span>Internal Guidance</span>
+                            </span>
                             <span class="accordion-icon">▶</span>
-                        </button>
+                        </div>
                         <div class="accordion-content">
                             <div class="accordion-content-inner">
                                 <label class="project-item">
-                                    <input type="checkbox" class="project-checkbox" value="internal-guidance" id="guide-internal">
-                                    <span class="project-label">Internal Documents</span>
+                                    <input type="checkbox" class="project-checkbox leaf-checkbox" value="internal_WorkingGuidance">
+                                    <span class="project-label">Working Guidance</span>
+                                </label>
+                                <label class="project-item">
+                                    <input type="checkbox" class="project-checkbox leaf-checkbox" value="internal_WTOutcomes">
+                                    <span class="project-label">WT outcomes / lessons learned</span>
+                                </label>
+                                <label class="project-item">
+                                    <input type="checkbox" class="project-checkbox leaf-checkbox" value="internal_SOPs">
+                                    <span class="project-label">SOPs</span>
+                                </label>
+                                <label class="project-item">
+                                    <input type="checkbox" class="project-checkbox leaf-checkbox" value="internal_QuickGuides">
+                                    <span class="project-label">Quick guides</span>
                                 </label>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -1161,8 +1307,7 @@
     </div>
 
     <script>
-        // Elements
-        const projectCheckboxes = document.querySelectorAll('.project-checkbox');
+        // ============ ELEMENTS ============
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const uploadBtn = document.getElementById('uploadBtn');
@@ -1174,235 +1319,336 @@
         const cancelBtn = document.getElementById('cancelBtn');
         const exportOptions = document.querySelectorAll('.export-option');
         const confirmExportBtn = document.getElementById('confirmExportBtn');
-        const accordionHeaders = document.querySelectorAll('.accordion-header');
-        const accordionItems = document.querySelectorAll('.accordion-item');
         const selectedFiltersContainer = document.getElementById('selectedFilters');
         const selectedFiltersList = document.getElementById('selectedFiltersList');
-        
+
         const uploadedFiles = [];
         let selectedExportFormat = 'pdf';
 
-        // ============ ACCORDION FUNCTIONALITY (MULTI-LEVEL) ============
-        // Robust nested accordion: animate open/close, then set height:auto so
-        // children can expand freely without being clipped by a fixed parent height.
+        // ============ ACCORDION — ANIMATE OPEN / CLOSE ============
 
         function collapseSection(element) {
-            // Get current natural height
             const sectionHeight = element.scrollHeight;
-            // Temporarily disable transition to set current height as explicit value
             const transition = element.style.transition;
             element.style.transition = '';
-
             requestAnimationFrame(() => {
                 element.style.height = sectionHeight + 'px';
                 element.style.transition = transition;
-
-                requestAnimationFrame(() => {
-                    element.style.height = '0px';
-                });
+                requestAnimationFrame(() => { element.style.height = '0px'; });
             });
         }
 
         function expandSection(element) {
             const sectionHeight = element.scrollHeight;
             element.style.height = sectionHeight + 'px';
-
             const onEnd = function handler() {
                 element.removeEventListener('transitionend', handler);
-                // Set to auto so nested children can freely expand
                 element.style.height = 'auto';
             };
             element.addEventListener('transitionend', onEnd);
         }
 
-        accordionHeaders.forEach(header => {
-            header.addEventListener('click', () => {
-                const item = header.parentElement;
+        function openAccordionItem(item) {
+            if (!item.classList.contains('open')) {
                 const content = item.querySelector(':scope > .accordion-content');
-                if (!content) return;
+                if (content) { expandSection(content); item.classList.add('open'); }
+            }
+        }
 
-                const isOpen = item.classList.contains('open');
-
-                if (isOpen) {
-                    collapseSection(content);
-                    item.classList.remove('open');
-                } else {
-                    expandSection(content);
-                    item.classList.add('open');
-                }
-            });
-        });
-
-        // Ensure items marked as open in HTML are expanded on load
-        // (set their height to auto immediately, no animation needed)
-        accordionItems.forEach(item => {
+        function closeAccordionItem(item) {
             if (item.classList.contains('open')) {
                 const content = item.querySelector(':scope > .accordion-content');
-                if (content) {
-                    content.style.height = 'auto';
-                }
+                if (content) { collapseSection(content); item.classList.remove('open'); }
             }
+        }
+
+        function toggleAccordionItem(item) {
+            item.classList.contains('open') ? closeAccordionItem(item) : openAccordionItem(item);
+        }
+
+        // Ensure items marked open in HTML have their content visible
+        document.querySelectorAll('.accordion-item.open').forEach(item => {
+            const content = item.querySelector(':scope > .accordion-content');
+            if (content) content.style.height = 'auto';
         });
 
-        // ============ FILE UPLOAD FUNCTIONALITY ============
-        uploadBtn.addEventListener('click', () => fileInput.click());
-
-        fileInput.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
-                if (!uploadedFiles.find(f => f.name === file.name)) {
-                    uploadedFiles.push(file);
-                }
+        // ============ ACCORDION HEADER CLICK → only toggle open/close ============
+        // Checkbox selection is handled separately by the checkbox click handlers below.
+        // This separation ensures the user can navigate the tree without accidental selections.
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', (e) => {
+                // If click was on the checkbox, let the checkbox handler deal with it
+                if (e.target.matches('input[type="checkbox"]')) return;
+                toggleAccordionItem(header.parentElement);
             });
-            updateFilePreview();
         });
 
-        function updateFilePreview() {
-            filePreviewArea.innerHTML = uploadedFiles.map((file, index) => `
-                <div class="file-badge">
-                    📄 ${file.name}
-                    <button type="button" onclick="removeFile(${index})">✕</button>
-                </div>
-            `).join('');
+        // ============ CASCADING CHECKBOX SELECTION ============
+
+        // Mark all descendant accordion-items & project-items as inherited
+        function markDescendantsInherited(item) {
+            const content = item.querySelector(':scope > .accordion-content');
+            if (!content) return;
+            content.querySelectorAll('.accordion-item').forEach(i => i.classList.add('inherited'));
+            content.querySelectorAll('.project-item').forEach(i => i.classList.add('inherited'));
         }
 
-        window.removeFile = (index) => {
-            uploadedFiles.splice(index, 1);
-            updateFilePreview();
-        };
-
-        // ============ CHAT FUNCTIONALITY ============
-        function updateSendButtonState() {
-            const hasSelection = Array.from(projectCheckboxes).some(cb => cb.checked);
-            const hasInput = messageInput.value.trim().length > 0;
-            sendBtn.disabled = !(hasSelection && hasInput);
+        // Remove inherited from all descendants
+        function removeInheritedFromDescendants(item) {
+            const content = item.querySelector(':scope > .accordion-content');
+            if (!content) return;
+            content.querySelectorAll('.accordion-item.inherited').forEach(i => i.classList.remove('inherited'));
+            content.querySelectorAll('.project-item.inherited').forEach(i => i.classList.remove('inherited'));
         }
 
-        // Build hierarchical label for selected filters (e.g. "Dossiers / DS-1062 / IMPD")
-        function getFilterDisplayText(cb) {
-            const labelEl = cb.parentElement.querySelector('.project-label');
-            const ownLabel = labelEl ? labelEl.textContent.trim() : cb.value;
-
-            const hierarchy = [];
-            let node = cb.parentElement;
-
-            while (node) {
-                if (node.classList && node.classList.contains('accordion-item')) {
-                    const headerTitleEl = node.querySelector(':scope > .accordion-header .accordion-title');
-                    if (headerTitleEl) {
-                        const text = headerTitleEl.textContent.trim();
-                        if (text && !hierarchy.includes(text)) {
-                            hierarchy.unshift(text);
-                        }
-                    }
+        // Update ancestor category-checkboxes (checked / indeterminate / unchecked)
+        function updateAncestors(startElement) {
+            let parentItem = startElement.closest('.accordion-item');
+            while (parentItem) {
+                const parentContent = parentItem.querySelector(':scope > .accordion-content');
+                if (!parentContent) break;
+                const allChild = parentContent.querySelectorAll('.category-checkbox, .leaf-checkbox');
+                const checkedCount = Array.from(allChild).filter(c => c.checked).length;
+                const parentCb = parentItem.querySelector(':scope > .accordion-header .category-checkbox');
+                if (parentCb) {
+                    if (checkedCount === 0) { parentCb.checked = false; parentCb.indeterminate = false; }
+                    else if (checkedCount === allChild.length) { parentCb.checked = true; parentCb.indeterminate = false; }
+                    else { parentCb.checked = false; parentCb.indeterminate = true; }
                 }
-                node = node.parentElement;
+                parentItem = parentItem.parentElement ? parentItem.parentElement.closest('.accordion-item') : null;
             }
-
-            // Avoid duplicating label if header and checkbox text are the same
-            if (hierarchy.length && hierarchy[hierarchy.length - 1] === ownLabel) {
-                hierarchy.pop();
-            }
-
-            const prefix = hierarchy.join(' / ');
-            return prefix ? `${prefix} / ${ownLabel}` : ownLabel;
         }
 
-        // Summary of selected filters
-        function updateSelectedFiltersView() {
-            const selected = Array.from(projectCheckboxes).filter(cb => cb.checked);
+        // --- Category checkbox (non-leaf) ---
+        document.querySelectorAll('.category-checkbox').forEach(cb => {
+            cb.addEventListener('click', (e) => {
+                e.stopPropagation();        // don't trigger header toggle
+                const item = cb.closest('.accordion-item');
 
-            if (selected.length === 0) {
-                selectedFiltersContainer.style.display = 'none';
-                selectedFiltersList.innerHTML = '';
-                return;
+                // If this item is currently inherited → refine instead of toggle
+                if (item.classList.contains('inherited')) {
+                    e.preventDefault();     // keep the checkbox checked
+                    refineCategory(item);
+                    return;
+                }
+
+                // Normal cascade
+                handleCategoryToggle(cb);
+            });
+        });
+
+        function handleCategoryToggle(checkbox) {
+            const item = checkbox.closest('.accordion-item');
+            const content = item.querySelector(':scope > .accordion-content');
+            if (checkbox.checked) {
+                // Check all descendants & mark inherited
+                if (content) {
+                    content.querySelectorAll('.category-checkbox, .leaf-checkbox').forEach(c => c.checked = true);
+                    markDescendantsInherited(item);
+                }
+                openAccordionItem(item);
+            } else {
+                // Uncheck all descendants
+                if (content) {
+                    content.querySelectorAll('.category-checkbox, .leaf-checkbox').forEach(c => c.checked = false);
+                    removeInheritedFromDescendants(item);
+                }
+                closeAccordionItem(item);
             }
-
-            selectedFiltersContainer.style.display = 'flex';
-
-            selectedFiltersList.innerHTML = selected.map(cb => {
-                const labelText = getFilterDisplayText(cb);
-                return `<button type="button" class="selected-filter-pill" data-target-id="${cb.id}">${labelText}<span aria-hidden="true">✕</span></button>`;
-            }).join('');
+            updateAncestors(checkbox);
+            updateSendButtonState();
+            updateSelectedFiltersView();
         }
 
-        projectCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
+        // Refine: user clicked an inherited category → make it explicit, uncheck other inherited siblings
+        function refineCategory(item) {
+            item.classList.remove('inherited');
+
+            // Keep this item's children inherited (they are still auto-selected) so they stay gray
+            // (they already have inherited from the parent cascade — no action needed)
+
+            const parent = item.parentElement; // .accordion container
+            if (parent) {
+                // Uncheck sibling inherited items (the ones the user did NOT click)
+                parent.querySelectorAll(':scope > .accordion-item.inherited').forEach(sib => {
+                    sib.classList.remove('inherited');
+                    const sibCb = sib.querySelector(':scope > .accordion-header .category-checkbox');
+                    if (sibCb) { sibCb.checked = false; sibCb.indeterminate = false; }
+                    const sibContent = sib.querySelector(':scope > .accordion-content');
+                    if (sibContent) {
+                        sibContent.querySelectorAll('.category-checkbox, .leaf-checkbox').forEach(c => { c.checked = false; c.indeterminate = false; });
+                        sibContent.querySelectorAll('.accordion-item.inherited').forEach(i => i.classList.remove('inherited'));
+                        sibContent.querySelectorAll('.project-item.inherited').forEach(i => i.classList.remove('inherited'));
+                    }
+                    closeAccordionItem(sib);
+                });
+            }
+            openAccordionItem(item);
+            // Recalculate ancestor indeterminate/checked states
+            const cb = item.querySelector(':scope > .accordion-header .category-checkbox');
+            if (cb) updateAncestors(cb);
+            updateSendButtonState();
+            updateSelectedFiltersView();
+        }
+
+        // --- Leaf checkbox ---
+        document.querySelectorAll('.leaf-checkbox').forEach(cb => {
+            cb.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const projectItem = cb.closest('.project-item');
+
+                // If inherited → refine (keep this one, uncheck inherited siblings)
+                if (projectItem && projectItem.classList.contains('inherited')) {
+                    e.preventDefault();     // keep checked
+                    refineLeaf(projectItem);
+                    return;
+                }
+
+                // Normal toggle — update ancestors and UI
+                updateAncestors(cb);
                 updateSendButtonState();
                 updateSelectedFiltersView();
             });
         });
 
-        messageInput.addEventListener('input', updateSendButtonState);
+        function refineLeaf(projectItem) {
+            projectItem.classList.remove('inherited');
+            const parent = projectItem.parentElement; // .accordion-content-inner
+            if (parent) {
+                parent.querySelectorAll(':scope > .project-item.inherited').forEach(sib => {
+                    sib.classList.remove('inherited');
+                    const sibCb = sib.querySelector('.leaf-checkbox');
+                    if (sibCb) sibCb.checked = false;
+                });
+            }
+            const cb = projectItem.querySelector('.leaf-checkbox');
+            if (cb) updateAncestors(cb);
+            updateSendButtonState();
+            updateSelectedFiltersView();
+        }
 
+        // ============ FILE UPLOAD ============
+        uploadBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            Array.from(e.target.files).forEach(file => {
+                if (!uploadedFiles.find(f => f.name === file.name)) uploadedFiles.push(file);
+            });
+            updateFilePreview();
+        });
+
+        function updateFilePreview() {
+            filePreviewArea.innerHTML = uploadedFiles.map((file, i) =>
+                `<div class="file-badge">📄 ${file.name}<button type="button" onclick="removeFile(${i})">✕</button></div>`
+            ).join('');
+        }
+
+        window.removeFile = (index) => { uploadedFiles.splice(index, 1); updateFilePreview(); };
+
+        // ============ SEND BUTTON STATE ============
+        function updateSendButtonState() {
+            const hasSelection = document.querySelector('.leaf-checkbox:checked') !== null;
+            const hasInput = messageInput.value.trim().length > 0;
+            sendBtn.disabled = !(hasSelection && hasInput);
+        }
+
+        messageInput.addEventListener('input', updateSendButtonState);
         updateSendButtonState();
+
+        // ============ SELECTED FILTERS VIEW (pills) ============
+        function getFilterDisplayText(cb) {
+            const labelEl = cb.parentElement.querySelector('.project-label');
+            const ownLabel = labelEl ? labelEl.textContent.trim() : cb.value;
+            const hierarchy = [];
+            let node = cb.parentElement;
+            while (node) {
+                if (node.classList && node.classList.contains('accordion-item')) {
+                    const titleSpan = node.querySelector(':scope > .accordion-header .accordion-title > span:last-child');
+                    if (titleSpan) {
+                        const text = titleSpan.textContent.trim();
+                        if (text && !hierarchy.includes(text)) hierarchy.unshift(text);
+                    }
+                }
+                node = node.parentElement;
+            }
+            if (hierarchy.length && hierarchy[hierarchy.length - 1] === ownLabel) hierarchy.pop();
+            const prefix = hierarchy.join(' / ');
+            return prefix ? `${prefix} / ${ownLabel}` : ownLabel;
+        }
+
+        function updateSelectedFiltersView() {
+            const selected = document.querySelectorAll('.leaf-checkbox:checked');
+            if (selected.length === 0) {
+                selectedFiltersContainer.style.display = 'none';
+                selectedFiltersList.innerHTML = '';
+                return;
+            }
+            selectedFiltersContainer.style.display = 'flex';
+            selectedFiltersList.innerHTML = Array.from(selected).map(cb => {
+                const label = getFilterDisplayText(cb);
+                return `<button type="button" class="selected-filter-pill" data-value="${cb.value}">${label}<span aria-hidden="true"> ✕</span></button>`;
+            }).join('');
+        }
+
         updateSelectedFiltersView();
 
-        // Clicking on a selected filter pill will uncheck the corresponding checkbox
+        // Clicking a pill unchecks the corresponding leaf
         selectedFiltersList.addEventListener('click', (e) => {
             const pill = e.target.closest('.selected-filter-pill');
             if (!pill) return;
-            const targetId = pill.getAttribute('data-target-id');
-            const targetCheckbox = document.getElementById(targetId);
-            if (targetCheckbox) {
-                targetCheckbox.checked = false;
-                targetCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+            const val = pill.getAttribute('data-value');
+            const target = document.querySelector(`.leaf-checkbox[value="${val}"]`);
+            if (target) {
+                target.checked = false;
+                const pi = target.closest('.project-item');
+                if (pi) pi.classList.remove('inherited');
+                updateAncestors(target);
+                updateSendButtonState();
+                updateSelectedFiltersView();
             }
         });
 
+        // ============ CHAT ============
         sendBtn.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey && !sendBtn.disabled) {
-                e.preventDefault();
-                sendMessage();
-            }
+            if (e.key === 'Enter' && !e.shiftKey && !sendBtn.disabled) { e.preventDefault(); sendMessage(); }
         });
 
         function sendMessage() {
             const text = messageInput.value.trim();
             if (!text) return;
 
-            const selectedFilters = Array.from(projectCheckboxes)
-                .filter(cb => cb.checked)
-                .map(cb => cb.value);
-
+            const selectedFilters = Array.from(document.querySelectorAll('.leaf-checkbox:checked')).map(cb => cb.value);
             if (selectedFilters.length === 0) return;
 
             // Clear placeholder
-            if (messagesContainer.querySelector('.placeholder-message')) {
-                messagesContainer.innerHTML = '';
-            }
+            if (messagesContainer.querySelector('.placeholder-message')) messagesContainer.innerHTML = '';
 
-            // Add user message
+            // User message
             const userMsg = document.createElement('div');
             userMsg.className = 'message user';
-            userMsg.innerHTML = `
-                <div class="message-avatar">TS</div>
-                <div class="message-content">${escapeHtml(text)}</div>
-            `;
+            userMsg.innerHTML = `<div class="message-avatar">TS</div><div class="message-content">${escapeHtml(text)}</div>`;
             messagesContainer.appendChild(userMsg);
 
-            // Clear input
             messageInput.value = '';
             uploadedFiles.length = 0;
             updateFilePreview();
             updateSendButtonState();
 
-            // Simulate typing indicator
+            // Typing indicator
             const typingMsg = document.createElement('div');
             typingMsg.className = 'message assistant';
             typingMsg.innerHTML = `
                 <div class="message-avatar">AI</div>
-                <div class="message-content" style="display: flex; gap: 4px;">
-                    <span style="animation: blink 1.4s infinite;">●</span>
-                    <span style="animation: blink 1.4s infinite; animation-delay: 0.2s;">●</span>
-                    <span style="animation: blink 1.4s infinite; animation-delay: 0.4s;">●</span>
-                </div>
-            `;
+                <div class="message-content" style="display:flex;gap:4px;">
+                    <span style="animation:blink 1.4s infinite;">●</span>
+                    <span style="animation:blink 1.4s infinite;animation-delay:.2s;">●</span>
+                    <span style="animation:blink 1.4s infinite;animation-delay:.4s;">●</span>
+                </div>`;
             messagesContainer.appendChild(typingMsg);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            // Simulate assistant response
+            // Simulated response
             setTimeout(() => {
                 typingMsg.remove();
                 const assistantMsg = document.createElement('div');
@@ -1413,18 +1659,17 @@
                         Based on selected sources (${selectedFilters.join(', ')}), here are the findings:
                         <br><br>
                         <strong>1. Process Validation Protocol</strong><br>
-                        This must include a detailed description of the manufacturing process, critical process parameters, and acceptance criteria. 
+                        This must include a detailed description of the manufacturing process, critical process parameters, and acceptance criteria.
                         <a href="#" class="citation" title="Click to view document">
                             <div class="citation-details">
                                 <span class="citation-doc">IMPD_Guidelines_v2.3.pdf</span>
                                 <span class="citation-meta">Page 47 | Uploaded: 2024-01-15</span>
                             </div>
                         </a>
-
                         <br><br>
                         <strong>2. Manufacturing Batch Records</strong><br>
                         Complete batch manufacturing records for at least three consecutive batches must be provided to demonstrate process consistency and control.
-                       <a href="#" class="citation" title="Click to view document">
+                        <a href="#" class="citation" title="Click to view document">
                             <div class="citation-details">
                                 <span class="citation-doc">Manufacturing_SOP_2024.docx</span>
                                 <span class="citation-meta">Page 12 | Uploaded: 2023-11-20</span>
@@ -1441,8 +1686,7 @@
                         </a>
                         <br><br>
                         All documentation must follow the format specified in Annex 15 of the EU GMP guidelines.
-                    </div>
-                `;
+                    </div>`;
                 messagesContainer.appendChild(assistantMsg);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }, 1500);
@@ -1450,63 +1694,33 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // ============ EXPORT MODAL FUNCTIONALITY ============
-        exportBtn.addEventListener('click', openExportModal);
+        // ============ EXPORT MODAL ============
+        exportBtn.addEventListener('click', () => modalOverlay.classList.add('active'));
+        cancelBtn.addEventListener('click', () => modalOverlay.classList.remove('active'));
 
-        function openExportModal() {
-            modalOverlay.classList.add('active');
-        }
-
-        function closeExportModal() {
-            modalOverlay.classList.remove('active');
-        }
-
-        cancelBtn.addEventListener('click', closeExportModal);
-
-        // Export option selection
         exportOptions.forEach(option => {
             option.addEventListener('click', () => {
-                exportOptions.forEach(opt => opt.classList.remove('selected'));
+                exportOptions.forEach(o => o.classList.remove('selected'));
                 option.classList.add('selected');
                 selectedExportFormat = option.dataset.format;
             });
         });
 
-        // Export confirmation
         confirmExportBtn.addEventListener('click', () => {
-            ///alert(`Export iniciado!\n\nFormato: ${selectedExportFormat.toUpperCase()}\n\nArchivo guardado en: C:\\Downloads\\RA_CMC_GPT_Export_${new Date().toISOString().slice(0,10)}.${selectedExportFormat === 'docx' ? 'docx' : selectedExportFormat === 'markdown' ? 'md' : 'pdf'}`);
-             alert(`Export iniciado!\n\nFormato: TXT\n\nArchivo guardado en: C:\\Downloads\\RA_CMC_GPT_Export_${new Date().toISOString().slice(0,10)}.${selectedExportFormat === 'docx' ? 'docx' : selectedExportFormat === 'markdown' ? 'md' : 'txt'}`);
-            closeExportModal();
+            alert(`Export iniciado!\n\nFormato: TXT\n\nArchivo guardado en: C:\\Downloads\\RA_CMC_GPT_Export_${new Date().toISOString().slice(0,10)}.txt`);
+            modalOverlay.classList.remove('active');
         });
 
-        // Close modal on overlay click
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
-                closeExportModal();
-            }
-        });
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove('active'); });
 
-        // Utility function to escape HTML
+        // ============ UTILITIES ============
         function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
+            const map = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};
             return text.replace(/[&<>"']/g, m => map[m]);
         }
 
-        // Add CSS for blinking animation
         const style = document.createElement('style');
-        style.textContent = `
-            @keyframes blink {
-                0%, 20%, 50%, 80%, 100% { opacity: 1; }
-                40% { opacity: 0.2; }
-                60% { opacity: 0.5; }
-            }
-        `;
+        style.textContent = `@keyframes blink{0%,20%,50%,80%,100%{opacity:1}40%{opacity:.2}60%{opacity:.5}}`;
         document.head.appendChild(style);
     </script>
 </body>
